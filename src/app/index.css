@@ -4,4 +4,28 @@
   width: 100vw;
   height: 100vh;
   background-color: black;
+  /* overflow: hidden; */
+}
+
+
+@font-face {
+  font-family: 'Salma Pro';
+  src: url('../assets/fonts/SalmaPro-MediumN.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Arimo';
+  src: url('../assets/fonts/arimo.regular.ttf') format('truetype');
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: 'Arimo';
+  src: url('../assets/fonts/arimo.bold.ttf') format('truetype');
+  font-weight: 700;
+}
+
+* {
+  font-family: 'Arimo', sans-serif;
+  letter-spacing: 0.01em;
 }

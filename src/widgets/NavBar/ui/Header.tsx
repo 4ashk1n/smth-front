@@ -4,7 +4,7 @@ import NavBarButton from "./NavBarButton";
 
 const Header: React.FC = () => {
     return (
-        <Group w={'100%'} className="pt-[10px] md:pt-[20px]" align="center" justify="center">
+        <Group w={'100%'} className="pt-[10px] md:pt-[20px]" align="center" justify="center" mb={40} style={{zIndex: '11111'}}>
             <Group wrap="nowrap" pos='relative' align="start" maw={'1280px'} w='90%' justify="space-between">
                 
                 <Divider 
@@ -25,6 +25,7 @@ const Header: React.FC = () => {
 
 
                 <Image 
+                    style={{zIndex: '1'}}
                     src={'/images/who1.png'} 
                     w='auto' 
                     pos='absolute' 
