@@ -2,10 +2,14 @@ import { BackgroundImage, Group, Stack, Text } from "@mantine/core";
 import type { GetArticleCardDTO } from "smth-shared/src/dto/article.dto";
 import ReadButton from "../../../entities/article/ui/card/ReadButton";
 import Tags from "../../../entities/article/ui/card/Tags";
+import HighlitedBlock from "../../../shared/blocks/HighlitedBlock";
+import type { CategoryColors } from "../../../entities/category/types/CategoryColors";
 
 const ArticleCardLarge = (props: GetArticleCardDTO) => {
     return (
-        <Stack
+        <HighlitedBlock
+            direction={'column'}
+            {...props.mainCategory as CategoryColors}
             p={0}
             style={{
                 backgroundImage: `url("${props.cover}")`,
@@ -42,6 +46,7 @@ const ArticleCardLarge = (props: GetArticleCardDTO) => {
                     accentColor={props.mainCategory.accentColor}
                     darkColor={props.mainCategory.darkColor}
                     lightColor={props.mainCategory.lightColor}
+                    articleId={props.id}
                 />
             </Group>
 
@@ -58,7 +63,7 @@ const ArticleCardLarge = (props: GetArticleCardDTO) => {
                 />
             </Group>
 
-        </Stack>
+        </HighlitedBlock>
     );
 }
 

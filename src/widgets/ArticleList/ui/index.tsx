@@ -3,10 +3,12 @@ import { useEffect, useState } from "react";
 import { getArticles } from "../api/getArticles";
 import ArticleCard from "../../ArticleCard/ui/ArticleCard";
 import Grid_4s1b1c from "./grids/4s1b1c";
+import { BackgroundImage, Stack } from "@mantine/core";
+import type { Category } from "../../../entities/category/types/Category";
 
 const ArticleList = () => {
     const [articles, setArticles] = useState<GetArticleCardDTO[]>([])
-   
+
     useEffect(() => {
         (async () => {
             setArticles(await getArticles())
@@ -14,9 +16,15 @@ const ArticleList = () => {
     }, [])
 
     if (articles.length === 0) return null
-    
+
     return (
-        <Grid_4s1b1c articles={articles} category={articles[0].mainCategory} />
+        <Stack gap={80} style={{overflow: 'visible'}}>
+            <Grid_4s1b1c articles={articles} category={articles[0].mainCategory as Category} />
+            <Grid_4s1b1c flip articles={articles} category={articles[0].mainCategory as Category} />
+            <Grid_4s1b1c articles={articles} category={articles[0].mainCategory as Category} />
+            <Grid_4s1b1c flip articles={articles} category={articles[0].mainCategory as Category} />
+        </Stack>
+
     )
 }
 

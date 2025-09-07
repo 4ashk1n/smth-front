@@ -13,6 +13,7 @@ export type ArticleFull = {
         lightColor: string,
     },
     categories: {
+        id: number,
         emoji: string,
         name: string,
     }[],

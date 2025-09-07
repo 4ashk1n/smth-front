@@ -17,6 +17,7 @@ const HighlitedBlock: React.FC<FlexProps & CategoryColors & { glow?: boolean; fi
       w={rest.w || "auto"}
       h={rest.h || "auto"}
       style={{
+        transition: '400ms cubic-bezier(0.03, 0.98, 0.52, 0.99)',
         position: "relative",
         borderRadius: 10,
         boxShadow: glow ? `0 0 30px ${lightColor}25` : "none",

@@ -6,3 +6,9 @@ export type Paragraph = Block & {
     title: string,
     content: string
 }
+
+export const ParagraphEmpty = {
+    type: 'paragraph',
+    title: '',
+    content: '',
+}

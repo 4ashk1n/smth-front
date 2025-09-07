@@ -7,6 +7,7 @@ const CategoryCard: React.FC<{category: Category}> = ({category}) => {
             style={{
                 background: `linear-gradient(90deg, ${category.accentColor} -100%, ${category.lightColor} 100%)`,
                 borderRadius: '10px',
+                zIndex: '1'
             }}
             p={40}
             justify="center"

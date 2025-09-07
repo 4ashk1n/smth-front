@@ -7,7 +7,11 @@ import ArticlePage from '../pages/Article/ui';
 import { createContext, useContext, useEffect, useRef, useState, type RefObject } from 'react';
 import "animate.css/animate.min.css";
 import { ParallaxProvider, useParallaxController } from 'react-scroll-parallax';
-
+import { BrowserRouter, Route, Routes } from 'react-router';
+import NewArticlePage from '../pages/NewArticle/ui';
+import '../../node_modules/react-grid-layout/css/styles.css';
+import '../../node_modules/react-resizable/css/styles.css';
+import '@mantine/tiptap/styles.css';
 const THEME = createTheme({
 
 })
@@ -29,7 +33,13 @@ function App() {
                         <Header />
                         {/* <LandingPage    /> */}
 
-                        <ArticlePage />
+                        <BrowserRouter>
+                            <Routes>
+                                <Route path='/' element={<LandingPage />} />
+                                <Route path='/article/:id' element={<ArticlePage />} />
+                                <Route path='/article/new' element={<NewArticlePage />} />
+                            </Routes>
+                        </BrowserRouter>
                     </Stack>
                     {/* </ScrollPositionContext.Provider> */}
 

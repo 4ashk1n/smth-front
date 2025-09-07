@@ -4,9 +4,11 @@ import { ARTICLE } from "../api/samples/article"
 import { Center, Stack } from "@mantine/core"
 import ArticleHeader from "../../../widgets/ArticleHeader/ui"
 import ArticleContent from "../../../widgets/ArticleContent/ui"
+import { useParams } from "react-router"
 
 const ArticlePage = () => {
 
+    const { id } = useParams();
     const [article, setArticle] = useState<ArticleFull | null>(null)
 
     useEffect(() => {
@@ -23,8 +25,8 @@ const ArticlePage = () => {
             <Stack maw={'1280px'} w='90%'>
                 <ArticleHeader article={article as ArticleFull} />
                 <ArticleContent article={article as ArticleFull} />
-                <ArticleContent article={article as ArticleFull} />
-                <ArticleContent article={article as ArticleFull} />
+                {/* <ArticleContent article={article as ArticleFull} />
+                <ArticleContent article={article as ArticleFull} /> */}
             </Stack>
         </Stack>
     

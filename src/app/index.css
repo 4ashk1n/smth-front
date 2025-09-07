@@ -26,6 +26,12 @@
 }
 
 * {
-  font-family: 'Arimo', sans-serif;
+  font-family: 'Arimo', sans-serif!important;
   letter-spacing: 0.01em;
 }
+
+/* .react-resizable-handle{
+  z-index: 9999;
+  background-color: red;
+  border-radius: 10px 0 0 0;
+} */

@@ -12,8 +12,10 @@ import type { CategoryColors } from "../../../entities/category/types/CategoryCo
 import ColBlock from "./ColBlock";
 import { useMediaQuery } from "@mantine/hooks";
 import { useIsMobileScreen } from "../../../shared/lib/useIsMobile";
+import EmptyBlock from "./EmptyBlock";
+import GridLayout from "react-grid-layout";
 
-export const ArticleBlock = ({ block, mainCategory }: { block: BlockTypes, mainCategory: CategoryColors }) => {
+export const ArticleBlock = ({ block, mainCategory }: { block: BlockTypes, mainCategory: CategoryColors, editMode?: boolean }) => {
     return (<>
         {
             block.type === 'paragraph' ?
@@ -24,27 +26,39 @@ export const ArticleBlock = ({ block, mainCategory }: { block: BlockTypes, mainC
                         <IconBlock block={block as Icon} mainCategory={mainCategory as Category} /> :
                         block.type === 'col' ?
                             <ColBlock block={block as any} mainCategory={mainCategory as Category} /> :
-                            null
+                            block.type === 'empty' ?
+                                <EmptyBlock block={block as any} /> :
+                                <></>
         }
     </>)
 }
 
-const ArticleContent: React.FC<{ article: ArticleFull }> = ({ article }) => {
+const ArticleContent: React.FC<{ article: ArticleFull, editMode?: boolean }> = ({ article, editMode = false }) => {
     const isMobile = useIsMobileScreen();
+    console.log(article.content.map((block, i) => ({x: block.layout.x, y: block.layout.y, w: block.layout.w, h: block.layout.h, i: i, static: true})))
     return (<>
-        <Grid justify="center" align="center" columns={isMobile ? 1 :12} gutter={80} mt={80}>
+        {/* <Grid justify="center" align="center" columns={isMobile ? 1 :12} gutter={80} mt={80}>
             {article.content.rows.map((row, i) =>
                 row.map((block, j) =>
                     <Grid.Col span={isMobile ? 1 : block.span} key={j}>
-                        {/* <AnimationOnScroll animateIn="animate__fadeIn"  key={j}> */}
-
-                            <ArticleBlock block={block} mainCategory={article.mainCategory} />
-
-                        {/* </AnimationOnScroll> */}
+                            <ArticleBlock block={block} editMode={editMode} mainCategory={article.mainCategory} />
                     </Grid.Col>
                 )
             )}
-        </Grid>
+        </Grid> */}
+
+        <GridLayout
+            className="layout"
+            cols={12}
+            rowHeight={250}
+            width={1200}
+            layout={article.content.map((block, i) => ({x: block.layout.x, y: block.layout.y, w: block.layout.w, h: block.layout.h, i: `${i}`, static: true}))}
+        >
+            {article.content.map((block, i) => 
+            <div key={`${i}`} style={{height: 'fit-content'}}><ArticleBlock block={block} mainCategory={article.mainCategory} editMode={editMode} /></div>
+
+            )}
+        </GridLayout>
     </>)
 };
 

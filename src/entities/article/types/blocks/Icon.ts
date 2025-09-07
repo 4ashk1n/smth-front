@@ -1,6 +1,11 @@
 import type { Block } from "./Block";
 
 export type Icon = Block & {
+    type: 'icon',
     name: string,
-    depth: number
 };
+
+export const IconEmpty = {
+    type: 'icon',
+    name: '',
+}

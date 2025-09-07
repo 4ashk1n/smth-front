@@ -38,7 +38,7 @@ const Header: React.FC = () => {
                         <NavBarButton label={'Категории'} url={'/about'} />
                     </Group>
                     <Group gap='40px'>
-                        <NavBarButton label={'Новая статья'} url={'/new'} />
+                        <NavBarButton label={'Новая статья'} url={'/article/new'} />
                         <NavBarButton label={'Профиль'} url={'/profile'} />
                     </Group>
                 </Group>

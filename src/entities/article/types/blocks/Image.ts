@@ -4,6 +4,14 @@ export type Image = Block & {
     type: 'image',
     url: string,
     source?: string,
-    soutceUrl?: string
+    sourceUrl?: string
     label?: string
+}
+
+export const ImageEmpty = {
+    type: 'image',
+    url: '',
+    source: '',
+    sourceUrl: '',
+    label: ''
 }

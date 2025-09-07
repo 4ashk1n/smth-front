@@ -49,7 +49,7 @@ const ImageBlock: React.FC<{ block: Image, mainCategory: CategoryColors }> = (pr
                             fw={400}
                             c='#ffffff80'
                         >
-                            Источник: <Anchor c='#ffffff80' underline="hover" target="_blank" href={props.block.soutceUrl}>{props.block.source}</Anchor>
+                            Источник: <Anchor c='#ffffff80' underline="hover" target="_blank" href={props.block.sourceUrl}>{props.block.source}</Anchor>
                         </Text>
                         : null
                 }

@@ -4,7 +4,7 @@ import type { IconBaseProps } from 'react-icons';
 
 
 // Маппинг библиотек иконок
-const iconComponents: { [key: string]: () => Promise<any> } = {
+export const iconComponents: { [key: string]: () => Promise<any> } = {
   Ai: () => import('react-icons/ai'),
   Bs: () => import('react-icons/bs'),
   Bi: () => import('react-icons/bi'),
@@ -71,6 +71,7 @@ interface ReactIconProps extends IconBaseProps {
   fallback?: React.ReactNode;
   loadingFallback?: React.ReactNode;
 }
+
 
 // Компонент для отображения ошибок
 const ErrorFallback: React.FC<{ iconName: string }> = ({ iconName }) => (

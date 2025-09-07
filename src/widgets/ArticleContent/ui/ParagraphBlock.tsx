@@ -6,16 +6,6 @@ import Object3dBlock from "../../../shared/blocks/Object3dBlock"
 import type { CategoryColors } from "../../../entities/category/types/CategoryColors"
 import Markdown from "react-markdown"
 
-const a = {
-    depth: 3,
-    translateX: 0,
-    translateY: 0,
-    translateZ: 0,
-    rotateX: 5,
-    rotateY: -10,
-    rotateZ: 0,
-    scale: 1
-}
 
 const ParagraphBlock: React.FC<{ block: Paragraph, mainCategory: CategoryColors }> = (props) => {
     const Paragraph2d = () => (<>
