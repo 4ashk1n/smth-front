@@ -18,7 +18,8 @@ const IconBlock: React.FC<{ block: Icon, mainCategory: CategoryColors }> = (prop
             // border: '1px solid white'
             // background: 'rgba(255, 255, 255, 0.1)'
             stroke: "url(#accent-gradient)",
-            fill: "url(#accent-gradient)"
+            fill: "url(#accent-gradient)",
+            overflow: 'visible'
         }} size={'100%'} name={props.block.name as IconName} />
     </>)
 

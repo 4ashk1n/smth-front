@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, type ComponentType } from 'react';
+import React, { Suspense, lazy, useEffect, useMemo, type ComponentType } from 'react';
 import type { IconBaseProps } from 'react-icons';
 
 
@@ -36,7 +36,7 @@ export const iconComponents: { [key: string]: () => Promise<any> } = {
 };
 
 // Тип для имен иконок (можно расширить по необходимости)
-export type IconName = 
+export type IconName =
   | `Ai${string}`
   | `Bs${string}`
   | `Bi${string}`
@@ -75,7 +75,7 @@ interface ReactIconProps extends IconBaseProps {
 
 // Компонент для отображения ошибок
 const ErrorFallback: React.FC<{ iconName: string }> = ({ iconName }) => (
-  <div style={{ 
+  <div style={{
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -89,42 +89,56 @@ const ErrorFallback: React.FC<{ iconName: string }> = ({ iconName }) => (
   </div>
 );
 
-const ReactIcon: React.FC<ReactIconProps> = ({ 
-  name, 
+const ReactIcon: React.FC<ReactIconProps> = ({
+  name,
   fallback = <ErrorFallback iconName={name} />,
   loadingFallback = null,
-  ...props 
+  ...props
 }) => {
-  const libraryPrefix = name.substring(0, 2) as keyof typeof iconComponents;
-  const importFunction = iconComponents[libraryPrefix];
 
-  if (!importFunction) {
-    console.warn(`Библиотека для префикса "${libraryPrefix}" не найдена`);
-    return <>{fallback}</>;
-  }
+  const [LazyIconComponent, setLazyIconComponent] = React.useState<ComponentType<IconBaseProps> | null>(null);
 
-  let LazyIconComponent: ComponentType<IconBaseProps> | null = null;
+  useMemo(() => {
+    const libraryPrefix = name.substring(0, 2) as keyof typeof iconComponents;
+    console.log(name.substring(0, 2), libraryPrefix)
+    const importFunction = iconComponents[libraryPrefix];
 
-  try {
-    LazyIconComponent = lazy(async () => {
-      const module = await importFunction();
-      const icon = module[name];
-      
-      if (!icon) {
-        console.warn(`Ошибка загрузки иконки "${name}":`, 'Иконка не найдена');
-        return { default: () => <ErrorFallback iconName={name} /> };
-      }
-      
-      return { default: icon };
-    });
-  } catch (error) {
-    console.warn(`Ошибка загрузки иконки "${name}":`, error);
-    return <>{fallback}</>;
-  }
+    if (!importFunction) {
+      console.warn(`Библиотека для префикса "${libraryPrefix}" не найдена`);
+      return;
+    }
+
+
+    try {
+      setLazyIconComponent(lazy(async () => {
+        const module = await importFunction();
+        const icon = module[name];
+
+        if (!icon) {
+          console.warn(`Ошибка загрузки иконки "${name}":`, 'Иконка не найдена');
+          return { default: () => <ErrorFallback iconName={name} /> };
+        }
+
+        return { default: icon };
+      }));
+    } catch (error) {
+      console.warn(`Ошибка загрузки иконки "${name}":`, error);
+    }
+  }, [name]);
+
+  useEffect(() => {
+      console.log(LazyIconComponent)
+  }, [LazyIconComponent])
+
 
   return (
     <Suspense fallback={loadingFallback}>
-      <LazyIconComponent {...props} />
+      {
+        LazyIconComponent === null ?
+          <ErrorFallback iconName={name} />
+          :
+          <LazyIconComponent {...props} />
+      }
     </Suspense>
   );
 };

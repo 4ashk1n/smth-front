@@ -15,7 +15,6 @@ const EditArticleContent: React.FC<{}> = observer(() => {
     const GridRef = useRef<ResponsiveGridLayout>(null)
 
     return (<>
-        <IconSelectMenu w='500px' h='500px' />
         <ResponsiveGridLayout
             compactType={null}
             ref={GridRef}

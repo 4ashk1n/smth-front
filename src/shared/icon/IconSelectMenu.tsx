@@ -35,7 +35,7 @@ import { iconComponents } from "./ReactIcon"
 const IconSelectMenuItem: React.FC<{
     name: string,
     icon: IconType,
-    setCurrentLibName?: () => void,
+    onClick: () => void,
     isLib?: boolean
 }> = (props) => {
     return (
@@ -47,7 +47,7 @@ const IconSelectMenuItem: React.FC<{
             align="center"
             justify="center"
             h={'100%'}
-            onClick={() => props.setCurrentLibName && props.setCurrentLibName()}
+            onClick={() => props.onClick()}
         >
             <props.icon color="white" size={20} />
             <Text style={{ textAlign: 'center' }} lh={1} c='#ffffff80' size="sm">{props.name}</Text>
@@ -57,7 +57,11 @@ const IconSelectMenuItem: React.FC<{
 
 const LIMIT = 50
 
-const IconSelectMenu: React.FC<StackProps> = (props) => {
+const IconSelectMenu: React.FC<
+    StackProps & {
+        setIcon: (icon: string) => void
+    }
+> = (props) => {
     const [icon, setIcon] = useState('')
     const [currentLibName, setCurrentLibName] = useState('')
     const [currentLib, setCurrentLib] = useState<any>({})
@@ -77,22 +81,25 @@ const IconSelectMenu: React.FC<StackProps> = (props) => {
             setLoading(true)
             const items = lazy(async () => {
                 const module = await iconComponents[currentLibName]();
-                return { default: <>{Object.keys(module).map(k => <Grid.Col span={6}><IconSelectMenuItem name={k} icon={module[k]} /></Grid.Col>)}</> } as any;
+                return { default: <>{Object.keys(module).map(k => <Grid.Col span={6}><IconSelectMenuItem onClick={() => setIcon(k)} name={k} icon={module[k]} /></Grid.Col>)}</> } as any;
             })
             setLoadedContent(items)
-            
-            
-
         }
     }, [currentLibName])
 
     useEffect(() => {
         setLoading(false)
-    }, [items])
+    }, [loadedContent])
 
     useEffect(() => {
         console.log(loading)
     }, [loading])
+
+    useEffect(() => {
+        if (icon) {
+            props.setIcon(icon)
+        }
+    }, [icon])
 
     // useEffect(() => {
     //     if (keys.length > 0 && currentLib) {
@@ -131,14 +138,15 @@ const IconSelectMenu: React.FC<StackProps> = (props) => {
                 }}
             />
 
-            <ScrollArea scrollbars="y" h={'100%'} w={'100%'}>
+            <ScrollArea scrollbars={loading ? false : 'y'} h={'100%'} w={'100%'}>
                 
                 <Grid gutter={10}>
-                    {
-                        (new Array(6)).map(() =>
+                    {loading &&
+                        (Array(6).fill(0)).map(() =>
                             <Grid.Col span={6}>
-                                <Skeleton visible={loading} h='100%' w='100%' radius={10} />
-                                23423423423423
+                                <Skeleton visible={true} h='100%' w='100%' radius={10} opacity={0.2}>
+                                    <IconSelectMenuItem icon={ImHome} name='loading' onClick={() => { }} />
+                                </Skeleton>
                             </Grid.Col>
                         )
                     }
@@ -150,7 +158,7 @@ const IconSelectMenu: React.FC<StackProps> = (props) => {
                             Object.keys(libs).map((lib) => {
                                 return (
                                     <Grid.Col key={lib} span={6}>
-                                        <IconSelectMenuItem isLib setCurrentLibName={() => setCurrentLibName(lib)} name={libs[lib].name} icon={libs[lib].icon} />
+                                        <IconSelectMenuItem isLib onClick={() => {setLoading(true); setCurrentLibName(lib)}} name={libs[lib].name} icon={libs[lib].icon} />
                                     </Grid.Col>
                                 )
                             })
@@ -160,7 +168,7 @@ const IconSelectMenu: React.FC<StackProps> = (props) => {
                                 items.map((item) => {
                                     return (
                                         <Grid.Col key={item.name} span={6}>
-                                            <IconSelectMenuItem name={item.name} icon={item.icon} />
+                                            <IconSelectMenuItem name={item.name} icon={item.icon} onClick={() => { setIcon(item.name) }} />
                                         </Grid.Col>
                                     )
                                 })

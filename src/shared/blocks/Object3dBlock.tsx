@@ -56,8 +56,8 @@ const Object3dBlock: React.FC<Object3dBlockProps> = (props) => {
                                                 scale3d(1, 1, 1) 
                                                 translate3d(
                                                     ${(props.depth - i) * (- tiltAngleY / 10)}px, 
-                                                    ${(props.depth - i) * tiltAngleX / 10 - 10 * +(props.blocktype === 'icon')}px, 
-                                                    ${-(props.depth - i) * 3}px)`,
+                                                    ${(props.depth - i) * tiltAngleX / 10 }px, 
+                                                    ${-(props.depth - i) * (props.blocktype == 'icon' ? 0.5 : 3)}px)`,
                                         position: 'absolute',
                                         willChange: 'transform',
                                         transition: '400ms cubic-bezier(0.03, 0.98, 0.52, 0.99)',
@@ -108,7 +108,7 @@ const Object3dBlock: React.FC<Object3dBlockProps> = (props) => {
                         tiltAngleXManual={tiltAngleX}
                         tiltAngleYManual={tiltAngleY}
                         style={{
-                            backdropFilter: 'blur(10px)',
+                            backdropFilter: props.blocktype === 'icon' ? 'none' : 'blur(10px)',
                             width: '100%',
                             height: '100%',
                             rotate: `${props.rotateZ}deg`,
