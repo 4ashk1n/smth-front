@@ -6,7 +6,7 @@ import type { CategoryColors } from "../../../entities/category/types/CategoryCo
 import { useContext } from "react";
 import { ArticleContext } from "../../../features/stores/ArticleStore";
 
-const ArticleHeader: React.FC<{ editMode?: boolean }> = ({ editMode = false }) => {
+const ArticleHeader: React.FC<{}> = () => {
     const { article } = useContext(ArticleContext)
     return (<>
         <HighlitedBlock
@@ -27,45 +27,11 @@ const ArticleHeader: React.FC<{ editMode?: boolean }> = ({ editMode = false }) =
                     fz={48}
                     lh={1}
                 >
-                    {
-                        editMode ?
-                            <TextInput
-                                styles={{
-                                    input: {
-                                        background: '#00000080',
-                                        border: '#000000ff 1px solid',
-                                        color: 'white',
-                                        borderRadius: '10px'
-                                    }
-                                }}
-                                defaultValue={article.title}
-                                size="xl"
-                                placeholder="Заголовок"
-                            />
-                            :
-                            article.title
-                    }
+                    {article.title}
                 </Title>
 
                 <Text fz={24} c={article.mainCategory.lightColor + '80'} lh={1}>
-                    {
-                        editMode ?
-                            <TextInput
-                                styles={{
-                                    input: {
-                                        background: '#00000080',
-                                        border: '#000000ff 1px solid',
-                                        color: 'white',
-                                        borderRadius: '10px'
-                                    }
-                                }}
-                                defaultValue={article.description}
-                                size="md"
-                                placeholder="Описание"
-                            />
-                            :
-                            article.description
-                    }
+                    {article.description}
                 </Text>
             </Stack>
             <UserPill size="md" user={article.author} />

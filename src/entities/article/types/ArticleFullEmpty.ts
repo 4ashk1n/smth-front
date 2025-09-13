@@ -1,10 +1,20 @@
 import type { ArticleFull } from "./ArticleFull";
 
+
+export const EmptyCategory = {
+    id: -1,
+    emoji: '',
+    name: '',
+    accentColor: '#ffffff',
+    darkColor: '#000000',
+    lightColor: '#ffffff'
+}
+
 export const ArticleFullEmpty: ArticleFull = {
     id: -1,
     title: '',
     description: '',
-    mainCategory: { id: -1, emoji: '', name: '', accentColor: '#ffffff', darkColor: '#000000', lightColor: '#ffffff' },
+    mainCategory: EmptyCategory,
     // content: { rows: [
     //     [
     //         {

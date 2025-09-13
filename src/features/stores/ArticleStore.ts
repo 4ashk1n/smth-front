@@ -1,7 +1,7 @@
 import type { ArticleFull } from "../../entities/article/types/ArticleFull";
 import { makeAutoObservable } from "mobx";
 import type { BlockTypes, BlockTypesString } from "../../entities/article/types/Content";
-import { ArticleFullEmpty } from "../../entities/article/types/ArticleFullEmpty";
+import { ArticleFullEmpty, EmptyCategory } from "../../entities/article/types/ArticleFullEmpty";
 import { createContext } from "react";
 import { ParagraphEmpty } from "../../entities/article/types/blocks/Paragraph";
 import { ImageEmpty } from "../../entities/article/types/blocks/Image";
@@ -10,6 +10,7 @@ import { getLayoutForNewBlock } from "../EditArticle/lib/getLayoutForNewBlock";
 import type { BlockLayout } from "../../entities/article/types/blocks/Block";
 import { compareLayouts } from "../EditArticle/lib/compareLayouts";
 import type { CategoryColors } from "../../entities/category/types/CategoryColors";
+import type { Category } from "../../entities/category/types/Category";
 
 class ArticleStore {
     article: ArticleFull = ArticleFullEmpty
@@ -94,6 +95,16 @@ class ArticleStore {
                 scale: 1
             }
         })
+    }
+
+    editCategories(categories: Category[]) {
+        if (!categories.length) {
+            this.article.mainCategory = EmptyCategory
+            this.article.categories = []
+            return
+        }
+        this.article.mainCategory = categories[0]
+        this.article.categories = categories
     }
 
 }
