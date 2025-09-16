@@ -1,34 +1,40 @@
 import { useEffect, useState } from "react"
 import type { ArticleFull } from "../../../entities/article/types/ArticleFull"
 import { ARTICLE } from "../api/samples/article"
-import { Center, Stack } from "@mantine/core"
+import { Center, Grid, Stack } from "@mantine/core"
 import ArticleHeader from "../../../widgets/ArticleHeader/ui"
 import ArticleContent from "../../../widgets/ArticleContent/ui"
 import { useParams } from "react-router"
+import { ArticleContext, articleStore } from "../../../features/stores/ArticleStore"
+import ArticleBackground from "../../../widgets/ArticleContent/ui/ArticleBackground"
 
 const ArticlePage = () => {
-
-    const { id } = useParams();
-    const [article, setArticle] = useState<ArticleFull | null>(null)
-
     useEffect(() => {
         (async () => {
-            setArticle(ARTICLE as ArticleFull)
+            articleStore.setArticle(ARTICLE as ArticleFull)
         })()
     }, [])
 
-    if (!article) return null
-
     return (<>
-    
-        <Stack align="center" w='100%' h='100%' style={{background: `linear-gradient(0deg, ${article.mainCategory.accentColor}, #000000 100%)`}}>
-            <Stack maw={'1280px'} w='90%'>
-                <ArticleHeader article={article as ArticleFull} />
-                <ArticleContent article={article as ArticleFull} />
+        <ArticleContext.Provider value={articleStore} >
+        <Stack align="center" w='100%' h='100%' pos='relative'>
+            {/* <Stack maw={'1280px'} w='90%'> */}
+                {/* <ArticleHeader article={article as ArticleFull} />
+                <ArticleContent article={article as ArticleFull} /> */}
                 {/* <ArticleContent article={article as ArticleFull} />
                 <ArticleContent article={article as ArticleFull} /> */}
-            </Stack>
+            {/* </Stack> */}
+            <ArticleBackground />
+            <Grid columns={4} maw={'1280px'} w='90%'>
+                <Grid.Col span={1}>
+                    <ArticleHeader />
+                </Grid.Col>
+                <Grid.Col span={2}>
+                    <ArticleContent />
+                </Grid.Col>
+            </Grid>
         </Stack>
+        </ArticleContext.Provider>
     
     </>)
 }

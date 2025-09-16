@@ -14,6 +14,8 @@ import { useMediaQuery } from "@mantine/hooks";
 import { useIsMobileScreen } from "../../../shared/lib/useIsMobile";
 import EmptyBlock from "./EmptyBlock";
 import GridLayout from "react-grid-layout";
+import { useContext } from "react";
+import { ArticleContext } from "../../../features/stores/ArticleStore";
 
 export const ArticleBlock = ({ block, mainCategory }: { block: BlockTypes, mainCategory: CategoryColors, editMode?: boolean }) => {
     return (<>
@@ -33,7 +35,8 @@ export const ArticleBlock = ({ block, mainCategory }: { block: BlockTypes, mainC
     </>)
 }
 
-const ArticleContent: React.FC<{ article: ArticleFull, editMode?: boolean }> = ({ article, editMode = false }) => {
+const ArticleContent: React.FC<{}> = ({}) => {
+    const { article } = useContext(ArticleContext);
     const isMobile = useIsMobileScreen();
     console.log(article.content.map((block, i) => ({x: block.layout.x, y: block.layout.y, w: block.layout.w, h: block.layout.h, i: i, static: true})))
     return (<>
@@ -55,7 +58,7 @@ const ArticleContent: React.FC<{ article: ArticleFull, editMode?: boolean }> = (
             layout={article.content.map((block, i) => ({x: block.layout.x, y: block.layout.y, w: block.layout.w, h: block.layout.h, i: `${i}`, static: true}))}
         >
             {article.content.map((block, i) => 
-            <div key={`${i}`} style={{height: 'fit-content'}}><ArticleBlock block={block} mainCategory={article.mainCategory} editMode={editMode} /></div>
+            <div key={`${i}`} style={{height: 'fit-content'}}><ArticleBlock block={block} mainCategory={article.mainCategory} /></div>
 
             )}
         </GridLayout>
