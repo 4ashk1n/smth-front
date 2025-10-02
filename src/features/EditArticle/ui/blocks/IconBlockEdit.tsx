@@ -20,7 +20,7 @@ const IconBlockEdit: React.FC<{
 
     useEffect(() => {
         saveChanges()
-        console.log(block.name)
+        // console.log(block.name)
     }, [block.name])
 
     return (<>

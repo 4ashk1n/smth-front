@@ -20,7 +20,7 @@ const ColoredPill: React.FC<ColoredPillProps> = (props) => {
             if (!props.image) return;
             const color = await getImageColor(props.image, .5);
             setColor(color);
-            console.log(color)
+            // console.log(color)
         })()
     }, [])
 

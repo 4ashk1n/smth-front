@@ -38,7 +38,7 @@ export const ArticleBlock = ({ block, mainCategory }: { block: BlockTypes, mainC
 const ArticleContent: React.FC<{}> = ({}) => {
     const { article } = useContext(ArticleContext);
     const isMobile = useIsMobileScreen();
-    console.log(article.content.map((block, i) => ({x: block.layout.x, y: block.layout.y, w: block.layout.w, h: block.layout.h, i: i, static: true})))
+    // console.log(article.content.map((block, i) => ({x: block.layout.x, y: block.layout.y, w: block.layout.w, h: block.layout.h, i: i, static: true})))
     return (<>
         {/* <Grid justify="center" align="center" columns={isMobile ? 1 :12} gutter={80} mt={80}>
             {article.content.rows.map((row, i) =>

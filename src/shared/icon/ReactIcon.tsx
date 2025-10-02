@@ -100,7 +100,7 @@ const ReactIcon: React.FC<ReactIconProps> = ({
 
   useMemo(() => {
     const libraryPrefix = name.substring(0, 2) as keyof typeof iconComponents;
-    console.log(name.substring(0, 2), libraryPrefix)
+    // console.log(name.substring(0, 2), libraryPrefix)
     const importFunction = iconComponents[libraryPrefix];
 
     if (!importFunction) {
@@ -127,7 +127,7 @@ const ReactIcon: React.FC<ReactIconProps> = ({
   }, [name]);
 
   useEffect(() => {
-      console.log(LazyIconComponent)
+      // console.log(LazyIconComponent)
   }, [LazyIconComponent])
 
 

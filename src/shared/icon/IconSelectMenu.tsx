@@ -92,7 +92,7 @@ const IconSelectMenu: React.FC<
     }, [loadedContent])
 
     useEffect(() => {
-        console.log(loading)
+        // console.log(loading)
     }, [loading])
 
     useEffect(() => {
@@ -103,13 +103,13 @@ const IconSelectMenu: React.FC<
 
     // useEffect(() => {
     //     if (keys.length > 0 && currentLib) {
-    //         console.log(offset)
+    //         // console.log(offset)
     //         setItems([...items, ...keys.slice(offset, offset + LIMIT).map(k => ({ name: k, icon: currentLib[k] }))])
     //     }
     // }, [keys, currentLib, offset])
 
     // useEffect(() => {
-    //     console.log(ref.current?.clientHeight, scrollPosition.y)
+    //     // console.log(ref.current?.clientHeight, scrollPosition.y)
     //     if ( ref.current?.clientHeight && ref.current.clientHeight - scrollPosition.y < 250 ) {
     //         setOffset(offset + LIMIT)
     //     }
