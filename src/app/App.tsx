@@ -12,6 +12,7 @@ import NewArticlePage from '../pages/NewArticle/ui';
 import '../../node_modules/react-grid-layout/css/styles.css';
 import '../../node_modules/react-resizable/css/styles.css';
 import '@mantine/tiptap/styles.css';
+import Footer from '../widgets/NavBar/ui/footer';
 const THEME = createTheme({
 
 })
@@ -20,30 +21,38 @@ export const ScrollPositionContext = createContext<{ x: number, y: number }>({ x
 
 function App() {
     const [scrollPosition, onScrollPositionChange] = useState({ x: 0, y: 0 });
-
     const parallaxController = useParallaxController();
+
+    useEffect(() => {
+        document.documentElement.requestFullscreen();
+    }, [])
 
     return (
         <MantineProvider theme={THEME}>
 
-            <ScrollArea scrollbars="y" onScrollCapture={() => {parallaxController?.update()}} type="scroll" h='100vh'>
-                
-                    {/* <ScrollPositionContext.Provider value={scrollPosition} > */}
-                    <Stack id="scrollArea">
-                        <Header />
-                        {/* <LandingPage    /> */}
+            {/* <ScrollArea scrollbars="y" onScrollCapture={() => {parallaxController?.update()}} type="scroll" h='100vh'> */}
 
-                        <BrowserRouter>
-                            <Routes>
-                                <Route path='/' element={<LandingPage />} />
-                                <Route path='/article/:id' element={<ArticlePage />} />
-                                <Route path='/article/new' element={<NewArticlePage />} />
-                            </Routes>
-                        </BrowserRouter>
-                    </Stack>
-                    {/* </ScrollPositionContext.Provider> */}
+            {/* <ScrollPositionContext.Provider value={scrollPosition} > */}
+            <Stack gap={0} id="scrollArea" h='100vh' mih={'100vh'} mah={'100vh'} style={{ overflow: 'hidden' }}>
+                {/* <Header /> */}
+                {/* <LandingPage    /> */}
 
-            </ScrollArea>
+                <div style={{ position: 'relative', width: '100%', height: 'calc(100vh - 80px)' }}>
+                    <BrowserRouter>
+                        <Routes>
+                            <Route path='/' element={<LandingPage />} />
+                            <Route path='/article/:id' element={<ArticlePage />} />
+                            <Route path='/article/new' element={<NewArticlePage />} />
+                        </Routes>
+                    </BrowserRouter>
+                </div>
+
+
+                <Footer />
+            </Stack>
+            {/* </ScrollPositionContext.Provider> */}
+
+            {/* </ScrollArea> */}
 
         </MantineProvider>
     )

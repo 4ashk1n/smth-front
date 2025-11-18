@@ -1,41 +1,70 @@
-import { useEffect, useState } from "react"
-import type { ArticleFull } from "../../../entities/article/types/ArticleFull"
-import { ARTICLE } from "../api/samples/article"
-import { Center, Grid, Stack } from "@mantine/core"
-import ArticleHeader from "../../../widgets/ArticleHeader/ui"
-import ArticleContent from "../../../widgets/ArticleContent/ui"
-import { useParams } from "react-router"
-import { ArticleContext, articleStore } from "../../../features/stores/ArticleStore"
-import ArticleBackground from "../../../widgets/ArticleContent/ui/ArticleBackground"
+import { Stack, Grid } from "@mantine/core"
+import ArticleStoreProvider from "../../../entities/article/contexts/article.context"
+import { ARTICLE_DTO_SAMPLE } from "../../../entities/article/samples/article.sample"
+import ArticleContent from "../../../widgets/ArticleContent"
+import ArticleBackground from "../../../entities/article/ui/ArticleContent/ArticleBackground"
+import ArticleHeader from "../../../entities/article/ui/ArticleHeader"
+import ReactGridLayout from "react-grid-layout"
+import ResponsiveGridLayout from "../../../shared/ui/grids/ResponsiveGridLayout"
+import TopicsList from "../../../features/ArticleNavigation/ui/TopicManager"
+import { useIsMobileScreen } from "../../../shared/lib/useIsMobile"
+import ArticleOverlay from "../../../widgets/ArticleOverlay/ui"
 
 const ArticlePage = () => {
-    useEffect(() => {
-        (async () => {
-            articleStore.setArticle(ARTICLE as ArticleFull)
-        })()
-    }, [])
-
+    const isMobile = useIsMobileScreen()
     return (<>
-        <ArticleContext.Provider value={articleStore} >
-        <Stack align="center" w='100%' h='100%' pos='relative'>
-            {/* <Stack maw={'1280px'} w='90%'> */}
-                {/* <ArticleHeader article={article as ArticleFull} />
-                <ArticleContent article={article as ArticleFull} /> */}
-                {/* <ArticleContent article={article as ArticleFull} />
-                <ArticleContent article={article as ArticleFull} /> */}
-            {/* </Stack> */}
+        <ArticleStoreProvider article={ARTICLE_DTO_SAMPLE}>
             <ArticleBackground />
-            <Grid columns={4} maw={'1280px'} w='90%'>
-                <Grid.Col span={1}>
-                    <ArticleHeader />
-                </Grid.Col>
-                <Grid.Col span={2}>
-                    <ArticleContent />
-                </Grid.Col>
-            </Grid>
-        </Stack>
-        </ArticleContext.Provider>
-    
+            <Stack align="center" w='100%' h='100%'>
+                {
+                    isMobile ?
+                        <Stack
+                            h='100%'
+                            gap={24}
+                            style={{
+                                position: 'relative',
+                                width: '100%',
+                                height: '100%',
+                                zIndex: 1,
+                            }}
+                        >
+                            <ArticleContent />
+                            <ArticleOverlay />
+                        </Stack>
+                        :
+                        <div
+                            style={{
+                                position: 'relative',
+                                width: '90%',
+                                height: '100%',
+                                zIndex: 1,
+                                maxWidth: 1280
+                            }}
+                        >
+                            <ResponsiveGridLayout
+                                cols={{ lg: 4, md: 4, sm: 2, xs: 1, xxs: 1 }}
+                                rowHeight={180}
+                                className="layout"
+                                margin={{ lg: [36, 18], md: [36, 18], sm: [36, 18], xs: [36, 18] }}
+                            >
+                                <div key='header' data-grid={{ x: 0, y: 0, w: 1, h: 4, static: true }}>
+                                    <ArticleHeader />
+                                </div>
+
+                                <div key='content' className="h-full" data-grid={{ x: 1, y: 0, w: 2, h: 4, static: true }}>
+                                    <ArticleContent />
+                                </div>
+
+                                <div key="topics-list" data-grid={{ x: 4, y: 0, w: 1, h: 1, static: true }}>
+                                    <TopicsList />
+                                </div>
+                            </ResponsiveGridLayout>
+                        </div>
+                }
+
+            </Stack>
+        </ArticleStoreProvider>
+
     </>)
 }
 

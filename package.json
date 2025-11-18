@@ -4,12 +4,13 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "npm link ../smth-shared && vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@editorjs/editorjs": "^2.31.0",
     "@loadable/component": "^5.16.7",
     "@mantine/core": "^8.2.8",
     "@mantine/hooks": "^8.2.8",
@@ -22,6 +23,7 @@
     "@tiptap/react": "^3.3.0",
     "@tiptap/starter-kit": "^3.3.0",
     "animate.css": "^4.1.1",
+    "framer-motion": "^12.23.24",
     "mobx-react": "^9.2.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",

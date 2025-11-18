@@ -1,7 +1,7 @@
-import ColoredPill, { type ColoredPillProps } from "../../../shared/pill/ColoredPill"
-import type { UserCompact } from "../types/UserCompact"
+import ColoredPill, { type ColoredPillProps } from "../../../shared/ui/pill/ColoredPill"
+import type { User } from "../types/user.types"
 
-const UserPill: React.FC<ColoredPillProps & {user: UserCompact}> = ({user, ...props}) => {
+const UserPill: React.FC<ColoredPillProps & {user: User}> = ({user, ...props}) => {
     return (
         <ColoredPill image={user.avatar} label={`${user.firstname} ${user.lastname}`} {...props}/>
     )
