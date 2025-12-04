@@ -27,24 +27,35 @@ const FakeDot: React.FC<{}> = () => {
 const PageManager = observer(() => {
   const article = useArticleStore()
   const pages = useMemo(() => article.content.pagesData, [article.content.pages])
-  const currentPageOrder = useMemo(() => article.content.currentPage?.order ?? 0, [article.content.currentPageId])
-  
+  const currentPageOrder = useMemo(
+    () => article.content.currentPage?.order ?? 0,
+    [article.content.currentPageId]
+  )
+
   const [navigationDirection, setNavigationDirection] = useState(0)
   const isInitialRender = useRef(true)
+  const prevOrderRef = useRef(currentPageOrder)
 
-  // Сбрасываем направление после анимации
+  // вычисляем направление при ЛЮБОЙ смене страницы (и клик, и свайп)
   useEffect(() => {
     if (isInitialRender.current) {
       isInitialRender.current = false
+      prevOrderRef.current = currentPageOrder
       return
     }
 
+    const prev = prevOrderRef.current
+    const dir = currentPageOrder === prev ? 0 : currentPageOrder > prev ? 1 : -1
+    setNavigationDirection(dir)
+    prevOrderRef.current = currentPageOrder
+
     const timer = setTimeout(() => {
       setNavigationDirection(0)
-    }, 400) // Длительность анимации
+    }, 400)
 
     return () => clearTimeout(timer)
   }, [currentPageOrder])
+
 
   // Всегда показываем 5 точек вокруг текущей
   const visiblePages = useMemo(() => {

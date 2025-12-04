@@ -3,9 +3,13 @@ import { useArticleStore } from "../../contexts/article.context"
 import Object3dBlock from "./Object3dBlock";
 import { observer } from "mobx-react-lite";
 import { useIsMobileScreen } from "../../../../shared/lib/useIsMobile";
+import type { Topic } from "../../types/content.types";
 
-const TopicHeader = observer(() => {
-    const article = useArticleStore();
+const TopicHeader: React.FC<{
+    topic?: Topic
+}> = observer(({topic}) => {
+    const article = useArticleStore()
+    const topicToRender = topic ?? article.content.currentTopic ?? article.content.topicsData[0]
     const isMobile = useIsMobileScreen()
     return (
         // <Object3dBlock
@@ -35,7 +39,7 @@ const TopicHeader = observer(() => {
                 // textShadow: `0 0px 16px ${article.mainCategory.colors.lightColor}40`
             }}
         >
-            {article.content.currentTopic?.title}
+            {topicToRender.title}
         </Title>
         //  </Object3dBlock>
     )

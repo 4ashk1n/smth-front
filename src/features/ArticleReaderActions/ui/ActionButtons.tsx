@@ -1,12 +1,15 @@
 
-import { ActionIcon, Burger, NumberFormatter, Stack, Text } from "@mantine/core"
+import { ActionIcon, Burger, NumberFormatter, Stack, Text, Transition } from "@mantine/core"
+import { useDisclosure } from "@mantine/hooks"
 import { observer } from "mobx-react-lite"
 import { PiBookmarkSimpleFill, PiChatCenteredDotsFill, PiHeartFill, PiShareFatFill } from "react-icons/pi"
+import { useArticleStore } from "../../../entities/article/contexts/article.context"
+import type { IconType } from "react-icons"
 
-const ArticleActionButtons: React.FC<{
+const ArticleActionButton: React.FC<{
     counter: number,
     pressed: boolean,
-    icon: React.ReactNode,
+    icon: IconType,
     onClick: () => void
 }> = observer((props) => {
 
@@ -16,17 +19,14 @@ const ArticleActionButtons: React.FC<{
             justify="center"
             gap={2}
         >
-            <ActionIcon size={'md'} variant="transparent" c='white'>
-                {props.icon}
-            </ActionIcon>
-
+                <props.icon size={30} color="white" />
             <Text
                 size="12px"
                 c='white'
-                style={{textAlign: 'center'}}
+                style={{ textAlign: 'center' }}
             >
                 {/* <NumberFormatter> */}
-                    {props.counter}
+                {props.counter}
                 {/* </NumberFormatter> */}
             </Text>
         </Stack>
@@ -34,6 +34,8 @@ const ArticleActionButtons: React.FC<{
 })
 
 const ActionButtons: React.FC<{}> = observer(() => {
+    const article = useArticleStore()
+    const [opened, { toggle }] = useDisclosure();
     return (<>
         <Stack
             w='fit-content'
@@ -45,36 +47,54 @@ const ActionButtons: React.FC<{}> = observer(() => {
             gap={24}
         >
 
-            <ArticleActionButtons
-                counter={0}
-                pressed={false}
-                icon={<PiHeartFill  size={30} />}
-                onClick={() => { }}
-            />
+            <Transition
+                mounted={opened}
+                duration={200}
+                transition={'slide-up'}
+            >
+                {
+                    (styles) =>
+                        <Stack
+                            gap={24}
+                            justify="center"
+                            style={styles}
+                        >
+                            <ArticleActionButton
+                                counter={0}
+                                pressed={false}
+                                icon={PiHeartFill}
+                                onClick={() => { }}
+                            />
 
 
-            <ArticleActionButtons
-                counter={0}
-                pressed={false}
-                icon={<PiChatCenteredDotsFill size={30}  />}
-                onClick={() => { }}
-            />
+                            <ArticleActionButton
+                                counter={0}
+                                pressed={false}
+                                icon={PiChatCenteredDotsFill}
+                                onClick={() => { }}
+                            />
 
-            <ArticleActionButtons
-                counter={0}
-                pressed={false}
-                icon={<PiBookmarkSimpleFill size={30} />}
-                onClick={() => { }}
-            />
+                            <ArticleActionButton
+                                counter={0}
+                                pressed={false}
+                                icon={PiBookmarkSimpleFill}
+                                onClick={() => { }}
+                            />
 
-            <ArticleActionButtons
-                counter={0}
-                pressed={false}
-                icon={<PiShareFatFill  size={30} />}
-                onClick={() => { }}
-            />
+                            <ArticleActionButton
+                                counter={0}
+                                pressed={false}
+                                icon={PiShareFatFill}
+                                onClick={() => { }}
+                            />
+                        </Stack>
+                }
 
-            <Burger size={'40px'} />
+            </Transition>
+            <ActionIcon size='40px' radius={'40px'} onClick={toggle} color={article.mainCategory.colors.accentColor}>
+                <Burger size={'sm'} opened={opened}/>
+            </ActionIcon>
+            
         </Stack>
     </>)
 })

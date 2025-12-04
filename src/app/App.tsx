@@ -12,7 +12,8 @@ import NewArticlePage from '../pages/NewArticle/ui';
 import '../../node_modules/react-grid-layout/css/styles.css';
 import '../../node_modules/react-resizable/css/styles.css';
 import '@mantine/tiptap/styles.css';
-import Footer from '../widgets/NavBar/ui/footer';
+import Footer from '../widgets/NavBar/ui/Footer';
+
 const THEME = createTheme({
 
 })
@@ -24,7 +25,7 @@ function App() {
     const parallaxController = useParallaxController();
 
     useEffect(() => {
-        document.documentElement.requestFullscreen();
+        // document.documentElement.requestFullscreen();
     }, [])
 
     return (
@@ -33,11 +34,22 @@ function App() {
             {/* <ScrollArea scrollbars="y" onScrollCapture={() => {parallaxController?.update()}} type="scroll" h='100vh'> */}
 
             {/* <ScrollPositionContext.Provider value={scrollPosition} > */}
-            <Stack gap={0} id="scrollArea" h='100vh' mih={'100vh'} mah={'100vh'} style={{ overflow: 'hidden' }}>
+            <div
+                id="scrollArea"
+                style={{
+                    overflow: "hidden",
+                    height: "100%",       
+                    width: "100%",
+                    display: "grid",
+                    gridTemplateRows: "minmax(0, 1fr) 80px", 
+                    gap: "0px",
+                }}
+            >
+
                 {/* <Header /> */}
                 {/* <LandingPage    /> */}
 
-                <div style={{ position: 'relative', width: '100%', height: 'calc(100vh - 80px)' }}>
+                <div style={{ position: 'relative', gridRow: '1', width: '100%', height: '100%', maxHeight: '100%' }}>
                     <BrowserRouter>
                         <Routes>
                             <Route path='/' element={<LandingPage />} />
@@ -49,7 +61,7 @@ function App() {
 
 
                 <Footer />
-            </Stack>
+            </div>
             {/* </ScrollPositionContext.Provider> */}
 
             {/* </ScrollArea> */}

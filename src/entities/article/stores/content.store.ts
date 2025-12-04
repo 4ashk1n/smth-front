@@ -17,6 +17,9 @@ export class ContentStore {
         this.topics = new ObservableMap(content.topics.map(t => [t.id, t]));
         this.pages = new ObservableMap(content.topics.flatMap(t => t.pages.map(p => [p.id, p])));
         this.blocks = new ObservableMap(content.topics.flatMap(t => t.pages.flatMap(p => p.blocks.map(b => [b.id, b]))));
+        
+        this.topics.set('cover', { id: 'cover', pages: [ { id: 'cover', topicId: '-1', blocks: [], order: 0 }], order: 0, title: 'cover' });
+        this.pages.set('cover', { id: 'cover', topicId: 'cover', blocks: [], order: 0 });
 
         this.currentPageId = content.topics[0].pages[0].id
         this.currentTopicId = content.topics[0].id
@@ -35,9 +38,13 @@ export class ContentStore {
     }
 
     get pagesData(): Page[] {
-        console.log(this.pages.size)
         return Array.from(this.pages.values()).sort((a, b) => a.order - b.order);
     }
+
+    getPageByOrder(order: number): Page | undefined {
+        return this.pagesData.find((p) => p.order === order);
+    }
+
     
     distanceToCurrentTopic(order: number): number {
         const currentTopicOrder = this.currentTopic?.order ?? 0

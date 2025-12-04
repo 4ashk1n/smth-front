@@ -2,7 +2,7 @@ import ImageBlock from "../../entities/article/ui/ArticleContent/ImageBlock";
 import IconBlock from "../../entities/article/ui/ArticleContent/IconBlock";
 
 import { useArticleStore } from "../../entities/article/contexts/article.context";
-import type { Block, Icon, Image, Paragraph } from "../../entities/article/types/content.types";
+import type { Block, Icon, Image, Page, Paragraph } from "../../entities/article/types/content.types";
 import { useIsMobileScreen } from "../../shared/lib/useIsMobile";
 import ParagraphBlock from "../../entities/article/ui/ArticleContent/ParagraphBlock";
 import { observer } from "mobx-react-lite";
@@ -11,6 +11,7 @@ import { type Layout } from "react-grid-layout";
 import ResponsiveGridLayout from "../../shared/ui/grids/ResponsiveGridLayout";
 import TopicHeader from "../../entities/article/ui/ArticleContent/TopicHeader";
 import PageManager from "../../features/ArticleNavigation/ui/PageManager";
+import ArticleCover from "../../entities/article/ui/ArticleContent/ArticleCover";
 
 
 export const ArticleBlock = ({ block }: { block: Block }) => {
@@ -27,9 +28,20 @@ export const ArticleBlock = ({ block }: { block: Block }) => {
     </>)
 }
 
-const ArticleContent: React.FC<{}> = observer(({ }) => {
-    const article = useArticleStore()
+const ArticleContent: React.FC<{ page?: Page }> = observer(({ page }) => {
+    const article = useArticleStore();
     const isMobile = useIsMobileScreen();
+
+    const pageToRender = page ?? article.content.currentPage;
+    if (!pageToRender) return null;
+
+    const blocks = pageToRender.blocks;
+    const topic =
+        article.content.topics.get(pageToRender.topicId) ??
+        article.content.currentTopic;
+
+    if (topic?.id === 'cover') return <ArticleCover />
+
 
     return (<>
         <ResponsiveGridLayout
@@ -42,11 +54,11 @@ const ArticleContent: React.FC<{}> = observer(({ }) => {
             margin={{ lg: [36, 18], md: [36, 18], sm: [16, 16], xs: [16, 16], xxs: [16, 16] }}
         >
             <div key='topic-header' data-grid={{ x: 0, y: 0, w: 2, h: 1, static: true }}>
-                <TopicHeader />
+                <TopicHeader topic={topic} />
             </div>
 
             {
-                article.content.currentPage?.blocks.map((block, i) =>
+                blocks.map((block, i) =>
                     <div key={`${i}`}
                         data-grid={{
                             x: block.layout.x,

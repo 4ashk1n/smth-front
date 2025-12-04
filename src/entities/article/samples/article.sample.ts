@@ -101,7 +101,7 @@ export const ARTICLE_DTO_SAMPLE: ArticleDTO = {
                             }
                         ],
                         topicId: '1',
-                        order: 0
+                        order: 1
                     },
                     {
                         id: '2',
@@ -120,10 +120,10 @@ export const ARTICLE_DTO_SAMPLE: ArticleDTO = {
                             }
                         ],
                         topicId: '1',
-                        order: 1
+                        order: 2
                     }
                 ],
-                order: 0
+                order: 1
             },
             {
                 id: '2',
@@ -157,10 +157,10 @@ export const ARTICLE_DTO_SAMPLE: ArticleDTO = {
                             }
                         ],
                         topicId: '2',
-                        order: 2
+                        order: 3
                     }
                 ],
-                order: 1
+                order: 2
             },
             {
                 id: '3',
@@ -194,43 +194,6 @@ export const ARTICLE_DTO_SAMPLE: ArticleDTO = {
                             }
                         ],
                         topicId: '3',
-                        order: 3
-                    }
-                ],
-                order: 2
-            },
-            {
-                id: '4',
-                title: 'Свобода мысли',
-                pages: [
-
-                    {
-                        id: '4',
-                        blocks: [
-                            {
-                                id: '6',
-                                type: 'icon',
-                                name: 'FaX',
-                                layout: {
-                                    i: '0',
-                                    x: 0,
-                                    y: 1,
-                                    w: 2,
-                                    h: 2
-                                },
-                                object3d: {
-                                    depth: 5,
-                                    translateX: 0,
-                                    translateY: 0,
-                                    translateZ: 3,
-                                    rotateX: 5,
-                                    rotateY: 10,
-                                    rotateZ: 0,
-                                    scale: 1
-                                }
-                            }
-                        ],
-                        topicId: '4',
                         order: 4
                     }
                 ],
