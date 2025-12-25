@@ -93,7 +93,7 @@ const PageManager = observer(() => {
   }
 
   return (
-    <Group wrap="nowrap" gap={0}>
+    <Group wrap="nowrap" gap={0} >
       {/* Фиктивные точки слева для выравнивания */}
       {leftFakeDotsCount > 0 && Array.from({ length: leftFakeDotsCount }).map((_, i) => (
         <FakeDot key={`left-fake-${i}`} />

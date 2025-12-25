@@ -1,16 +1,34 @@
-import { StrictMode } from 'react'
+import { createContext, StrictMode, useEffect, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
 import { ParallaxProvider } from 'react-scroll-parallax'
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <ParallaxProvider>
+export const GlobalContext = createContext<{
+  setScrollContainer: (container: HTMLDivElement) => void
+}>({
+  setScrollContainer: () => { },
+})
 
-      <App />
-    </ParallaxProvider>
-  </StrictMode>,
+const AppContainer = () => {
+  const [scrollContainer, setScrollContainer] = useState<HTMLDivElement | undefined>(undefined)
+  useEffect(() => {
+    console.log(scrollContainer)
+  }, [scrollContainer])
+  return (
+    // <ParallaxProvider scrollAxis='horizontal'>
+      <GlobalContext.Provider value={{ setScrollContainer }}>
+        <App />
+      </GlobalContext.Provider>
+    // </ParallaxProvider>
+  )
+}
+
+createRoot(document.getElementById('root')!).render(
+  // <StrictMode>
+    <AppContainer />
+  // </StrictMode>,
 )
+
 
 // test 3

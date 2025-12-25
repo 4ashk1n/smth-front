@@ -11,7 +11,9 @@ const ArticleBackground = observer(() => {
                 left: 0,
                 width: '100%',
                 height: '100%',
-                background: `linear-gradient(0deg, ${mainCategory.colors.accentColor}, #000000 80%)` 
+                background: `linear-gradient(0deg, ${mainCategory.colors.accentColor}, #000000 80%)`,
+
+                pointerEvents: "none", // 🔥 ОБЯЗАТЕЛЬНО 
             }}
         >
         </div>

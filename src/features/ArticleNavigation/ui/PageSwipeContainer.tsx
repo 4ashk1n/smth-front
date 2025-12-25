@@ -1,161 +1,89 @@
-// features/ArticleNavigation/ui/PageSwipeContainer.tsx
-import { useRef, useEffect } from "react"
-import { observer } from "mobx-react-lite"
+import { useRef } from "react"
+import { useGesture } from "@use-gesture/react"
+import { motion, useMotionValue, animate, MotionValue } from "framer-motion"
 import { useArticleStore } from "../../../entities/article/contexts/article.context"
-import { useMotionValue, animate, type MotionValue } from "framer-motion"
+import { observer } from "mobx-react-lite"
 
-const SWIPE_THRESHOLD = 40 // px
-
-interface PageSwipeContainerProps {
-  // контент, который будет двигаться при свайпе
-  content: (swipeX: MotionValue<number>) => React.ReactNode
-  // фиксированный оверлей (реакции, заголовки, точки)
+interface Props {
   overlay: React.ReactNode
+  children: (swipeX: MotionValue<number>) => React.ReactNode
+  lockAxis?: (axis: "x" | "y") => void // пригодится для пункта 3
 }
 
-const PageSwipeContainer = observer(
-  ({ content, overlay }: PageSwipeContainerProps) => {
-    const article = useArticleStore()
+const PageSwipeContainer = observer(({ children, overlay, lockAxis }: Props) => {
+  const ref = useRef<HTMLDivElement>(null)
+  const article = useArticleStore()
+  const pages = article.content.pagesData
+  const order = article.content.currentPage?.order ?? 0
 
-    const swipeX = useMotionValue(0)
+  const x = useMotionValue(0)
+  const width = typeof window !== "undefined" ? window.innerWidth : 375
 
-    const pages = article.content.pagesData
-    const current = article.content.currentPage
-    const currentOrder = current?.order ?? 0
-    const maxOrder = pages.length - 1
-
-    const touchStartX = useRef(0)
-    const touchStartY = useRef(0)
-    const isDragging = useRef(false)
-
-    const changeToOrder = (order: number) => {
-      const page = pages.find((p) => p.order === order)
-      if (!page) return
-      article.content.changePage(page.id)
-    }
-
-    const handleTouchStart: React.TouchEventHandler<HTMLDivElement> = (e) => {
-      const t = e.touches[0]
-      touchStartX.current = t.clientX
-      touchStartY.current = t.clientY
-      isDragging.current = false
-    }
-
-    const handleTouchMove: React.TouchEventHandler<HTMLDivElement> = (e) => {
-      if (e.touches.length !== 1) return
-
-      const t = e.touches[0]
-      const dx = t.clientX - touchStartX.current
-      const dy = t.clientY - touchStartY.current
-
-      // если вертикальный жест сильнее — отдаем его скроллу
-      if (!isDragging.current) {
-        if (Math.abs(dx) < 10) return
-        if (Math.abs(dy) > Math.abs(dx)) {
-          // вертикальный скролл — выходим
+  useGesture(
+    {
+      onDrag: ({ movement: [mx, my], last, cancel }) => {
+        // axis lock: если пользователь повёл больше по Y — не крадём вертикаль
+        if (Math.abs(my) > Math.abs(mx)) {
+          cancel?.()
           return
         }
-        // начинаем горизонтальный свайп
-        isDragging.current = true
-      }
+        lockAxis?.("x")
 
-      // горизонтальный свайп — блокируем стандартный скролл страницы
-      e.preventDefault()
-      swipeX.set(dx)
+        x.set(mx)
+
+        if (!last) return
+
+        const passed = Math.abs(mx) > width * 0.15
+        if (!passed) {
+          animate(x, 0)
+          return
+        }
+
+        console.log(order)
+        // mx < 0 => влево => next
+        if (mx < 0 && order < pages.length - 1) {
+          animate(x, -width).then(() => {
+            article.content.changePage(article.content.getPageByOrder(order + 1)?.id ?? "")
+            x.set(0)
+          })
+          return
+        }
+
+        // mx > 0 => вправо => prev
+        if (mx > 0 && order > 0) {
+          animate(x, width).then(() => {
+            article.content.changePage(article.content.getPageByOrder(order - 1)?.id ?? "")
+            x.set(0)
+          })
+          return
+        }
+
+        animate(x, 0)
+      },
+    },
+    {
+      target: ref,
+      drag: { axis: "x", threshold: 10, filterTaps: true },
     }
+  )
 
-    const handleTouchEnd: React.TouchEventHandler<HTMLDivElement> = (e) => {
-      if (!isDragging.current) {
-        swipeX.set(0)
-        return
-      }
+  return (
+    <motion.div
+      ref={ref}
+      style={{
+        position: "absolute",
+        inset: 0,
+        touchAction: "none",
+      }}
+    >
+      {children(x)}
 
-      const changed = e.changedTouches[0]
-      const dx = changed.clientX - touchStartX.current
-      const width = window.innerWidth || 375
-      const duration = 0.18
-
-      isDragging.current = false
-
-      // маленький свайп — откатить назад
-      if (Math.abs(dx) < SWIPE_THRESHOLD) {
-        animate(swipeX, 0, { duration, ease: "easeOut" })
-        return
-      }
-
-      // вправо — предыдущая
-      if (dx > 0 && currentOrder > 0) {
-        animate(swipeX, width, { duration, ease: "easeOut" }).then(() => {
-          changeToOrder(currentOrder - 1)
-          swipeX.set(0)
-        })
-        return
-      }
-
-      // влево — следующая
-      if (dx < 0 && currentOrder < maxOrder) {
-        animate(swipeX, -width, { duration, ease: "easeOut" }).then(() => {
-          changeToOrder(currentOrder + 1)
-          swipeX.set(0)
-        })
-        return
-      }
-
-      // край — откатить назад
-      animate(swipeX, 0, { duration, ease: "easeOut" })
-    }
-
-    // при смене страницы не по свайпу — обнуляем смещение
-    useEffect(() => {
-      swipeX.set(0)
-    }, [currentOrder, swipeX])
-
-    return (
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          width: "100%",
-          height: "100%",
-          touchAction: "pan-y", // даём системе вертикальный скролл
-        }}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        onTouchCancel={handleTouchEnd}
-      >
-        {/* ДВИЖУЩИЙСЯ КОНТЕНТ */}
-        <div
-          style={{
-            width: "100%",
-            height: "100%",
-            overflow: "hidden",
-          }}
-        >
-          {content(swipeX)}
-        </div>
-
-        {/* ФИКСИРОВАННЫЙ ОВЕРЛЕЙ */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            pointerEvents: "none",
-          }}
-        >
-          <div
-            style={{
-              width: "100%",
-              height: "100%",
-              pointerEvents: "auto", // внутри оверлея кнопки живут
-            }}
-          >
-            {overlay}
-          </div>
-        </div>
+      {/* overlay НЕ должен быть авто-кликабельным на весь экран */}
+      <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
+        {overlay}
       </div>
-    )
-  }
-)
+    </motion.div>
+  )
+})
 
 export default PageSwipeContainer

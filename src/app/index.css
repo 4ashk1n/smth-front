@@ -88,3 +88,7 @@ body {
   padding: 0;
   overflow: hidden;            /* чтобы не было лишних скроллов контейнера-обёртки */
 }
+/* например App.css */
+html, body {
+  overscroll-behavior: none;
+}

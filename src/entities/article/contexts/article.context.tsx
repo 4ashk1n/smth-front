@@ -21,6 +21,7 @@ const ArticleStoreProvider: React.FC<{
 
     useEffect(() => {
         store.fromDTO(article)
+        store.content.changePage('cover')
     }, [article])
 
     return (

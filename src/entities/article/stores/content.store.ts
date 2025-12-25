@@ -1,4 +1,4 @@
-import type { Block, Content, Page, Topic } from "../types/content.types";
+import type { Block, Content, Icon, Image, Page, Topic } from "../types/content.types";
 import { makeAutoObservable, ObservableMap } from "mobx";
 
 export class ContentStore {
@@ -39,6 +39,27 @@ export class ContentStore {
 
     get pagesData(): Page[] {
         return Array.from(this.pages.values()).sort((a, b) => a.order - b.order);
+    }
+
+    get coverBlock(): Image | Icon {
+        const blocks_values = this.blocks.values()
+        const images_and_icons = Array.from(blocks_values).filter(b => b.type === 'image' || b.type === 'icon')
+        if (images_and_icons.length === 0) return { id: '', type: 'icon', name: 'MdQuestionMark', layout: { i: '', x: 0, y: 0, w: 1, h: 1 } }
+        
+        const chosen_block = images_and_icons[Math.floor(Math.random() * images_and_icons.length)]
+        
+        if (chosen_block.type === 'image') return {
+            id: chosen_block.id,
+            type: 'image',
+            url: chosen_block.url,
+            layout: { i: '', x: 0, y: 0, w: 1, h: 1 }
+        }
+        return {
+            id: chosen_block.id,
+            type: 'icon',
+            name: chosen_block.name,
+            layout: { i: '', x: 0, y: 0, w: 1, h: 1 }
+        }
     }
 
     getPageByOrder(order: number): Page | undefined {

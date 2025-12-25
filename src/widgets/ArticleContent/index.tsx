@@ -46,6 +46,7 @@ const ArticleContent: React.FC<{ page?: Page }> = observer(({ page }) => {
     return (<>
         <ResponsiveGridLayout
             className="layout"
+            key={'RGL-' + article.id}
             cols={{ lg: 2, md: 2, sm: 2, xs: 2, xxs: 2 }}
             rowHeight={isMobile ? 80 : 180}
             compactType={null}

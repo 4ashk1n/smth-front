@@ -1,14 +1,19 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useArticleStore } from '../../contexts/article.context'
 import { Stack, Text } from '@mantine/core'
 import ResponsiveGridLayout from '../../../../shared/ui/grids/ResponsiveGridLayout'
 import { useIsMobileScreen } from '../../../../shared/lib/useIsMobile'
 import Object3dBlock from './Object3dBlock'
+import ImageBlock from './ImageBlock'
+import IconBlock from './IconBlock'
 
 const ArticleCover: React.FC<{}> = observer(() => {
     const article = useArticleStore()
     const isMobile = useIsMobileScreen()
+
+    const coverBlock = article.content.coverBlock
+
 
     return (
         <ResponsiveGridLayout
@@ -22,7 +27,7 @@ const ArticleCover: React.FC<{}> = observer(() => {
         >
             <div
                 key={'title'}
-                data-grid={{ w: 2, h: 2, x: 0, y: 1 }}
+                data-grid={{ w: 2, h: 2, x: 0, y: 1, static: true }}
             >
                 <Stack gap={16}>
                     <Text
@@ -56,7 +61,7 @@ const ArticleCover: React.FC<{}> = observer(() => {
                             lh={'24px'}
                             style={{
                                 fontVariantCaps: 'small-caps',
-                                textShadow: `0 0 8px ${article.mainCategory.colors.lightColor}40`
+                                // textShadow: `0 0 8px ${article.mainCategory.colors.lightColor}40`
                             }}
                         >
                             #{article.mainCategory.name}
@@ -83,22 +88,28 @@ const ArticleCover: React.FC<{}> = observer(() => {
             </div>
 
             <div 
-                data-grid={{ w: 2, h: 2, x: 2, y: 1 }}
+                key='abcderf'
+                data-grid={{ w: 2, h: 4, x: 0, y: 4, static: true }}
+                style={{ height: '100%' }}
             >
                 <Object3dBlock 
                     h='100%' 
-                    blocktype={'image'} 
+                    w='100%'
+                    blocktype={coverBlock.type} 
                     {...article.mainCategory.colors}
                     translateX={0}
                     translateY={0}
-                    translateZ={0}
-                    rotateX={0}
-                    rotateY={0}
-                    rotateZ={0}
+                    translateZ={3}
+                    rotateX={-30}
+                    rotateY={30}
+                    rotateZ={30}
                     scale={1}
                     depth={5}
                 >
-                    
+                    {
+                        coverBlock.type === 'image' ? <ImageBlock block={coverBlock} /> :  
+                        coverBlock.type === 'icon' ? <IconBlock block={coverBlock} /> : null
+                    }
                 </Object3dBlock>
 
             </div>

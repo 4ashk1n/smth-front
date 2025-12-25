@@ -57,6 +57,7 @@ const ActionButtons: React.FC<{}> = observer(() => {
                         <Stack
                             gap={24}
                             justify="center"
+                            align="center"
                             style={styles}
                         >
                             <ArticleActionButton
@@ -91,9 +92,9 @@ const ActionButtons: React.FC<{}> = observer(() => {
                 }
 
             </Transition>
-            <ActionIcon size='40px' radius={'40px'} onClick={toggle} color={article.mainCategory.colors.accentColor}>
+            {/* <ActionIcon size='40px' radius={'10px'} onClick={toggle} color={article.mainCategory.colors.accentColor}> */}
                 <Burger size={'sm'} opened={opened}/>
-            </ActionIcon>
+            {/* </ActionIcon> */}
             
         </Stack>
     </>)
