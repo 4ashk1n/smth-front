@@ -27,7 +27,8 @@ const ArticleOverlay = observer(() => {
     >
       <Stack
         gap={12}
-        py={12}
+        pt={12}
+        pb={92}
         align="center"
         style={{
           position: "absolute",

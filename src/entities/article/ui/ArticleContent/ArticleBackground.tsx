@@ -10,7 +10,7 @@ const ArticleBackground = observer(() => {
                 top: 0,
                 left: 0,
                 width: '100%',
-                height: '100%',
+                height: '100vh',
                 background: `linear-gradient(0deg, ${mainCategory.colors.accentColor}, #000000 80%)`,
 
                 pointerEvents: "none", // 🔥 ОБЯЗАТЕЛЬНО 

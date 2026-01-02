@@ -55,7 +55,9 @@ const Footer = () => {
             h='80px'
             style={{
                 zIndex: 999,
-                gridRow: '2',
+                position: 'absolute',
+                bottom: 0,
+                // boxShadow: '0 -5px 10px rgba(0, 0, 0, 0.1)',
                 backdropFilter: 'blur(10px)',
             }}
             columns={5}

@@ -44,7 +44,7 @@ function App() {
                         height: "100%",
                         width: "100%",
                         display: "grid",
-                        gridTemplateRows: "minmax(0, 1fr) 80px",
+                        gridTemplateRows: "100%",
                         gap: "0px",
                     }}
                 >
