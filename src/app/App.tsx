@@ -32,45 +32,46 @@ function App() {
 
     return (
         // <ParallaxProvider>
-            <MantineProvider theme={THEME}>
+        <MantineProvider theme={THEME}>
 
-                {/* <ScrollArea scrollbars="y" onScrollCapture={() => {parallaxController?.update()}} type="scroll" h='100vh'> */}
+            {/* <ScrollArea scrollbars="y" onScrollCapture={() => {parallaxController?.update()}} type="scroll" h='100vh'> */}
 
-                {/* <ScrollPositionContext.Provider value={scrollPosition} > */}
-                <div
-                    id="scrollArea"
-                    style={{
-                        overflow: "hidden",
-                        height: "100%",
-                        width: "100%",
-                        display: "grid",
-                        gridTemplateRows: "100%",
-                        gap: "0px",
-                    }}
-                >
+            {/* <ScrollPositionContext.Provider value={scrollPosition} > */}
+            <div
+                id="scrollArea"
+                style={{
+                    overflow: "hidden",
+                    height: "100%",
+                    width: "100%",
+                    display: "grid",
+                    gridTemplateRows: "100%",
+                    gap: "0px",
+                }}
+            >
 
-                    {/* <Header /> */}
-                    {/* <LandingPage    /> */}
-
+                {/* <Header /> */}
+                {/* <LandingPage    /> */}
+                <BrowserRouter>
                     <div style={{ position: 'relative', gridRow: '1', width: '100%', height: '100%', maxHeight: '100%' }}>
-                        <BrowserRouter>
-                            <Routes>
-                                <Route path='/' element={<LandingPage />} />
-                                <Route path='/article/:id' element={<ArticlePage />} />
-                                <Route path='/article/new' element={<NewArticlePage />} />
-                                <Route path='/feed' element={<FeedPage />} />
-                            </Routes>
-                        </BrowserRouter>
+
+                        <Routes>
+                            <Route path='/' element={<LandingPage />} />
+                            <Route path='/article/:id' element={<ArticlePage />} />
+                            <Route path='/article/new' element={<NewArticlePage />} />
+                            <Route path='/feed' element={<FeedPage />} />
+                        </Routes>
                     </div>
 
 
                     <Footer />
-                </div>
-                {/* </ScrollPositionContext.Provider> */}
 
-                {/* </ScrollArea> */}
+                </BrowserRouter>
+            </div>
+            {/* </ScrollPositionContext.Provider> */}
 
-            </MantineProvider>
+            {/* </ScrollArea> */}
+
+        </MantineProvider>
         // </ParallaxProvider>
     )
 }

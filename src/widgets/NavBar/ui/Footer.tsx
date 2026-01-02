@@ -4,6 +4,7 @@ import type { IconName } from "../../../shared/icon/ReactIcon"
 import type { ReactNode } from "react"
 import type { IconType } from "react-icons"
 import { PiBell, PiHouse, PiHouseLine, PiHouseLineBold, PiMagnifyingGlass, PiMagnifyingGlassBold, PiPlusBold, PiUser } from "react-icons/pi"
+import { useNavigate, useNavigation } from "react-router"
 
 const FooterButton: React.FC<{
     icon: ReactNode
@@ -11,9 +12,10 @@ const FooterButton: React.FC<{
     url: string
 }> = (props) => {
 
+    const navigate = useNavigate()
 
     return (<>
-        <GridCol span={1}>
+        <GridCol span={1} onClick={() => navigate(props.url)}>
             <Stack
                 justify="center"
                 align="center"
