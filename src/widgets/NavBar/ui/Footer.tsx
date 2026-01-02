@@ -3,8 +3,8 @@ import type React from "react"
 import type { IconName } from "../../../shared/icon/ReactIcon"
 import type { ReactNode } from "react"
 import type { IconType } from "react-icons"
-import { PiBell, PiHouse, PiHouseLine, PiHouseLineBold, PiMagnifyingGlass, PiMagnifyingGlassBold, PiPlusBold, PiUser } from "react-icons/pi"
-import { useNavigate, useNavigation } from "react-router"
+import { PiBell, PiBellFill, PiHouse, PiHouseFill, PiHouseLine, PiHouseLineBold, PiMagnifyingGlass, PiMagnifyingGlassBold, PiMagnifyingGlassFill, PiPlusBold, PiUser, PiUserFill } from "react-icons/pi"
+import { useLocation, useNavigate, useNavigation, useResolvedPath } from "react-router"
 
 const FooterButton: React.FC<{
     icon: ReactNode
@@ -13,6 +13,7 @@ const FooterButton: React.FC<{
 }> = (props) => {
 
     const navigate = useNavigate()
+    const location = useLocation()
 
     return (<>
         <GridCol span={1} onClick={() => navigate(props.url)}>
@@ -32,6 +33,7 @@ const FooterButton: React.FC<{
                         size="10px"
                         c='white'
                         style={{ textAlign: 'center' }}
+                        fw={location.pathname === props.url ? '500' : 'normal'}
                     >
                         {props.label}
                     </Text>
@@ -51,6 +53,8 @@ const NewArticleIcon: React.FC = () => {
 }
 
 const Footer = () => {
+    const location = useLocation()
+
     return (<>
 
         <Grid
@@ -69,12 +73,12 @@ const Footer = () => {
 
         >
             <FooterButton
-                icon={<PiHouse size={20} color="white" />}
+                icon={location.pathname === '/feed' ? <PiHouseFill size={20} color="white" /> : <PiHouse size={20} color="white" />}
                 label={'Лента'}
                 url={'/feed'} />
 
             <FooterButton
-                icon={<PiMagnifyingGlass size={20} color="white" />}
+                icon={location.pathname  === '/search' ? <PiMagnifyingGlassBold size={20} color="white" /> : <PiMagnifyingGlass size={20} color="white" />}
                 label={'Поиск'}
                 url={'/search'} />
 
@@ -84,14 +88,14 @@ const Footer = () => {
                 url={'/article/new'} />
 
             <FooterButton
-                icon={<PiBell size={20} color="white" />}
+                icon={location.pathname === '/notifications' ? <PiBellFill size={20} color="white" /> : <PiBell size={20} color="white" />}
                 label={'Уведомления'}
                 url={'/notifications'} />
 
             <FooterButton
-                icon={<PiUser size={20} color="white" />}
+                icon={location.pathname === '/profile' ? <PiUserFill size={20} color="white" /> : <PiUser size={20} color="white" />}
                 label={'Профиль'}
-                url={'/article/new'} />
+                url={'/profile'} />
 
 
 
