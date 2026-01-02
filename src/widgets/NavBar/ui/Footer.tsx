@@ -1,10 +1,8 @@
-import { Center, Grid, GridCol, Group, Stack, Text } from "@mantine/core"
+import { Center, Grid, GridCol, Stack, Text } from "@mantine/core"
 import type React from "react"
-import type { IconName } from "../../../shared/icon/ReactIcon"
 import type { ReactNode } from "react"
-import type { IconType } from "react-icons"
-import { PiBell, PiBellFill, PiHouse, PiHouseFill, PiHouseLine, PiHouseLineBold, PiMagnifyingGlass, PiMagnifyingGlassBold, PiMagnifyingGlassFill, PiPlusBold, PiUser, PiUserFill } from "react-icons/pi"
-import { useLocation, useNavigate, useNavigation, useResolvedPath } from "react-router"
+import { PiBell, PiBellFill, PiHouse, PiHouseFill, PiMagnifyingGlass, PiMagnifyingGlassBold, PiPlusBold, PiUser, PiUserFill } from "react-icons/pi"
+import { useLocation, useNavigate } from "react-router"
 
 const FooterButton: React.FC<{
     icon: ReactNode
