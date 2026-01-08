@@ -1,12 +1,15 @@
 import React, { useMemo } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useArticleStore } from '../../contexts/article.context'
-import { Stack, Text } from '@mantine/core'
+import { Group, Stack, Text } from '@mantine/core'
 import ResponsiveGridLayout from '../../../../shared/ui/grids/ResponsiveGridLayout'
 import { useIsMobileScreen } from '../../../../shared/lib/useIsMobile'
 import Object3dBlock from './Object3dBlock'
 import ImageBlock from './ImageBlock'
 import IconBlock from './IconBlock'
+import EditArticleTitle from '../../../../features/EditArticle/ui/cover/EditArticleTitle'
+import EditArticleDescription from '../../../../features/EditArticle/ui/cover/EditArticleDescription'
+import EditArticleCategories from '../../../../features/EditArticle/ui/cover/EditArticleCategories'
 
 const ArticleCover: React.FC<{}> = observer(() => {
     const article = useArticleStore()
@@ -30,44 +33,69 @@ const ArticleCover: React.FC<{}> = observer(() => {
                 data-grid={{ w: 2, h: 2, x: 0, y: 1, static: true }}
             >
                 <Stack gap={16}>
-                    <Text
-                        fz={48}
-                        lh={1}
-                        fw={900}
-                        c={`${article.mainCategory.colors.lightColor}`}
-                        style={{
-                            textShadow: '0 4px 4px rgba(0, 0, 0, 0.25)',
-                            fontVariantCaps: 'small-caps'
-                        }}
-                    >
-                        {article.title}
-                    </Text>
-                    <Text
-                        fz={24}
-                        lh={1}
-                        fw={200}
-                        c={`${article.mainCategory.colors.lightColor}`}
-                        style={{
-                            textShadow: '0 4px 4px rgba(0, 0, 0, 0.25)'
-                        }}
-                    >
-                        {article.description}
-                    </Text>
+                    {
+                        article.editMode ?
+                            <EditArticleTitle /> :
+                            <Text
+                                fz={48}
+                                lh={1}
+                                fw={900}
+                                c={`${article.mainCategory.colors.lightColor}`}
+                                style={{
+                                    textShadow: '0 4px 4px rgba(0, 0, 0, 0.25)',
+                                    fontVariantCaps: 'small-caps'
+                                }}
+                            >
+                                {article.title}
+                            </Text>
+                    }
+
+                    {
+                        article.editMode ?
+                            <EditArticleDescription />
+                            :
+                            <Text
+                                fz={24}
+                                lh={1}
+                                fw={200}
+                                c={`${article.mainCategory.colors.lightColor}`}
+                                style={{
+                                    textShadow: '0 4px 4px rgba(0, 0, 0, 0.25)'
+                                }}
+                            >
+                                {article.description}
+                            </Text>
+                    }
+
                     <Stack gap={0}>
-                        <Text
-                            fw={900}
-                            fz={18}
-                            c={article.mainCategory.colors.accentColor}
-                            lh={'24px'}
-                            style={{
-                                fontVariantCaps: 'small-caps',
-                                // textShadow: `0 0 8px ${article.mainCategory.colors.lightColor}40`
-                            }}
+
+                        <Group
+                            align='center'
+                            justify='start'
+                            gap={8}
                         >
-                            #{article.mainCategory.name}
-                        </Text>
+                            <Text
+                                fw={900}
+                                fz={18}
+                                c={article.mainCategory.colors.accentColor}
+                                lh={'24px'}
+                                style={{
+                                    fontVariantCaps: 'small-caps',
+                                    // textShadow: `0 0 8px ${article.mainCategory.colors.lightColor}40`
+                                }}
+                            >
+                                #{article.mainCategory.name}
+
+                            </Text>
+
+                            {
+                                article.editMode ?
+                                    <EditArticleCategories />
+                                    : null
+                            }
+                        </Group>
                         {
-                            article.categories.map((c, i) => (
+                            article.categories.slice(1).map((c, i) => (
                                 <Text
                                     key={i}
                                     fz={14}
@@ -87,15 +115,15 @@ const ArticleCover: React.FC<{}> = observer(() => {
                 </Stack>
             </div>
 
-            <div 
+            <div
                 key='abcderf'
                 data-grid={{ w: 2, h: 4, x: 0, y: 4, static: true }}
                 style={{ height: '100%' }}
             >
-                <Object3dBlock 
-                    h='100%' 
+                <Object3dBlock
+                    h='100%'
                     w='100%'
-                    blocktype={coverBlock.type} 
+                    blocktype={coverBlock.type}
                     {...article.mainCategory.colors}
                     translateX={0}
                     translateY={0}
@@ -107,8 +135,8 @@ const ArticleCover: React.FC<{}> = observer(() => {
                     depth={5}
                 >
                     {
-                        coverBlock.type === 'image' ? <ImageBlock block={coverBlock} /> :  
-                        coverBlock.type === 'icon' ? <IconBlock block={coverBlock} /> : null
+                        coverBlock.type === 'image' ? <ImageBlock block={coverBlock} /> :
+                            coverBlock.type === 'icon' ? <IconBlock block={coverBlock} /> : null
                     }
                 </Object3dBlock>
 

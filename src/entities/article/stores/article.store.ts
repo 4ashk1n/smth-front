@@ -3,6 +3,7 @@ import { makeAutoObservable } from "mobx";
 import { ContentStore } from "./content.store";
 import type { Category } from "../../category/types/category.types";
 import type { User } from "../../user/types/user.types";
+import { EMPTY_CATEGORY } from "../../category/samples/category.empty";
 
 export class ArticleStore {
     
@@ -15,6 +16,8 @@ export class ArticleStore {
     author: User = {id: '', username: '', firstname: '', lastname: '', avatar: ''}
     status: 'published' | 'draft' | 'archived' | 'review' | undefined
 
+    editMode: boolean = false
+
 
     constructor() {
         makeAutoObservable(this, {}, { autoBind: true })
@@ -24,8 +27,15 @@ export class ArticleStore {
         this.id = article.id
         this.title = article.title
         this.description = article.description
-        this.mainCategory = article.mainCategory
         this.categories = article.categories
+
+        if (article.categories.length > 0) {
+            this.mainCategory = article.categories[0]
+        }
+        else {
+            this.mainCategory = EMPTY_CATEGORY
+        }
+
         this.author = article.author
         this.status = article.status
 
@@ -33,5 +43,18 @@ export class ArticleStore {
         this.content.fromDTO(article.content)
     }
 
-    
+    setEditMode(editMode: boolean) {
+        this.editMode = editMode
+    }
+
+    setCategories(categories: Category[]) {
+        if (!this.editMode) return
+        if (categories.length > 0) {
+            this.mainCategory = categories[0]
+        }
+        else {
+            this.mainCategory = EMPTY_CATEGORY
+        }
+        this.categories = categories
+    }
 }

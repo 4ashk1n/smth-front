@@ -20,7 +20,6 @@ export type ArticleDTO = {
     id: string
     title: string
     description: string
-    mainCategory: Category
     categories: Category[]
     author: User
     status: 'published' | 'draft' | 'archived' | 'review'

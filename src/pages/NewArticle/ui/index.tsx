@@ -7,25 +7,19 @@
 // import EditArticleHeader from "../../../features/EditArticle/ui/header/EditArticleHeader"
 // import ArticleBackground from "../../../widgets/ArticleContent/ui/ArticleBackground"
 
+import ArticleStoreProvider from "../../../entities/article/contexts/article.context"
+import { ARTICLE_EMPTY } from "../../../entities/article/samples/article.empty"
+import ArticleScreen from "../../Article/ui/screen"
+
 const NewArticlePage = () => {
-    // useEffect(() => {
-    //     articleStore.setArticle(ArticleFullEmpty)
-    // }, [])
 
-    // return (<>
-    //     <ArticleContext.Provider value={articleStore} >
-    //         <Stack align="center" w='100%' mih='100vh'>
-    //             <ArticleBackground />
-    //             <Stack maw={'1280px'} w='90%'>
-    //                 <EditArticleHeader />
-    //                 {/* <ArticleContent editMode article={draft as ArticleFull} /> */}
-    //                 <EditArticleContent />
-    //             </Stack>
-    //         </Stack>
-    //     </ArticleContext.Provider>
-    // </>)
+    
 
-    return <></>
+    return <>
+        <ArticleStoreProvider article={ARTICLE_EMPTY} editMode>
+            <ArticleScreen />
+        </ArticleStoreProvider>
+    </>
 }
 
 export default NewArticlePage
