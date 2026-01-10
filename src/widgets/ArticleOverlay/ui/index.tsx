@@ -5,6 +5,7 @@ import ActionButtons from "../../../features/ArticleReaderActions/ui/ActionButto
 import { useArticleStore } from "../../../entities/article/contexts/article.context"
 import { observer } from "mobx-react-lite"
 import { motion } from "framer-motion"
+import ActionsMenu from "./ActionsMenu"
 
 const ArticleOverlay = observer(() => {
   const article = useArticleStore()
@@ -42,7 +43,7 @@ const ArticleOverlay = observer(() => {
       >
         <PageManager />
         <ArticleHeader />
-        <ActionButtons />
+        <ActionsMenu />
       </Stack>
     </motion.div>
   )

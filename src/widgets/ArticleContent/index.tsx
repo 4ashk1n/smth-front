@@ -12,6 +12,7 @@ import ResponsiveGridLayout from "../../shared/ui/grids/ResponsiveGridLayout";
 import TopicHeader from "../../entities/article/ui/ArticleContent/TopicHeader";
 import PageManager from "../../features/ArticleNavigation/ui/PageManager";
 import ArticleCover from "../../entities/article/ui/ArticleContent/ArticleCover";
+import EditTopicHeader from "../../features/EditArticle/ui/content/EditTopicHeader";
 
 
 export const ArticleBlock = ({ block }: { block: Block }) => {
@@ -40,7 +41,7 @@ const ArticleContent: React.FC<{ page?: Page }> = observer(({ page }) => {
         article.content.topics.get(pageToRender.topicId) ??
         article.content.currentTopic;
 
-    if (topic?.id === 'cover') return <ArticleCover />
+    if (page?.id === 'cover') return <ArticleCover />
 
 
     return (<>
@@ -55,7 +56,9 @@ const ArticleContent: React.FC<{ page?: Page }> = observer(({ page }) => {
             margin={{ lg: [36, 18], md: [36, 18], sm: [16, 16], xs: [16, 16], xxs: [16, 16] }}
         >
             <div key='topic-header' data-grid={{ x: 0, y: 0, w: 2, h: 1, static: true }}>
-                <TopicHeader topic={topic} />
+                {
+                    article.editMode ? <EditTopicHeader topic={topic} /> : <TopicHeader topic={topic} />
+                }
             </div>
 
             {

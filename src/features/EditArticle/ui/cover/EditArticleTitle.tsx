@@ -7,6 +7,10 @@ const EditArticleTitle: React.FC<{}> = observer(() => {
 
     const article = useArticleStore()
 
+    const handleTitleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        article.setTitle(e.target.value)
+    }
+
     return (<>
         <Textarea
             fw={900}
@@ -30,6 +34,7 @@ const EditArticleTitle: React.FC<{}> = observer(() => {
             }}
             maxLength={20}
             rows={1}
+            onChange={handleTitleChange}
             defaultValue={article.title}
         />
 

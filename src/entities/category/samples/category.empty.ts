@@ -5,8 +5,8 @@ export const EMPTY_CATEGORY: Category = {
     emoji: '',
     name: '',
     colors: {
-        accentColor: '#888',
+        accentColor: '#888888',
         darkColor: '#000000',
-        lightColor: '#bbb'
+        lightColor: '#bbbbbb'
     }
 }

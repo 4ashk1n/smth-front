@@ -1,10 +1,13 @@
 import type { Block, Content, Icon, Image, Page, Topic } from "../types/content.types";
 import { makeAutoObservable, ObservableMap } from "mobx";
+import { v4 as uuidv4 } from 'uuid';
 
 export class ContentStore {
     topics: ObservableMap<string, Topic> = new ObservableMap();
     pages: ObservableMap<string, Page> = new ObservableMap();
     blocks: ObservableMap<string, Block> = new ObservableMap();
+
+    editMode: boolean = false
 
     currentPageId: string = ''
     currentTopicId: string = ''
@@ -88,6 +91,38 @@ export class ContentStore {
     changeTopic(topicId: string) {
         this.currentTopicId = topicId
         this.currentPageId = this.topics.get(topicId)?.pages[0].id ?? ''
+    }
+
+    setEditMode(editMode: boolean) {
+        this.editMode = editMode
+    }
+
+    addNewTopic(): Topic | null {
+        if (!this.editMode) return null
+
+        const newTopicId = uuidv4()
+        const newTopic: Topic = { id: newTopicId, pages: [], order: this.topicsData.length, title: '' }
+        this.topics.set(newTopicId, newTopic)
+
+        return newTopic
+    }
+
+    addEmptyPage(): Page | null {
+        if (!this.editMode) return null
+
+        const newPageId = uuidv4()
+        let prevTopic = this.getPageByOrder(this.pagesData.length - 1)?.topicId 
+        console.log(prevTopic)
+        if (!prevTopic || prevTopic === 'cover' || prevTopic === '') {
+            const newTopic = this.addNewTopic()
+            if (!newTopic) return null
+            prevTopic = newTopic.id
+            console.log(prevTopic)
+        }
+        const newPage: Page = { id: newPageId, blocks: [], topicId: prevTopic, order: this.pagesData.length }
+        this.pages.set(newPageId, newPage)
+
+        return newPage
     }
 
 }

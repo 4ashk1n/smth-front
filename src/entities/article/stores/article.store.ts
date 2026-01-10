@@ -45,6 +45,11 @@ export class ArticleStore {
 
     setEditMode(editMode: boolean) {
         this.editMode = editMode
+        this.content.setEditMode(editMode);
+
+        if (editMode) {
+            this.content.addEmptyPage();
+        }
     }
 
     setCategories(categories: Category[]) {
@@ -56,5 +61,15 @@ export class ArticleStore {
             this.mainCategory = EMPTY_CATEGORY
         }
         this.categories = categories
+    }
+
+    setTitle(title: string) {
+        if (!this.editMode) return
+        this.title = title
+    }
+
+    setDescription(description: string) {
+        if (!this.editMode) return
+        this.description = description
     }
 }

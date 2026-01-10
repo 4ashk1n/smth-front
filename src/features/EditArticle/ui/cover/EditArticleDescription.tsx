@@ -6,6 +6,10 @@ import { useArticleStore } from "../../../../entities/article/contexts/article.c
 const EditArticleDescription: React.FC<{}> = observer(() => {
     const article = useArticleStore()
 
+    const handleDescriptionChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+        article.setDescription(event.target.value)
+    }
+
     return (<>
         <Textarea
             fw={200}
@@ -28,6 +32,7 @@ const EditArticleDescription: React.FC<{}> = observer(() => {
             w='100%'
             maxLength={48}
             rows={2}
+            onChange={handleDescriptionChange}
             defaultValue={article.description}
         />
 

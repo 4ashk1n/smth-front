@@ -19,7 +19,7 @@ const ArticleActionButton: React.FC<{
             justify="center"
             gap={2}
         >
-                <props.icon size={30} color="white" />
+            <props.icon size={30} color="white" />
             <Text
                 size="12px"
                 c='white'
@@ -37,66 +37,33 @@ const ActionButtons: React.FC<{}> = observer(() => {
     const article = useArticleStore()
     const [opened, { toggle }] = useDisclosure();
     return (<>
-        <Stack
-            w='fit-content'
-            h='fit-content'
-            pos={'absolute'}
-            justify="center"
-            right={8}
-            bottom={8}
-            gap={24}
-        >
+        <ArticleActionButton
+            counter={0}
+            pressed={false}
+            icon={PiHeartFill}
+            onClick={() => { }}
+        />
 
-            <Transition
-                mounted={opened}
-                duration={200}
-                transition={'slide-up'}
-            >
-                {
-                    (styles) =>
-                        <Stack
-                            gap={24}
-                            justify="center"
-                            align="center"
-                            style={styles}
-                        >
-                            <ArticleActionButton
-                                counter={0}
-                                pressed={false}
-                                icon={PiHeartFill}
-                                onClick={() => { }}
-                            />
+        <ArticleActionButton
+            counter={0}
+            pressed={false}
+            icon={PiChatCenteredDotsFill}
+            onClick={() => { }}
+        />
 
+        <ArticleActionButton
+            counter={0}
+            pressed={false}
+            icon={PiBookmarkSimpleFill}
+            onClick={() => { }}
+        />
 
-                            <ArticleActionButton
-                                counter={0}
-                                pressed={false}
-                                icon={PiChatCenteredDotsFill}
-                                onClick={() => { }}
-                            />
-
-                            <ArticleActionButton
-                                counter={0}
-                                pressed={false}
-                                icon={PiBookmarkSimpleFill}
-                                onClick={() => { }}
-                            />
-
-                            <ArticleActionButton
-                                counter={0}
-                                pressed={false}
-                                icon={PiShareFatFill}
-                                onClick={() => { }}
-                            />
-                        </Stack>
-                }
-
-            </Transition>
-            {/* <ActionIcon size='40px' radius={'10px'} onClick={toggle} color={article.mainCategory.colors.accentColor}> */}
-                <Burger size={'sm'} opened={opened}/>
-            {/* </ActionIcon> */}
-            
-        </Stack>
+        <ArticleActionButton
+            counter={0}
+            pressed={false}
+            icon={PiShareFatFill}
+            onClick={() => { }}
+        />
     </>)
 })
 

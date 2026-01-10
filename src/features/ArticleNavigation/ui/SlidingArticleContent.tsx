@@ -23,7 +23,6 @@ const SlidingArticleContent: React.FC<SlidingArticleContentProps> = observer(
     const baseOffset = -currentOrder * width
 
     const translateX = useTransform(swipeX, (dx) => baseOffset + dx)
-
     return (
       <div
         style={{

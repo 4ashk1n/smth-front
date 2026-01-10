@@ -79,7 +79,7 @@ const Object3dBlock: React.FC<Object3dBlockProps> = observer((props) => {
                                         borderRadius: '10px',
                                         filter: `brightness(0.5) ${props.blocktype !== 'icon' ? `contrast(${1 - (props.depth - i) * .05})` : ''}`,
                                         mixBlendMode: props.blocktype === 'icon' ? 'luminosity' : 'luminosity',
-
+                                        
                                     }}
                                 >
                                     {
