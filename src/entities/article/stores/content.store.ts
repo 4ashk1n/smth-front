@@ -1,6 +1,8 @@
-import type { Block, Content, Icon, Image, Page, Topic } from "../types/content.types";
+import type { Block, BlockType, Content, Icon, Image, Page, Paragraph, Topic } from "../types/content.types";
 import { makeAutoObservable, ObservableMap } from "mobx";
 import { v4 as uuidv4 } from 'uuid';
+import type { BlockTypes } from "../../__old/article/types/Content";
+import { findOptimalFreeSpot } from "../../../features/EditArticle/lib/getLayoutForNewBlock";
 
 export class ContentStore {
     topics: ObservableMap<string, Topic> = new ObservableMap();
@@ -139,4 +141,60 @@ export class ContentStore {
         return newPage
     }
 
+    addBlockToCurrentPage(block: Block) {
+        if (!this.currentPage || !this.editMode) return
+        this.currentPage.blocks.push(block)
+
+        if (this.currentPage.order === this.pagesData.length - 1) {
+            this.addEmptyPage();
+        }
+    }
+
+    addEmptyBlock(blocktype: BlockType) {
+        if (!this.currentPage || !this.editMode) return
+        
+        const { x, y } = findOptimalFreeSpot(this.currentPage);
+        if (x === -1 || y === -1) return
+        
+        switch (blocktype) {
+            case 'image': {
+                const newBlock: Image = {
+                    id: uuidv4(),
+                    type: 'image',
+                    url: '',
+                    layout: { i: '', x, y, w: 1, h: 1 }
+                };
+                this.addBlockToCurrentPage(newBlock);
+                break;
+            }
+            case 'icon': {
+                const newBlock: Icon = {
+                    id: uuidv4(),
+                    type: 'icon',
+                    name: 'MdQuestionMark',
+                    layout: { i: '', x, y, w: 1, h: 1 }
+                };
+                this.addBlockToCurrentPage(newBlock);
+                break;
+            }
+            case 'paragraph': {
+                const newBlock: Paragraph = {
+                    id: uuidv4(),
+                    type: 'paragraph',
+                    content: '',
+                    layout: { i: '', x, y, w: 1, h: 1 }
+                };
+                this.addBlockToCurrentPage(newBlock);
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+
+        console.log('created')
+    }
+
+    
+    
 }
