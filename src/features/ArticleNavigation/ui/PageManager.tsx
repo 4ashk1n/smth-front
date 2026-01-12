@@ -26,7 +26,7 @@ const FakeDot: React.FC<{}> = () => {
 
 const PageManager = observer(() => {
   const article = useArticleStore()
-  const pages = useMemo(() => article.content.pagesData, [article.content.pages])
+  const pages = useMemo(() => article.content.pagesData, [article.content.pages.size])
   const currentPageOrder = useMemo(
     () => article.content.currentPage?.order ?? 0,
     [article.content.currentPageId]
@@ -62,7 +62,7 @@ const PageManager = observer(() => {
     const start = Math.max(0, currentPageOrder - 2)
     const end = Math.min(pages.length, currentPageOrder + 3)
     return pages.slice(start, end)
-  }, [pages, currentPageOrder])
+  }, [pages.length, currentPageOrder])
 
   const leftFakeDotsCount = useMemo(() => {
     return Math.max(0, 2 - currentPageOrder)

@@ -85,7 +85,15 @@ export class ContentStore {
     changePage(pageId: string) {
         this.currentPageId = pageId
         this.currentTopicId = this.pages.get(pageId)?.topicId ?? ''
-        console.log(this.currentTopicId)
+        
+        if (
+            this.editMode && 
+            this.currentPage?.order === this.pagesData.length - 1 && 
+            this.currentPage?.blocks.length !== 0
+        ) {
+            //this.clearExtraEmptyPages()
+            this.addEmptyPage()
+        }
     }
 
     changeTopic(topicId: string) {
@@ -105,6 +113,12 @@ export class ContentStore {
         this.topics.set(newTopicId, newTopic)
 
         return newTopic
+    }
+
+    clearExtraEmptyPages() {
+        const emptyPages = this.pagesData.filter(p => (p.blocks.length === 0 && p.topicId !== 'cover' && p.order !== this.pagesData.length - 1 ))
+        console.log(emptyPages.map(p => p.order), this.pagesData.length - 1)
+        emptyPages.forEach(p => this.pages.delete(p.id))
     }
 
     addEmptyPage(): Page | null {
