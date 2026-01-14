@@ -2,7 +2,8 @@ import type { Block, BlockType, Content, Icon, Image, Page, Paragraph, Topic } f
 import { makeAutoObservable, ObservableMap } from "mobx";
 import { v4 as uuidv4 } from 'uuid';
 import type { BlockTypes } from "../../__old/article/types/Content";
-import { findOptimalFreeSpot } from "../../../features/EditArticle/lib/getLayoutForNewBlock";
+import { findOptimalFreeSpot } from "../../../features/EditArticle/lib/findOptimalFreeSpot";
+import type { Layout } from "react-grid-layout";
 
 export class ContentStore {
     topics: ObservableMap<string, Topic> = new ObservableMap();
@@ -10,6 +11,7 @@ export class ContentStore {
     blocks: ObservableMap<string, Block> = new ObservableMap();
 
     editMode: boolean = false
+    dragMode: boolean = false
 
     currentPageId: string = ''
     currentTopicId: string = ''
@@ -107,6 +109,16 @@ export class ContentStore {
         this.editMode = editMode
     }
 
+    setDragMode(dragMode: boolean) {
+        console.log(dragMode, "DRAG")
+        if (!this.editMode) {
+            this.dragMode = false;
+            return
+        }
+        if (this.dragMode === dragMode) return
+        this.dragMode = dragMode
+    }
+
     addNewTopic(): Topic | null {
         if (!this.editMode) return null
 
@@ -155,34 +167,36 @@ export class ContentStore {
         
         const { x, y } = findOptimalFreeSpot(this.currentPage);
         if (x === -1 || y === -1) return
+
+        const newBlockId = uuidv4();
         
         switch (blocktype) {
             case 'image': {
                 const newBlock: Image = {
-                    id: uuidv4(),
+                    id: newBlockId,
                     type: 'image',
                     url: '',
-                    layout: { i: '', x, y, w: 1, h: 1 }
+                    layout: { i: newBlockId, x, y, w: 1, h: 2 }
                 };
                 this.addBlockToCurrentPage(newBlock);
                 break;
             }
             case 'icon': {
                 const newBlock: Icon = {
-                    id: uuidv4(),
+                    id: newBlockId,
                     type: 'icon',
                     name: 'MdQuestionMark',
-                    layout: { i: '', x, y, w: 1, h: 1 }
+                    layout: { i: newBlockId, x, y, w: 1, h: 2 }
                 };
                 this.addBlockToCurrentPage(newBlock);
                 break;
             }
             case 'paragraph': {
                 const newBlock: Paragraph = {
-                    id: uuidv4(),
+                    id: newBlockId,
                     type: 'paragraph',
                     content: '',
-                    layout: { i: '', x, y, w: 1, h: 1 }
+                    layout: { i: newBlockId, x, y, w: 1, h: 2 }
                 };
                 this.addBlockToCurrentPage(newBlock);
                 break;
@@ -195,6 +209,24 @@ export class ContentStore {
         console.log('created')
     }
 
+    editBlock(block: Block) {
+        if (!this.currentPage || !this.editMode) return
+        const index = this.currentPage.blocks.findIndex(b => b.id === block.id)
+        if (index === -1) return
+        this.currentPage.blocks[index] = block
+    }
+
+    changeLayout(layout: Layout[]) {
+        if (!this.currentPage || !this.editMode) return
+        console.log(layout)
+        
+        this.currentPage.blocks.forEach((b) => {
+            const blockLayout = layout.find(l => l.i === b.layout.i)
+            console.log(b.layout, blockLayout)
+            if (!blockLayout) return
+            this.editBlock({ ...b, layout: blockLayout })
+        })
+    }
     
     
 }

@@ -1,20 +1,22 @@
 import { useContext, useEffect, useState } from "react"
-import type { Image } from "../../../../entities/article/types/blocks/Image"
+
 import { observer } from "mobx-react-lite"
-import { ArticleContext } from "../../../stores/ArticleStore"
 import { Stack, Anchor, Image as MantineImage, Text, TextInput, Group, FileInput, ActionIconGroup, FileButton, ActionIcon, ButtonGroup } from "@mantine/core"
-import HighlitedBlock from "../../../../shared/blocks/HighlitedBlock"
+
 import { FaPlus, FaX } from "react-icons/fa6"
+import type { Image } from "../../../../entities/article/types/content.types"
+import { useArticleStore } from "../../../../entities/article/contexts/article.context"
+import HighlitedBlock from "../../../../shared/ui/blocks/HighlitedBlock"
 
 const ImageBlockEdit: React.FC<{
     block: Image
 }> = observer((props) => {
     const [block, setBlock] = useState(props.block)
-    const { editBlock, categoryColors } = useContext(ArticleContext)
+    const article = useArticleStore()
 
     const saveChanges = () => {
         if (props.block.label === block.label && props.block.source === block.source && props.block.sourceUrl === block.sourceUrl && props.block.url === block.url) return
-        editBlock(block)
+        article.content.editBlock(block)
     }
 
     return (<>
@@ -24,7 +26,7 @@ const ImageBlockEdit: React.FC<{
             w='100%'
             h='100%'
             glow
-            {...categoryColors}
+            {...article.mainCategory.colors}
         >
             {
                 block.url ?

@@ -9,9 +9,9 @@ export const ARTICLE_DTO_SAMPLE: ArticleDTO = {
         emoji: '🐘',
         name: 'Slon',
         colors: {
-            lightColor: '#E0F7F4',
-            darkColor: '#00796B',
-            accentColor: '#00B5AD'
+            lightColor: '#F9EBEA',
+            darkColor: '#145A32',
+            accentColor: '#B03A2E'
         }
     },
     categories: [{
@@ -50,7 +50,7 @@ export const ARTICLE_DTO_SAMPLE: ArticleDTO = {
                                     x: 0,
                                     y: 1,
                                     w: 1,
-                                    h: 2
+                                    h: 4
                                 }
                             },
                             {
@@ -74,7 +74,7 @@ export const ARTICLE_DTO_SAMPLE: ArticleDTO = {
                                     x: 1,
                                     y: 1,
                                     w: 1,
-                                    h: 1
+                                    h: 2
                                 },
                             },
                             {
@@ -84,9 +84,9 @@ export const ARTICLE_DTO_SAMPLE: ArticleDTO = {
                                 layout: {
                                     i: '2',
                                     x: 0,
-                                    y: 3,
+                                    y: 6,
                                     w: 2,
-                                    h: 1
+                                    h: 2
                                 },
                                 // object3d: {
                                 //     depth: 5,
@@ -113,9 +113,9 @@ export const ARTICLE_DTO_SAMPLE: ArticleDTO = {
                                 layout: {
                                     i: '2',
                                     x: 0,
-                                    y: 1,
+                                    y: 2,
                                     w: 2,
-                                    h: 2
+                                    h: 4
                                 }
                             }
                         ],
@@ -140,9 +140,9 @@ export const ARTICLE_DTO_SAMPLE: ArticleDTO = {
                                 layout: {
                                     i: '0',
                                     x: 0,
-                                    y: 1,
+                                    y: 2,
                                     w: 2,
-                                    h: 2
+                                    h: 4
                                 },
                                 object3d: {
                                     depth: 5,
@@ -177,9 +177,9 @@ export const ARTICLE_DTO_SAMPLE: ArticleDTO = {
                                 layout: {
                                     i: '0',
                                     x: 0,
-                                    y: 1,
+                                    y: 2,
                                     w: 2,
-                                    h: 2
+                                    h: 4
                                 },
                                 object3d: {
                                     depth: 5,
@@ -214,9 +214,9 @@ export const ARTICLE_DTO_SAMPLE: ArticleDTO = {
                                 layout: {
                                     i: '0',
                                     x: 0,
-                                    y: 1,
+                                    y: 2,
                                     w: 2,
-                                    h: 2
+                                    h: 4
                                 },
                                 object3d: {
                                     depth: 5,
@@ -251,9 +251,9 @@ export const ARTICLE_DTO_SAMPLE: ArticleDTO = {
                                 layout: {
                                     i: '0',
                                     x: 0,
-                                    y: 1,
+                                    y: 2,
                                     w: 2,
-                                    h: 2
+                                    h: 4
                                 },
                                 object3d: {
                                     depth: 5,
@@ -288,9 +288,9 @@ export const ARTICLE_DTO_SAMPLE: ArticleDTO = {
                                 layout: {
                                     i: '0',
                                     x: 0,
-                                    y: 1,
+                                    y: 2,
                                     w: 2,
-                                    h: 2
+                                    h: 4
                                 },
                                 object3d: {
                                     depth: 5,

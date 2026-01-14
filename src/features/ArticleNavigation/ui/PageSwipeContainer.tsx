@@ -22,12 +22,19 @@ const PageSwipeContainer = observer(({ children, overlay, lockAxis }: Props) => 
   useGesture(
     {
       onDrag: ({ movement: [mx, my], last, cancel }) => {
+        if (article.content.dragMode) {
+          return
+        };
+
+
         // axis lock: если пользователь повёл больше по Y — не крадём вертикаль
         if (Math.abs(my) > Math.abs(mx)) {
           cancel?.()
           return
         }
         lockAxis?.("x")
+
+        article.setSwiping(true)
 
         x.set(mx)
 
@@ -60,6 +67,9 @@ const PageSwipeContainer = observer(({ children, overlay, lockAxis }: Props) => 
 
         animate(x, 0)
       },
+      onDragEnd: () => {
+        article.setSwiping(false)
+      }
     },
     {
       target: ref,

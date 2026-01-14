@@ -17,6 +17,7 @@ export class ArticleStore {
     status: 'published' | 'draft' | 'archived' | 'review' | undefined
 
     editMode: boolean = false
+    swiping: boolean = false
 
 
     constructor() {
@@ -50,6 +51,10 @@ export class ArticleStore {
         if (editMode) {
             this.content.addEmptyPage();
         }
+    }
+
+    setSwiping(swiping: boolean) {
+        this.swiping = swiping
     }
 
     setCategories(categories: Category[]) {

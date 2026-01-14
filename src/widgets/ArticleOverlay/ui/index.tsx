@@ -10,6 +10,7 @@ import ActionsMenu from "./ActionsMenu"
 const ArticleOverlay = observer(() => {
   const article = useArticleStore()
   const visible = article.content.currentPageId !== "cover"
+  
 
   return (
     <motion.div
