@@ -1,9 +1,8 @@
 
 import { Stack, Text } from "@mantine/core"
 import { observer } from "mobx-react-lite"
-import { PiArrowsOut, PiArrowsOutBold, PiArrowsOutDuotone, PiArrowsOutFill, PiBookmarkSimpleFill, PiChatCenteredDotsFill, PiHeartFill, PiImageSquare, PiImageSquareDuotone, PiLockSimpleDuotone, PiParagraph, PiShareFatFill, PiStar, PiStarDuotone, PiTextAa, PiTextAaDuotone } from "react-icons/pi"
+import { PiImageSquareDuotone, PiLockSimpleDuotone, PiSelectionBackgroundDuotone, PiStarDuotone, PiTextAaDuotone } from "react-icons/pi"
 import type { IconType } from "react-icons"
-import { FaIcons } from "react-icons/fa6"
 import { useArticleStore } from "../../../../entities/article/contexts/article.context"
 
 const EditArticleActionButton: React.FC<{
@@ -34,7 +33,7 @@ const EditArticleOverlayButtons: React.FC<{}> = observer(() => {
     const article = useArticleStore();
     return (<>
         <EditArticleActionButton
-            icon={article.content.dragMode ? PiLockSimpleDuotone : PiArrowsOut}
+            icon={article.content.dragMode ? PiLockSimpleDuotone : PiSelectionBackgroundDuotone}
             onClick={() => {article.content.setDragMode(!article.content.dragMode)}}
         />
 

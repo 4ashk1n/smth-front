@@ -4,7 +4,7 @@ import { useDisclosure } from "@mantine/hooks"
 import { observer } from "mobx-react-lite"
 import { useArticleStore } from "../../../entities/article/contexts/article.context"
 import ActionButtons from "../../../features/ArticleReaderActions/ui/ActionButtons"
-import EditArticleOverlayButtons from "../../../features/EditArticle/ui/actions/EditArticleOverlayButtons"
+import EditArticleOverlayButtons from "../../../features/EditArticle/ui/tools/EditArticleOverlayButtons"
 
 
 const ActionsMenu: React.FC<{}> = observer(() => {

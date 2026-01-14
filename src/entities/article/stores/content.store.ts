@@ -1,7 +1,6 @@
 import type { Block, BlockType, Content, Icon, Image, Page, Paragraph, Topic } from "../types/content.types";
 import { makeAutoObservable, ObservableMap } from "mobx";
 import { v4 as uuidv4 } from 'uuid';
-import type { BlockTypes } from "../../__old/article/types/Content";
 import { findOptimalFreeSpot } from "../../../features/EditArticle/lib/findOptimalFreeSpot";
 import type { Layout } from "react-grid-layout";
 
