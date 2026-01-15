@@ -2,7 +2,7 @@ import ReactIcon, { type IconName } from "../../../../shared/icon/ReactIcon";
 import { useArticleStore } from "../../contexts/article.context";
 import type { Icon } from "../../types/content.types";
 import Object3dBlock from "./Object3dBlock";
-import { observer } from "mobx-react-lite";
+import { observer } from "mobx-react";
 
 const IconBlock: React.FC<{ block: Icon }> = observer((props) => {
 

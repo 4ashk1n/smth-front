@@ -1,7 +1,7 @@
 
 import { ActionIcon, Burger, NumberFormatter, Stack, Text, Transition } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
-import { observer } from "mobx-react-lite"
+import { observer } from "mobx-react"
 import { PiBookmarkSimpleFill, PiChatCenteredDotsFill, PiHeartFill, PiShareFatFill } from "react-icons/pi"
 import { useArticleStore } from "../../../entities/article/contexts/article.context"
 import type { IconType } from "react-icons"

@@ -8,7 +8,7 @@ import type { CategoryColors } from "../../../category/types/category.types";
 import type { Object3d } from "../../types/content.types";
 import { useDeviceType } from "../../../../shared/lib/useDeviceType";
 import { useArticleStore } from "../../contexts/article.context";
-import { observer } from "mobx-react-lite";
+import { observer } from "mobx-react";
 
 type Object3dBlockProps = FlexProps & Object3d & CategoryColors & {
     blocktype: string,
@@ -155,7 +155,7 @@ export default Object3dBlock
 // import type { CategoryColors } from "../../../category/types/category.types"
 // import type { Object3d } from "../../types/content.types"
 // import { useDeviceType } from "../../../../shared/lib/useDeviceType"
-// import { observer } from "mobx-react-lite"
+// import { observer } from "mobx-react"
 // import { useHorizontalParallax } from "../../../../shared/lib/horizontalParallaxContext"
 // import {
 //   motion,

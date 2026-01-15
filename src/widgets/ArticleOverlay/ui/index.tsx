@@ -3,7 +3,7 @@ import PageManager from "../../../features/ArticleNavigation/ui/PageManager"
 import ArticleHeader from "../../../entities/article/ui/ArticleHeader"
 import ActionButtons from "../../../features/ArticleReaderActions/ui/ActionButtons"
 import { useArticleStore } from "../../../entities/article/contexts/article.context"
-import { observer } from "mobx-react-lite"
+import { observer } from "mobx-react"
 import { motion } from "framer-motion"
 import ActionsMenu from "./ActionsMenu"
 

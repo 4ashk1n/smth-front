@@ -1,9 +1,9 @@
-import { Textarea, Title } from "@mantine/core"
+import { Textarea } from "@mantine/core"
+import { observer } from "mobx-react"
 import { useArticleStore } from "../../../../entities/article/contexts/article.context"
 import type { Topic } from "../../../../entities/article/types/content.types"
-import { observer } from "mobx-react-lite"
 
-const EditTopicHeader: React.FC<{topic?: Topic}> = observer(({topic}) => {
+const EditTopicHeader: React.FC<{ topic?: Topic }> = observer(({ topic }) => {
     const article = useArticleStore()
     const topicToRender = topic ?? article.content.currentTopic ?? article.content.topicsData[0]
     return (
@@ -14,7 +14,7 @@ const EditTopicHeader: React.FC<{topic?: Topic}> = observer(({topic}) => {
             // fw={700}
             lh={0.8}
             mt={10}
-            fw={900}
+            fw={900} 
             defaultValue={topicToRender.title}
             style={{
                 fontVariantCaps: 'small-caps',

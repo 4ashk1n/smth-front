@@ -8,7 +8,7 @@ import ResponsiveGridLayout from "../../../shared/ui/grids/ResponsiveGridLayout"
 import ArticleContent from "../../../widgets/ArticleContent"
 import ArticleOverlay from "../../../widgets/ArticleOverlay/ui"
 import { useIsMobileScreen } from "../../../shared/lib/useIsMobile"
-import { observer } from "mobx-react-lite"
+import { observer } from "mobx-react"
 import { useArticleStore } from "../../../entities/article/contexts/article.context"
 import { ParallaxProvider } from "react-scroll-parallax"
 

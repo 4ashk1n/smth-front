@@ -1,6 +1,6 @@
 
 import { Stack, Text } from "@mantine/core"
-import { observer } from "mobx-react-lite"
+import { observer } from "mobx-react"
 import { PiImageSquareDuotone, PiLockSimpleDuotone, PiSelectionBackgroundDuotone, PiStarDuotone, PiTextAaDuotone } from "react-icons/pi"
 import type { IconType } from "react-icons"
 import { useArticleStore } from "../../../../entities/article/contexts/article.context"

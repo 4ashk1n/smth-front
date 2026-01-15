@@ -1,5 +1,5 @@
 // features/ArticleNavigation/ui/SlidingArticleContent.tsx
-import { observer } from "mobx-react-lite"
+import { observer } from "mobx-react"
 import { useArticleStore } from "../../../entities/article/contexts/article.context"
 import ArticleContent from "../../../widgets/ArticleContent"
 import { type MotionValue, useTransform, motion } from "framer-motion"

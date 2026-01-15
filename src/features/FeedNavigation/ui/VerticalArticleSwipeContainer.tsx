@@ -1,7 +1,7 @@
 import { useGesture } from "@use-gesture/react"
 import { motion, useMotionValue, animate, MotionValue } from "framer-motion"
 import { useRef } from "react"
-import { observer } from "mobx-react-lite"
+import { observer } from "mobx-react"
 
 interface Props {
     index: number

@@ -6,7 +6,7 @@ import { LuArrowDownRight } from "react-icons/lu";
 import AddBlockAffix from "./AddBlockAffix";
 import { EditArticleBlock } from "./EditArticleBlock";
 import { ArticleContext } from "../../stores/ArticleStore";
-import { observer } from "mobx-react-lite";
+import { observer } from "mobx-react";
 import IconSelectMenu from "../../../shared/icon/IconSelectMenu";
 
 

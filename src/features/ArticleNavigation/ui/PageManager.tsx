@@ -2,7 +2,7 @@ import { Group } from "@mantine/core"
 import { useArticleStore } from "../../../entities/article/contexts/article.context"
 import { useMemo, useRef, useState, useEffect } from "react"
 import type { Page } from "../../../entities/article/types/content.types"
-import { observer } from "mobx-react-lite"
+import { observer } from "mobx-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { dotVariants } from "../animations/dots"
 

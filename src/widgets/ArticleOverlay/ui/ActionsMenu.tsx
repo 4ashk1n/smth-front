@@ -1,7 +1,7 @@
 
 import { ActionIcon, Burger, Stack, Transition } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
-import { observer } from "mobx-react-lite"
+import { observer } from "mobx-react"
 import { useArticleStore } from "../../../entities/article/contexts/article.context"
 import ActionButtons from "../../../features/ArticleReaderActions/ui/ActionButtons"
 import EditArticleOverlayButtons from "../../../features/EditArticle/ui/tools/EditArticleOverlayButtons"

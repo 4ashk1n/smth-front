@@ -6,7 +6,7 @@ import HighlitedBlock from "../../../../shared/blocks/HighlitedBlock";
 import type ArticleHeader from "../../../../widgets/ArticleHeader/ui";
 import { ArticleContext } from "../../../stores/ArticleStore";
 import EditArticleCategories from "./EditArticleCategories";
-import { observer } from "mobx-react-lite";
+import { observer } from "mobx-react";
 
 
 const EditArticleHeader: React.FC<{}> = observer(() => {

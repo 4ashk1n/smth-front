@@ -2,7 +2,7 @@ import { Stack, Text, Title } from "@mantine/core";
 import type { CategoryColors } from "../../../category/types/category.types";
 import { useArticleStore } from "../../contexts/article.context";
 import UserPill from "../../../user/ui/UserPill";
-import { observer } from "mobx-react-lite";
+import { observer } from "mobx-react";
 import HighlitedBlock from "../../../../shared/ui/blocks/HighlitedBlock";
 import { useIsMobileScreen } from "../../../../shared/lib/useIsMobile";
 

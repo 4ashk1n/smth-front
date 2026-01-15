@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { observer } from "mobx-react-lite"
+import { observer } from "mobx-react"
 import ReactIcon, { type IconName } from "../../../../shared/icon/ReactIcon"
 import IconSelectMenu from "../../../../shared/icon/IconSelectMenu"
 import type { Icon } from "../../../../entities/article/types/content.types"

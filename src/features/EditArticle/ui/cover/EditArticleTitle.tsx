@@ -1,6 +1,6 @@
 
 import { Textarea } from "@mantine/core"
-import { observer } from "mobx-react-lite"
+import { observer } from "mobx-react"
 import { useArticleStore } from "../../../../entities/article/contexts/article.context"
 
 const EditArticleTitle: React.FC<{}> = observer(() => {

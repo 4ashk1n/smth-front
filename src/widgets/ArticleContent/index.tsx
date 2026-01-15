@@ -4,7 +4,7 @@ import IconBlock from "../../entities/article/ui/ArticleContent/IconBlock";
 import { useArticleStore } from "../../entities/article/contexts/article.context";
 import type { Block, Icon, Image, Page, Paragraph } from "../../entities/article/types/content.types";
 import ParagraphBlock from "../../entities/article/ui/ArticleContent/ParagraphBlock";
-import { observer } from "mobx-react-lite";
+import { observer } from "mobx-react";
 import { type Layout } from "react-grid-layout";
 import ResponsiveGridLayout from "../../shared/ui/grids/ResponsiveGridLayout";
 import TopicHeader from "../../entities/article/ui/ArticleContent/TopicHeader";

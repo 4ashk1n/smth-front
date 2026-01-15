@@ -7,7 +7,7 @@ import StarterKit from '@tiptap/starter-kit';
 import { RichTextEditor } from '@mantine/tiptap';
 import Placeholder from '@tiptap/extension-placeholder';
 import { Markdown } from 'tiptap-markdown-3';
-import { observer } from "mobx-react-lite"
+import { observer } from "mobx-react"
 import type { Paragraph } from "../../../../entities/article/types/content.types";
 import { useArticleStore } from "../../../../entities/article/contexts/article.context";
 import HighlitedBlock from "../../../../shared/ui/blocks/HighlitedBlock";

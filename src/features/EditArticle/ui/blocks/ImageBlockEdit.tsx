@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react"
 
-import { observer } from "mobx-react-lite"
+import { observer } from "mobx-react"
 import { Stack, Anchor, Image as MantineImage, Text, TextInput, Group, FileInput, ActionIconGroup, FileButton, ActionIcon, ButtonGroup } from "@mantine/core"
 
 import { FaPlus, FaX } from "react-icons/fa6"

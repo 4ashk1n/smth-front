@@ -1,7 +1,6 @@
 import { Title } from "@mantine/core";
 import { useArticleStore } from "../../contexts/article.context"
-import Object3dBlock from "./Object3dBlock";
-import { observer } from "mobx-react-lite";
+import { observer } from "mobx-react";
 import { useIsMobileScreen } from "../../../../shared/lib/useIsMobile";
 import type { Topic } from "../../types/content.types";
 

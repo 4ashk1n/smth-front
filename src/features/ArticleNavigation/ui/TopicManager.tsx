@@ -1,6 +1,6 @@
 import { Group, ScrollArea, Stack, Text } from "@mantine/core"
 import { useArticleStore } from "../../../entities/article/contexts/article.context"
-import { observer } from "mobx-react-lite"
+import { observer } from "mobx-react"
 import { useMemo } from "react"
 import type { Topic } from "../../../entities/article/types/content.types"
 
