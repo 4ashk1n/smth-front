@@ -188,7 +188,7 @@ export class ContentStore {
                 const newBlock: Icon = {
                     id: newBlockId,
                     type: 'icon',
-                    name: 'MdQuestionMark',
+                    name: '',
                     layout: { i: newBlockId, x, y, w: 1, h: 2 }
                 };
                 this.addBlockToCurrentPage(newBlock);

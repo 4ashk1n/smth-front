@@ -80,7 +80,7 @@ const ErrorFallback: React.FC<{ iconName: string }> = ({ iconName }) => (
     alignItems: 'center',
     justifyContent: 'center',
     color: '#ff6b6b',
-    border: '1px dashed #ff6b6b',
+    // border: '1px dashed #ff6b6b',
     borderRadius: '4px',
     padding: '4px 8px',
     fontSize: '12px'
