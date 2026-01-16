@@ -1,8 +1,8 @@
-import type { Block, BlockType, Content, Icon, Image, Page, Paragraph, Topic } from "../types/content.types";
 import { makeAutoObservable, ObservableMap } from "mobx";
+import type { Layout } from "react-grid-layout";
 import { v4 as uuidv4 } from 'uuid';
 import { findOptimalFreeSpot } from "../../../features/EditArticle/lib/findOptimalFreeSpot";
-import type { Layout } from "react-grid-layout";
+import type { Block, BlockType, Content, Icon, Image, Page, Paragraph, Topic } from "../types/content.types";
 
 export class ContentStore {
     topics: ObservableMap<string, Topic> = new ObservableMap();
@@ -14,6 +14,10 @@ export class ContentStore {
 
     currentPageId: string = ''
     currentTopicId: string = ''
+    currentBlockId: string = ''
+
+    isDragging: boolean = false
+    currentDragPos: { x: number, y: number } = { x: 0, y: 0 }
 
     constructor() {
         makeAutoObservable(this, {}, { autoBind: true })
@@ -215,6 +219,16 @@ export class ContentStore {
         this.currentPage.blocks[index] = block
     }
 
+    deleteBlock(blockId: string) {
+        if (!this.currentPage || !this.editMode) return
+        this.currentPage.blocks = this.currentPage.blocks.filter(b => b.id !== blockId)
+
+        if (this.currentPage.blocks.length === 0) {
+            // this.clearExtraEmptyPages() - #TO FIX: Rendered fewer hooks than expected
+            this.setDragMode(false)
+        }
+    }
+
     changeLayout(layout: Layout[]) {
         if (!this.currentPage || !this.editMode) return
         console.log(layout)
@@ -225,6 +239,20 @@ export class ContentStore {
             if (!blockLayout) return
             this.editBlock({ ...b, layout: blockLayout })
         })
+    }
+    
+    setCurrentBlock(blockId: string) {
+        if (!this.currentPage || !this.editMode) return
+        this.currentBlockId = blockId
+    }
+
+    setIsDragging(isDragging: boolean) {
+        this.isDragging = isDragging
+    }
+
+    setCurrentDragPos(x: number, y: number) {
+        if (!this.currentPage || !this.editMode || !this.dragMode) return
+        this.currentDragPos = { x, y }
     }
     
     

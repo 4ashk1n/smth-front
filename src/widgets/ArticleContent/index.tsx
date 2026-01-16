@@ -1,20 +1,20 @@
-import ImageBlock from "../../entities/article/ui/ArticleContent/ImageBlock";
 import IconBlock from "../../entities/article/ui/ArticleContent/IconBlock";
+import ImageBlock from "../../entities/article/ui/ArticleContent/ImageBlock";
 
-import { useArticleStore } from "../../entities/article/contexts/article.context";
-import type { Block, Icon, Image, Page, Paragraph } from "../../entities/article/types/content.types";
-import ParagraphBlock from "../../entities/article/ui/ArticleContent/ParagraphBlock";
+import { motion } from "framer-motion";
 import { observer } from "mobx-react";
 import { type Layout } from "react-grid-layout";
-import ResponsiveGridLayout from "../../shared/ui/grids/ResponsiveGridLayout";
-import TopicHeader from "../../entities/article/ui/ArticleContent/TopicHeader";
+import { useArticleStore } from "../../entities/article/contexts/article.context";
+import type { Block, Icon, Image, Page, Paragraph } from "../../entities/article/types/content.types";
 import ArticleCover from "../../entities/article/ui/ArticleContent/ArticleCover";
-import EditTopicHeader from "../../features/EditArticle/ui/content/EditTopicHeader";
-import ParagraphBlockEdit from "../../features/EditArticle/ui/blocks/ParagraphBlockEdit";
-import ImageBlockEdit from "../../features/EditArticle/ui/blocks/ImageBlockEdit";
+import ParagraphBlock from "../../entities/article/ui/ArticleContent/ParagraphBlock";
+import TopicHeader from "../../entities/article/ui/ArticleContent/TopicHeader";
 import IconBlockEdit from "../../features/EditArticle/ui/blocks/IconBlockEdit";
-import { motion } from "framer-motion";
+import ImageBlockEdit from "../../features/EditArticle/ui/blocks/ImageBlockEdit";
+import ParagraphBlockEdit from "../../features/EditArticle/ui/blocks/ParagraphBlockEdit";
+import EditTopicHeader from "../../features/EditArticle/ui/content/EditTopicHeader";
 import ResizeHandle from "../../features/EditArticle/ui/tools/ResizeHandle";
+import ResponsiveGridLayout from "../../shared/ui/grids/ResponsiveGridLayout";
 
 
 export const ArticleBlock = ({ block }: { block: Block }) => {
@@ -101,6 +101,14 @@ const ArticleContent: React.FC<{ page?: Page }> = observer(({ page }) => {
             margin={{ lg: [36, 18], md: [36, 18], sm: [16, 16], xs: [16, 16], xxs: [16, 16] }}
             onLayoutChange={(currentLayout, _) => { article.content.changeLayout(currentLayout) }}
             resizeHandle={<ResizeHandle hidden={!article.editMode || !article.content.dragMode} />}
+            autoSize={false}
+            onDrag={(_, blockLayout, __, ___, event: MouseEvent) => {
+                article.content.setCurrentBlock(blockLayout.i); 
+                article.content.setIsDragging(true);
+                article.content.setCurrentDragPos(event.clientX, event.clientY)
+            }}
+            onDragStop={() => {article.content.setIsDragging(false)}}
+
             // resizeHandle={
             //     <div
             //         style={{

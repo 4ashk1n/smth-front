@@ -1,13 +1,14 @@
 
 import { Stack, Text } from "@mantine/core"
 import { observer } from "mobx-react"
-import { PiImageSquareDuotone, PiLockSimpleDuotone, PiSelectionBackgroundDuotone, PiStarDuotone, PiTextAaDuotone } from "react-icons/pi"
 import type { IconType } from "react-icons"
+import { PiImageSquareDuotone, PiLockSimpleDuotone, PiSelectionBackgroundDuotone, PiStarDuotone, PiTextAaDuotone } from "react-icons/pi"
 import { useArticleStore } from "../../../../entities/article/contexts/article.context"
 
 const EditArticleActionButton: React.FC<{
     icon: IconType,
-    onClick: () => void
+    onClick: () => void,
+    active: boolean
 }> = observer((props) => {
 
     return (
@@ -15,7 +16,8 @@ const EditArticleActionButton: React.FC<{
             w='fit-content'
             justify="center"
             gap={2}
-            onClick={props.onClick}
+            onClick={props.active ? props.onClick : undefined}
+            opacity={0.5 + +props.active * 0.5}
         >
             <props.icon size={30} color="white" />
             <Text
@@ -33,22 +35,26 @@ const EditArticleOverlayButtons: React.FC<{}> = observer(() => {
     const article = useArticleStore();
     return (<>
         <EditArticleActionButton
+            active={article.content.currentPage?.blocks.length !== 0}
             icon={article.content.dragMode ? PiLockSimpleDuotone : PiSelectionBackgroundDuotone}
             onClick={() => {article.content.setDragMode(!article.content.dragMode)}}
         />
 
         <EditArticleActionButton
+            active
             icon={PiStarDuotone}
             onClick={() => article.content.addEmptyBlock('icon')}
         />
 
 
         <EditArticleActionButton
+            active
             icon={PiImageSquareDuotone}
             onClick={() => article.content.addEmptyBlock('image')}
         />
 
         <EditArticleActionButton
+            active
             icon={PiTextAaDuotone}
             onClick={() => article.content.addEmptyBlock('paragraph')}
         />

@@ -1,9 +1,9 @@
 import { Group } from "@mantine/core"
-import { useArticleStore } from "../../../entities/article/contexts/article.context"
-import { useMemo, useRef, useState, useEffect } from "react"
-import type { Page } from "../../../entities/article/types/content.types"
+import { AnimatePresence, motion } from "framer-motion"
 import { observer } from "mobx-react"
-import { motion, AnimatePresence } from "framer-motion"
+import { useEffect, useMemo, useRef, useState } from "react"
+import { useArticleStore } from "../../../entities/article/contexts/article.context"
+import type { Page } from "../../../entities/article/types/content.types"
 import { dotVariants } from "../animations/dots"
 
 
@@ -84,21 +84,26 @@ const PageManager = observer(() => {
 
   const handlePageClick = (page: Page) => {
     if (page.order === currentPageOrder) return
-    
+
     // Синхронно устанавливаем направление
     const direction = page.order > currentPageOrder ? 1 : -1
     setNavigationDirection(direction)
-    
+
     article.content.changePage(page.id)
   }
 
   return (
-    <Group wrap="nowrap" gap={0} >
+    <Group 
+      wrap="nowrap"
+      gap={0}
+      opacity={+!article.content.dragMode}
+      className="transition-opacity transition-duration-300 ease-in-out"
+    >
       {/* Фиктивные точки слева для выравнивания */}
       {leftFakeDotsCount > 0 && Array.from({ length: leftFakeDotsCount }).map((_, i) => (
         <FakeDot key={`left-fake-${i}`} />
       ))}
-      
+
       <AnimatePresence mode="popLayout">
         {visiblePages.map((page) => {
           return (

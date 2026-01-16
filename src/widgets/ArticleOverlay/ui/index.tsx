@@ -1,16 +1,16 @@
 import { Stack } from "@mantine/core"
-import PageManager from "../../../features/ArticleNavigation/ui/PageManager"
-import ArticleHeader from "../../../entities/article/ui/ArticleHeader"
-import ActionButtons from "../../../features/ArticleReaderActions/ui/ActionButtons"
-import { useArticleStore } from "../../../entities/article/contexts/article.context"
-import { observer } from "mobx-react"
 import { motion } from "framer-motion"
+import { observer } from "mobx-react"
+import { useArticleStore } from "../../../entities/article/contexts/article.context"
+import ArticleHeader from "../../../entities/article/ui/ArticleHeader"
+import PageManager from "../../../features/ArticleNavigation/ui/PageManager"
+import DeleteBlockArea from "../../../features/EditArticle/ui/tools/DeleteBlockArea"
 import ActionsMenu from "./ActionsMenu"
 
 const ArticleOverlay = observer(() => {
   const article = useArticleStore()
   const visible = article.content.currentPageId !== "cover"
-  
+
 
   return (
     <motion.div
@@ -43,6 +43,9 @@ const ArticleOverlay = observer(() => {
         }}
       >
         <PageManager />
+        {
+          article.content.editMode && <DeleteBlockArea />
+        }
         <ArticleHeader />
         <ActionsMenu />
       </Stack>
