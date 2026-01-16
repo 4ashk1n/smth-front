@@ -1,7 +1,6 @@
 import { Title } from "@mantine/core";
-import { useArticleStore } from "../../contexts/article.context"
 import { observer } from "mobx-react";
-import { useIsMobileScreen } from "../../../../shared/lib/useIsMobile";
+import { useArticleStore } from "../../contexts/article.context";
 import type { Topic } from "../../types/content.types";
 
 const TopicHeader: React.FC<{
@@ -9,7 +8,6 @@ const TopicHeader: React.FC<{
 }> = observer(({topic}) => {
     const article = useArticleStore()
     const topicToRender = topic ?? article.content.currentTopic ?? article.content.topicsData[0]
-    const isMobile = useIsMobileScreen()
     return (
         // <Object3dBlock
         //     blocktype={'icon'}

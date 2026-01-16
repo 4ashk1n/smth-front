@@ -1,18 +1,27 @@
-import { useContext, useEffect, useState } from "react"
+import { useState } from "react"
 
+import { Stack, Textarea } from "@mantine/core"
 import { observer } from "mobx-react"
-import { Stack, Anchor, Image as MantineImage, Text, TextInput, Group, FileInput, ActionIconGroup, FileButton, ActionIcon, ButtonGroup } from "@mantine/core"
 
-import { FaPlus, FaX } from "react-icons/fa6"
-import type { Image } from "../../../../entities/article/types/content.types"
 import { useArticleStore } from "../../../../entities/article/contexts/article.context"
+import type { Image } from "../../../../entities/article/types/content.types"
 import HighlitedBlock from "../../../../shared/ui/blocks/HighlitedBlock"
+import ImageInput from "../../../../shared/ui/inputs/ImageInput/ui"
+
 
 const ImageBlockEdit: React.FC<{
     block: Image
 }> = observer((props) => {
     const [block, setBlock] = useState(props.block)
     const article = useArticleStore()
+
+    const handleImageLoad = (url: string) => {
+        setBlock({ ...block, url })
+    }
+
+    const handleImageClear = () => {
+        setBlock({ ...block, url: '' })
+    }
 
     const saveChanges = () => {
         if (props.block.label === block.label && props.block.source === block.source && props.block.sourceUrl === block.sourceUrl && props.block.url === block.url) return
@@ -28,34 +37,64 @@ const ImageBlockEdit: React.FC<{
             glow
             {...article.mainCategory.colors}
         >
-            {
-                block.url ?
-                    <MantineImage src={props.block.url} w='100%' h='100%' fit='cover' />
-                    : null
-            }
+            <ImageInput
+                onImageClear={handleImageClear}
+                onImageLoad={handleImageLoad}
+                dropzoneProps={{
+                    w: '100%',
+                    h: '100%',
+                    c: article.mainCategory.colors.accentColor,
+                    radius: '5px',
+                }}
+                style={{
+                    width: '100%',
+                    height: '100%',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    boxSizing: 'border-box',
+                    padding: '8px',
+                }}
+            />
+
 
             <Stack
                 pos={'absolute'}
+                hidden={!block.url}
                 bottom={0}
                 left={0}
                 gap={0}
                 w='100%'
+                h='fit-content'
+
                 style={{
-                    background: 'linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.8) 100%)'
+                    // backdropFilter: 'blur(10px)',
+                    background: `linear-gradient(180deg, ${article.mainCategory.colors.darkColor + '00'} 0%, ${article.mainCategory.colors.darkColor + '80'} 20%, ${article.mainCategory.colors.darkColor} 100%)`
                 }}
-                p={20}
+                p={10}
+                justify="end"
             >
-                <TextInput
-                    size="xs"
+                <Textarea
+                    size=""
                     value={block.label}
-                    fw={700}
+                    fw={400}
                     h={'fit-content'}
+                    maxRows={3}
+                    maxLength={64}
+                    autosize
                     w='100%'
+                    lh={1}
+                    classNames={{
+                        input: `placeholder-[#ffffff80]!`
+                    }}
                     styles={{
                         input: {
-                            fontSize: '18px',
-                            lineHeight: '1.4',
-                            color: '#ffffffc0'
+                            fontSize: '12px',
+                            lineHeight: '1',
+                            color: article.mainCategory.colors.lightColor,
+                            // '&::placeholder': {
+                            //     color: article.mainCategory.colors.accentColor + '80'
+                            // }
                         }
                     }}
                     variant="unstyled"
@@ -63,25 +102,26 @@ const ImageBlockEdit: React.FC<{
                     onChange={(e) => setBlock({ ...block, label: e.currentTarget.value })}
                     placeholder="Описание"
                 />
-                <Group gap={10} wrap="nowrap" align="center">
+                {/* <Group gap={5} wrap="nowrap" align="center">
                     <Text
-                        fz={18}
-                        lh={'1.4'}
-                        fw={400}
-                        c='#ffffff80'
+                        fz={10}
+                        lh={'1'}
+                        fw={200}
+                        c={article.mainCategory.colors.lightColor}
                     >
                         Источник:
                     </Text>
                     <TextInput
-                        size="xs"
-                        fw={400}
+                        size=""
+                        lh={1}
+                        fw={200}
                         w='100%'
                         styles={{
                             input: {
                                 height: 'fit-content',
-                                fontSize: '18px',
-                                lineHeight: '1.4',
-                                color: '#ffffff80'
+                                fontSize: '10px',
+                                lineHeight: '1',
+                                color: article.mainCategory.colors.lightColor
                             }
                         }}
                         value={block.sourceUrl}
@@ -90,7 +130,7 @@ const ImageBlockEdit: React.FC<{
                         onChange={(e) => setBlock({ ...block, sourceUrl: e.currentTarget.value })}
                         placeholder="URL"
                     />
-                </Group>
+                </Group> */}
 
             </Stack>
 
