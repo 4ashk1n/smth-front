@@ -10,7 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@editorjs/editorjs": "^2.31.0",
+    "@editorjs/editorjs": "^2.31.1",
+    "@editorjs/paragraph": "^2.11.7",
     "@loadable/component": "^5.16.7",
     "@mantine/core": "^8.2.8",
     "@mantine/dropzone": "^8.3.12",
@@ -30,6 +31,7 @@
     "mobx-react": "^9.2.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-editor-js": "^2.1.0",
     "react-grid-layout": "^1.5.2",
     "react-icons": "^5.5.0",
     "react-markdown": "^10.1.0",

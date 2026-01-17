@@ -52,7 +52,7 @@ const ArticleEditBlock = ({ block }: { block: Block }) => {
                 height: '100%',
                 width: '100%',
                 pointerEvents: 'auto', // Важно для работы drag&drop
-                position: 'relative'
+                // position: 'relative'
             }}
         >
             {
@@ -103,33 +103,34 @@ const ArticleContent: React.FC<{ page?: Page }> = observer(({ page }) => {
             resizeHandle={<ResizeHandle hidden={!article.editMode || !article.content.dragMode} />}
             autoSize={false}
             onDrag={(_, blockLayout, __, ___, event: MouseEvent) => {
-                article.content.setCurrentBlock(blockLayout.i); 
+                article.content.setCurrentBlock(blockLayout.i);
                 article.content.setIsDragging(true);
                 article.content.setCurrentDragPos(event.clientX, event.clientY)
             }}
-            onDragStop={() => {article.content.setIsDragging(false)}}
+            useCSSTransforms={false}
+            onDragStop={() => { article.content.setIsDragging(false) }}
 
-            // resizeHandle={
-            //     <div
-            //         style={{
-            //             // position: 'absolute',
-            //             // bottom: 0,
-            //             // right: 0,
-            //             width: 16,
-            //             height: 16,
-            //             background: 'black',
-            //             zIndex: 99999
-            //         }}
+        // resizeHandle={
+        //     <div
+        //         style={{
+        //             // position: 'absolute',
+        //             // bottom: 0,
+        //             // right: 0,
+        //             width: 16,
+        //             height: 16,
+        //             background: 'black',
+        //             zIndex: 99999
+        //         }}
 
-            //         // ref={ref}
-            //         // className={`resizeHandle handle-${handleAxis}`}
-            //         // {...restProps}
-            //     >
-            //         {/* <PiArrowsOutSimple style={{
-            //         rotate: '90deg',
-            //     }} /> */}
-            //     </div>
-            // }
+        //         // ref={ref}
+        //         // className={`resizeHandle handle-${handleAxis}`}
+        //         // {...restProps}
+        //     >
+        //         {/* <PiArrowsOutSimple style={{
+        //         rotate: '90deg',
+        //     }} /> */}
+        //     </div>
+        // }
         >
             <div key='topic-header' data-grid={{ x: 0, y: 0, w: 2, h: 1, static: true, resizeHandles: [] }}>
                 {

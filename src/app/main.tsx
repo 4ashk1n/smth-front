@@ -1,8 +1,7 @@
-import { createContext, StrictMode, useEffect, useState } from 'react'
+import { createContext, useEffect, useState } from 'react'
 import { createRoot } from 'react-dom/client'
-import './index.css'
 import App from './App.tsx'
-import { ParallaxProvider } from 'react-scroll-parallax'
+import './index.css'
 
 export const GlobalContext = createContext<{
   setScrollContainer: (container: HTMLDivElement) => void

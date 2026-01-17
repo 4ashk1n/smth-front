@@ -1,19 +1,19 @@
-import './App.css'
-import { createTheme, MantineProvider, ScrollArea, Stack } from '@mantine/core'
-import Header from '../widgets/NavBar/ui/Header'
+import { createTheme, MantineProvider } from '@mantine/core';
 import '@mantine/core/styles.css';
-import LandingPage from '../pages/Landing/ui';
-import ArticlePage from '../pages/Article/ui';
-import { createContext, useContext, useEffect, useRef, useState, type RefObject } from 'react';
+import '@mantine/tiptap/styles.css';
 import "animate.css/animate.min.css";
-import { ParallaxProvider, useParallaxController } from 'react-scroll-parallax';
+import { createContext, useEffect, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router';
-import NewArticlePage from '../pages/NewArticle/ui';
 import '../../node_modules/react-grid-layout/css/styles.css';
 import '../../node_modules/react-resizable/css/styles.css';
-import '@mantine/tiptap/styles.css';
-import Footer from '../widgets/NavBar/ui/Footer';
+import ArticlePage from '../pages/Article/ui';
 import FeedPage from '../pages/Feed/ui';
+import LandingPage from '../pages/Landing/ui';
+import NewArticlePage from '../pages/NewArticle/ui';
+import Footer from '../widgets/NavBar/ui/Footer';
+import './App.css';
+import './styles/editorjs.css';
+
 
 const THEME = createTheme({
 
