@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@alkhipce/editorjs-aitext": "^1.2.0",
     "@editorjs/editorjs": "^2.31.1",
     "@editorjs/paragraph": "^2.11.7",
     "@loadable/component": "^5.16.7",

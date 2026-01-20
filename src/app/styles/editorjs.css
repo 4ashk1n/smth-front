@@ -6,41 +6,49 @@
 /* ширина контента (по умолчанию EditorJS ограничивает) */
 #my-editor .ce-block__content,
 #my-editor .ce-toolbar__content {
-  max-width: 100%;
-} 
+    max-width: 100%;
+}
+
+.ce-block {
+    color: #eaeaea;
+}
 
 /* абзацы */
 .ce-paragraph {
-  font-size: 14px;
-  line-height: 16px!important;
-  color: #eaeaea;
-  padding: 0;
+    font-size: 14px;
+    line-height: 16px !important;
+    padding: 0;
+    text-align: 'justify';
+    overflow-wrap: 'break-word';
+    hyphens: 'auto';
+    text-indent: 16px;
+    text-shadow: '0 4px 4px rgba(0, 0, 0, 0.25)'
 }
 
 
 
 /* выделение */
 #my-editor ::selection {
-  background: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.25);
 }
 
 
 /* Bottom-sheet для меню (+) */
 .ce-popover {
-  position: fixed !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  top: auto !important;
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    top: auto !important;
 
-  width: 100% !important;
-  max-width: none !important;
+    width: 100% !important;
+    max-width: none !important;
 
-  margin: 0 !important;
-  transform: none !important;
+    margin: 0 !important;
+    transform: none !important;
 
-  border-radius: 16px 16px 0 0 !important;
-  z-index: 10000 !important;
+    border-radius: 16px 16px 0 0 !important;
+    z-index: 10000 !important;
 }
 
 /* чтобы список прокручивался и не залезал на home-indicator
@@ -52,34 +60,63 @@
 
 /* сам контейнер Mantine порталов поднимем повыше */
 [data-mantine-shared-portal-node="true"] {
-  position: relative;
-  z-index: 2147483647;
+    position: relative;
+    z-index: 2147483647;
 }
 
-/* popover как bottom-sheet */
 .ej-bottom-sheet {
-  position: fixed !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  top: auto !important;
-
-  width: 100vw !important;
-  max-width: none !important;
-  margin: 0 !important;
-  transform: none !important;
-
-  border-radius: 16px 16px 0 0 !important;
-  z-index: 2147483647 !important;
-}
-
-/* чтобы overlay EditorJS не мешал */
-.ej-bottom-sheet .ce-popover__overlay {
-  display: none !important;
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    top: auto !important;
+    width: 100vw !important;
+    margin: 0 !important;
+    transform: none !important;
+    z-index: 2147483647 !important;
 }
 
 .ej-bottom-sheet .ce-popover__container {
-  max-height: 45vh;
-  overflow: auto;
-  padding-bottom: env(safe-area-inset-bottom);
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100%;
+    bottom: 0 !important;
+    border: none;
+    padding: 10px 10px 80px 10px;
+    top: auto !important;
+    max-height: 45vh;
+    height: fit-content;
+    overflow: auto;
+    z-index: 2147483647 !important;
+    background-color: #00000080;
+    backdrop-filter: blur(10px);
+}
+
+.ej-bottom-sheet .ce-popover__overlay {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 2147483646 !important;
+    background-color: #00000080;
+}
+
+.ej-bottom-sheet .ce-popover-item,
+.ce-popover-item-html>* {
+    /* transition: 300ms ease-in-out; */
+    background-color: transparent !important;
+    color: #ccc
+}
+
+.ej-bottom-sheet .ce-popover-item:hover,
+.ce-popover-item-html>*:hover {
+    background-color: #00000080 !important;
+    color: white
+}
+
+.ce-popover-item__title {
+    color: inherit;
+}
+
+.ce-popover-item__icon {
+    color: inherit;
 }
