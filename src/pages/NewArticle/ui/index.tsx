@@ -12,9 +12,6 @@ import { ARTICLE_EMPTY } from "../../../entities/article/samples/article.empty"
 import ArticleScreen from "../../Article/ui/screen"
 
 const NewArticlePage = () => {
-
-    
-
     return <>
         <ArticleStoreProvider article={ARTICLE_EMPTY} editMode>
             <ArticleScreen />

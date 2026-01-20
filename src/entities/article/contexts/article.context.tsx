@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react"
-import type { Article, ArticleDTO } from "../types/article.types"
 import { ArticleStore } from "../stores/article.store"
+import type { ArticleDTO } from "../types/article.types"
 
 const ArticleContext = createContext<ArticleStore | null>(null)
 
@@ -28,6 +28,7 @@ const ArticleStoreProvider: React.FC<{
 
     useEffect(() => {
         store.fromDTO(article)
+        if (editMode) store.loadLocalDraft()
         store.setEditMode(editMode ?? false)
         store.content.changePage('cover')
     }, [article])

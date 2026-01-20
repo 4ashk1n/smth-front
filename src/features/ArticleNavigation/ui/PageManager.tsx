@@ -26,11 +26,29 @@ const FakeDot: React.FC<{}> = () => {
 
 const PageManager = observer(() => {
   const article = useArticleStore()
-  const pages = useMemo(() => article.content.pagesData, [article.content.pages.size])
-  const currentPageOrder = useMemo(
-    () => article.content.currentPage?.order ?? 0,
-    [article.content.currentPageId]
-  )
+  const pages = article.content.pagesData
+  const currentPageId = article.content.currentPageId
+
+  // Вместо зависимости от pages.size, используйте стабильный идентификатор
+  const pagesKey = `${article.content.pages.size}_${currentPageId}`
+
+  // Мемоизируем вычисления с ключом, который меняется только когда нужно
+  const { visiblePages, leftFakeDotsCount, rightFakeDotsCount } = useMemo(() => {
+    const currentPage = article.content.currentPage
+    const currentPageOrder = currentPage?.order ?? 0
+
+    // Всегда показываем 5 точек вокруг текущей
+    const start = Math.max(0, currentPageOrder - 2)
+    const end = Math.min(pages.length, currentPageOrder + 3)
+    const visiblePages = pages.slice(start, end)
+
+    const leftFakeDotsCount = Math.max(0, 2 - currentPageOrder)
+    const rightFakeDotsCount = Math.max(0, 2 - (pages.length - 1 - currentPageOrder))
+
+    return { visiblePages, leftFakeDotsCount, rightFakeDotsCount }
+  }, [pagesKey]) // Зависим от стабильного ключа
+
+  const currentPageOrder = article.content.currentPage?.order ?? 0
 
   const [navigationDirection, setNavigationDirection] = useState(0)
   const isInitialRender = useRef(true)
@@ -57,21 +75,6 @@ const PageManager = observer(() => {
   }, [currentPageOrder])
 
 
-  // Всегда показываем 5 точек вокруг текущей
-  const visiblePages = useMemo(() => {
-    const start = Math.max(0, currentPageOrder - 2)
-    const end = Math.min(pages.length, currentPageOrder + 3)
-    return pages.slice(start, end)
-  }, [pages.length, currentPageOrder])
-
-  const leftFakeDotsCount = useMemo(() => {
-    return Math.max(0, 2 - currentPageOrder)
-  }, [currentPageOrder])
-
-  const rightFakeDotsCount = useMemo(() => {
-    return Math.max(0, 2 - (pages.length - 1 - currentPageOrder))
-  }, [currentPageOrder, pages.length])
-
   const getAnimationProps = (page: Page) => {
     const distance = Math.abs(page.order - currentPageOrder)
     return {
@@ -93,7 +96,7 @@ const PageManager = observer(() => {
   }
 
   return (
-    <Group 
+    <Group
       wrap="nowrap"
       gap={0}
       opacity={+!article.content.dragMode}

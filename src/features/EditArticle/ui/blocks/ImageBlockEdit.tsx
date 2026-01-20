@@ -1,7 +1,6 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 import { Stack, Textarea } from "@mantine/core"
-import { observer } from "mobx-react"
 
 import { useArticleStore } from "../../../../entities/article/contexts/article.context"
 import type { Image } from "../../../../entities/article/types/content.types"
@@ -11,9 +10,11 @@ import ImageInput from "../../../../shared/ui/inputs/ImageInput/ui"
 
 const ImageBlockEdit: React.FC<{
     block: Image
-}> = observer((props) => {
+}> = (props) => {
     const [block, setBlock] = useState(props.block)
     const article = useArticleStore()
+
+    // TODO: Загрузка изображения на сервер
 
     const handleImageLoad = (url: string) => {
         setBlock({ ...block, url })
@@ -23,14 +24,13 @@ const ImageBlockEdit: React.FC<{
         setBlock({ ...block, url: '' })
     }
 
-    const saveChanges = () => {
-        if (props.block.label === block.label && props.block.source === block.source && props.block.sourceUrl === block.sourceUrl && props.block.url === block.url) return
+    useEffect(() => {
         article.content.editBlock(block)
-    }
+    }, [block])
+    
 
     return (<>
         <HighlitedBlock
-            onBlur={saveChanges}
             p={0}
             w='100%'
             h='100%'
@@ -138,6 +138,6 @@ const ImageBlockEdit: React.FC<{
 
         </HighlitedBlock>
     </>)
-})
+}
 
 export default ImageBlockEdit

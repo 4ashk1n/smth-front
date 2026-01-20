@@ -1,18 +1,23 @@
-import { Text } from "@mantine/core"
-import Markdown from "react-markdown"
+import { createReactEditorJS } from "react-editor-js"
+import { useIsMobileScreen } from "../../../../shared/lib/useIsMobile"
 import { useArticleStore } from "../../contexts/article.context"
 import type { Paragraph } from "../../types/content.types"
-import HighlitedBlock from "../../../../shared/ui/blocks/HighlitedBlock"
 import Object3dBlock from "./Object3dBlock"
-import { useIsMobileScreen } from "../../../../shared/lib/useIsMobile"
 
 
 const ParagraphBlock: React.FC<{ block: Paragraph }> = (props) => {
     const { mainCategory } = useArticleStore()
     const isMobile = useIsMobileScreen()
 
+    const ReactEditorJS = createReactEditorJS()
+
     const Paragraph2d = () => (<>
-        <Text
+        <ReactEditorJS
+            holder={`${props.block.id}-editorjs`}
+            readOnly={true}
+            value={props.block.content}
+        />
+        {/* <Text
             fz={isMobile ? 14 : 16}
             lh={isMobile ? '16px' : '18px'}
             fw={400}
@@ -26,7 +31,7 @@ const ParagraphBlock: React.FC<{ block: Paragraph }> = (props) => {
             }}
         >
             <Markdown remarkRehypeOptions={{}}>{props.block.content}</Markdown>
-        </Text>
+        </Text> */}
     </>)
 
     return (<>

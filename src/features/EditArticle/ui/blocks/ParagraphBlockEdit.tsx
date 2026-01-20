@@ -11,21 +11,9 @@ const ParagraphBlockEdit: React.FC<{
     block: Paragraph
 }> = observer((props) => {
     const article = useArticleStore()
-
     const ReactEditorJS = createReactEditorJS()
 
-    const saveChanges = () => {
-        // if (props.block.content === block.content) return
-        // article.content.editBlock(block)
-    }
-
-    // useEffect(() => {
-    //     if (props.block.content === block.content && props.block.title === block.title) return
-    //     editBlock(block)
-    // }, [block.content, block.title])
-
     const holderId = `${props.block.id}-editorjs`;
-    // useEditorJSPopoverToMantinePortal(holderId);
     useEffect(() => {
         const portalRoot =
             document.querySelector('[data-mantine-shared-portal-node="true"]') ??
@@ -35,7 +23,6 @@ const ParagraphBlockEdit: React.FC<{
             const popover = document.querySelector('.ce-popover.ce-popover--opened');
             if (!popover) return;
 
-            // если уже вынесен — ничего
             if (popover.parentElement === portalRoot) return;
 
             portalRoot.appendChild(popover);
@@ -50,9 +37,7 @@ const ParagraphBlockEdit: React.FC<{
             attributeFilter: ['class'],
         });
 
-        // на случай если уже открыт
         movePopover();
-
         return () => obs.disconnect();
     }, []);
 
@@ -63,7 +48,7 @@ const ParagraphBlockEdit: React.FC<{
             const parent = block.parentElement?.parentElement?.parentElement;
             if (!parent) continue
             const parentHeight = parent?.offsetHeight;
-            const blockEndPosition = block.offsetTop + block.offsetHeight; 
+            const blockEndPosition = block.offsetTop + block.offsetHeight;
             if (blockEndPosition > parentHeight) {
                 block.style.color = 'red'
             }
@@ -76,9 +61,14 @@ const ParagraphBlockEdit: React.FC<{
     const handleChange = (api: API, event: BlockMutationEvent | BlockMutationEvent[]) => {
         // console.log(api.blocks.)
         checkOverflow()
+        api.saver.save().then((outputData) => {
+            article.content.editBlock({ ...props.block, content: outputData })
+        }).catch((error) => {
+            console.log('Saving failed: ', error)
+        });
     };
 
-    useEffect(()=>{
+    useEffect(() => {
         checkOverflow()
     }, [props.block.layout.h, props.block.layout.w, props.block.layout.x, props.block.layout.y])
 
@@ -88,11 +78,12 @@ const ParagraphBlockEdit: React.FC<{
             placeholder={'Aaa'}
             tools={EDITOR_JS_TOOLS}
             onChange={handleChange}
+            onReady={checkOverflow}
+            defaultValue={props.block.content}
         >
             {/* <HighlitedBlock id={`${block.id}-editorjs`} onBlur={saveChanges} style={{ zIndex: 10 }} p={40} w='100%' h={'100%'} direction={'column'} gap={10} {...article.mainCategory.colors}> */}
             <div
                 id={holderId}
-                onBlur={saveChanges}
                 style={{
                     width: '100%',
                     height: '100%',

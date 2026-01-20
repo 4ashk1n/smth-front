@@ -1,3 +1,4 @@
+import type { OutputData } from "@editorjs/editorjs"
 import type { Layout } from "react-grid-layout"
 
 export type Object3d = {
@@ -25,7 +26,7 @@ export type Icon = BlockBase & {
 
 export type Paragraph = BlockBase & {
     type: 'paragraph',
-    content: any,
+    content: OutputData,
 };
 
 export type Image = BlockBase & {

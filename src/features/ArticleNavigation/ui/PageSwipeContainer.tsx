@@ -1,8 +1,8 @@
-import { useRef } from "react"
 import { useGesture } from "@use-gesture/react"
-import { motion, useMotionValue, animate, MotionValue } from "framer-motion"
-import { useArticleStore } from "../../../entities/article/contexts/article.context"
+import { animate, motion, MotionValue, useMotionValue } from "framer-motion"
 import { observer } from "mobx-react"
+import { useRef } from "react"
+import { useArticleStore } from "../../../entities/article/contexts/article.context"
 
 interface Props {
   overlay: React.ReactNode

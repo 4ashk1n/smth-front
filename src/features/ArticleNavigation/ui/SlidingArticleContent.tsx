@@ -1,9 +1,8 @@
-// features/ArticleNavigation/ui/SlidingArticleContent.tsx
+import { useLongPress } from "@mantine/hooks"
+import { motion, type MotionValue, useTransform } from "framer-motion"
 import { observer } from "mobx-react"
 import { useArticleStore } from "../../../entities/article/contexts/article.context"
 import ArticleContent from "../../../widgets/ArticleContent"
-import { type MotionValue, useTransform, motion } from "framer-motion"
-import { useLongPress } from "@mantine/hooks"
 
 interface SlidingArticleContentProps {
   swipeX: MotionValue<number>
@@ -13,24 +12,26 @@ const SlidingArticleContent: React.FC<SlidingArticleContentProps> = observer(
   ({ swipeX }) => {
     const article = useArticleStore()
     const pages = article.content.pagesData
-    const current = article.content.currentPage
+    let current = article.content.currentPage
 
-    if (!current) return null
+    if (!current) {
+      current = article.content.getPageByOrder(pages.length - 1)
+    }
 
-    const currentOrder = current.order
     const width = typeof window !== "undefined" ? window.innerWidth : 375
-
-    // базовый сдвиг, чтобы current всегда был по центру при swipeX = 0
+    
+    const currentOrder = current?.order ?? 0
+    
     const baseOffset = -currentOrder * width
 
     const translateX = useTransform(swipeX, (dx) => baseOffset + dx)
 
-
     const activateDragMode = useLongPress(() => {
       if (!article.content.editMode || article.swiping) return
       article.content.setDragMode(true)
-
     })
+
+
     return (
       <div
         style={{
@@ -51,10 +52,10 @@ const SlidingArticleContent: React.FC<SlidingArticleContentProps> = observer(
         >
           {pages.map((page) => (
             <div
-              key={page.id}                         // 👈 стабильный key по id
+              key={page.id}
               style={{ width, height: "100%", flexShrink: 0 }}
             >
-              <ArticleContent page={page} />        {/* страница никогда не размонтируется */}
+              <ArticleContent page={page} />
             </div>
           ))}
         </motion.div>
