@@ -1,27 +1,5 @@
-import type { Category } from "../../category/types/category.types"
-import type { User } from "../../user/types/user.types"
-import type { Content } from "./content.types"
 
-export type ArticleMeta = {
-    id: string 
-    title: string
-    description: string
-    mainCategory: string
-    categories: string[]
-    author: User
-    status: 'published' | 'draft' | 'archived' | 'review'
-}
+import type { Article as SHARED_Article, ArticleMeta as SHARED_ArticleMeta } from "@smth/shared";
 
-export type Article = ArticleMeta & {
-    content: Content
-}
-
-export type ArticleDTO = {
-    id: string
-    title: string
-    description: string
-    categories: Category[]
-    author: User
-    status: 'published' | 'draft' | 'archived' | 'review'
-    content: Content
-}
+export type ArticleMeta = SHARED_ArticleMeta;
+export type Article = SHARED_Article;

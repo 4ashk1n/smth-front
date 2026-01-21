@@ -1,7 +1,5 @@
-export interface User {
-    id: string
-    username: string
-    firstname: string
-    lastname: string
-    avatar: string
-}
+import type {
+    User as SHARED_User
+} from "@smth/shared";
+
+export type User = SHARED_User;
