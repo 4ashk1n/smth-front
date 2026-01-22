@@ -1,59 +1,15 @@
-import type { OutputData } from "@editorjs/editorjs"
-import type { Layout } from "react-grid-layout"
+import type {
+    Block as SHARED_Block,
+    BlockType as SHARED_BlockType,
+    Content as SHARED_Content,
+    Object3d as SHARED_Object3d,
+    Page as SHARED_Page,
+    Topic as SHARED_Topic
+} from "@smth/shared";
 
-export type Object3d = {
-    depth: number
-    translateX: number
-    translateY: number
-    translateZ: number
-    rotateX: number
-    rotateY: number
-    rotateZ: number
-    scale: number
-}
-
-export type BlockBase = {
-    id: string
-    type: string
-    layout: Layout
-    object3d?: Object3d
-}
-
-export type Icon = BlockBase & {
-    type: 'icon',
-    name: string,
-};
-
-export type Paragraph = BlockBase & {
-    type: 'paragraph',
-    content: OutputData,
-};
-
-export type Image = BlockBase & {
-    type: 'image',
-    url: string,
-    source?: string,
-    sourceUrl?: string,
-    label?: string,
-};
-
-export type Block = Icon | Paragraph | Image
-export type BlockType = 'icon' | 'paragraph' | 'image'
-
-export type Page = {
-    id: string
-    blocks: Block[]
-    topicId: string
-    order: number
-}
-
-export type Topic = {
-    id: string 
-    pages: Page[]
-    order: number
-    title: string
-}
-
-export type Content = {
-    topics: Topic[]
-}
+export type Object3d = SHARED_Object3d;
+export type Block = SHARED_Block;
+export type BlockType = SHARED_BlockType;
+export type Page = SHARED_Page;
+export type Topic = SHARED_Topic;
+export type Content = SHARED_Content;
