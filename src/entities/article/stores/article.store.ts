@@ -1,7 +1,9 @@
 import { makeAutoObservable, runInAction } from "mobx";
+import { v4 as uuidv4 } from 'uuid';
 import { EMPTY_CATEGORY } from "../../category/samples/category.empty";
 import type { Category } from "../../category/types/category.types";
 import type { User } from "../../user/types/user.types";
+import { ARTICLE_EMPTY } from "../samples/article.empty";
 import type { ArticleDTO } from "../types/article.types";
 import { ContentStore } from "./content.store";
 
@@ -58,6 +60,11 @@ export class ArticleStore {
             this.status = article.status
             this.content.fromJSON(article.content)
         })
+    }
+
+    createEmptyArticle() {
+        this.fromDTO(ARTICLE_EMPTY)
+        this.id = uuidv4()
     }
 
     setEditMode(editMode: boolean) {

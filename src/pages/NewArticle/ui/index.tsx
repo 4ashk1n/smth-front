@@ -8,12 +8,11 @@
 // import ArticleBackground from "../../../widgets/ArticleContent/ui/ArticleBackground"
 
 import ArticleStoreProvider from "../../../entities/article/contexts/article.context"
-import { ARTICLE_EMPTY } from "../../../entities/article/samples/article.empty"
 import ArticleScreen from "../../Article/ui/screen"
 
 const NewArticlePage = () => {
     return <>
-        <ArticleStoreProvider article={ARTICLE_EMPTY} editMode>
+        <ArticleStoreProvider empty editMode>
             <ArticleScreen />
         </ArticleStoreProvider>
     </>

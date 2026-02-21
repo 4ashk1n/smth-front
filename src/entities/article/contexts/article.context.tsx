@@ -20,14 +20,18 @@ export const useArticleStore = () => {
 
 const ArticleStoreProvider: React.FC<{
     children: React.ReactNode
-    article: ArticleDTO
+    article?: ArticleDTO
     editMode?: boolean
-}> = ({ children, article, editMode }) => {
+    empty?: boolean
+}> = ({ children, article, editMode, empty }) => {
     
     const [store] = useState(() => new ArticleStore())
 
     useEffect(() => {
-        store.fromDTO(article)
+        if (article) store.fromDTO(article);
+        else if (empty) store.createEmptyArticle();
+        else return;
+
         if (editMode) store.loadLocalDraft()
         store.setEditMode(editMode ?? false)
         store.content.changePage('cover')

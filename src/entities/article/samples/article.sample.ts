@@ -1,4 +1,4 @@
-import type { Article, ArticleDTO } from "../types/article.types";
+﻿import type { ArticleDTO } from "../types/article.types";
 
 export const ARTICLE_DTO_SAMPLE: ArticleDTO = {
     id: '1',
@@ -44,7 +44,27 @@ export const ARTICLE_DTO_SAMPLE: ArticleDTO = {
                             {
                                 id: '1',
                                 type: 'paragraph',
-                                content: 'Павел Дуров — это не просто основатель ВКонтакте и Telegram. Это человек, который выбрал путь одиночки, отказался от миллиардов и убежал от всего, что его ограничивало. У него нет дома, нет гражданства, нет офиса. Зато есть миллионы пользователей и чёткая позиция — свобода личных данных превыше всего. \n\n Мы встретились с Павлом онлайн. Он отвечал голосом, но без камеры. Фоном был глухой ветер и иногда слышался шум моря.',
+                                content: {
+                                    time: 0,
+                                    blocks: [
+                                        {
+                                            id: 'p1',
+                                        type: 'paragraph',
+                                            data: {
+                                                text: 'Pavel Durov is more than the founder of VKontakte and Telegram. He chose a solitary path, turned down billions, and walked away from anything that tried to limit him. He has no home, no citizenship, no office. But he does have millions of users and a clear stance: personal data freedom comes first.'
+                                            }
+                                        },
+                                        {
+                                            id: 'p2',
+                                        type: 'paragraph',
+                                            data: {
+                                                text: 'We met Pavel online. He answered by voice, without a camera. In the background there was a low wind, and at times you could hear the sea.'
+                                            }
+                                        }
+                                    ],
+                                    version: '2.28.2'
+                                },
+
                                 layout: {
                                     i: '0',
                                     x: 0,

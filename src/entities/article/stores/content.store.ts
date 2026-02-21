@@ -204,7 +204,7 @@ export class ContentStore {
         if (
             this.editMode &&
             this.currentPage?.order === this.pagesData.length - 1 &&
-            this.currentPage?.blocks.length !== 0
+            (this.currentPage?.blocks.length !== 0 || this.currentPage?.topicId === 'cover')
         ) {
             this.addEmptyPage()
         }
@@ -268,9 +268,24 @@ export class ContentStore {
     }
 
     clearExtraEmptyPages() {
-        const emptyPages = this.pagesData.filter(p => (p.blocks.length === 0 && p.topicId !== 'cover' && p.order !== this.pagesData.length - 1))
-        console.log(emptyPages.map(p => p.order), this.pagesData.length - 1)
-        emptyPages.forEach(p => this.pages.delete(p.id))
+        const pages = this.pagesData
+        const lastPageOrder = pages.length > 0 ? pages[pages.length - 1].order : -1
+
+        const emptyPages = pages.filter(p => (
+            p.blocks.length === 0 &&
+            p.topicId !== 'cover' &&
+            p.order !== lastPageOrder
+        ))
+        emptyPages.forEach(p => {
+            this.pages.delete(p.id) 
+            const topic = this.topics.get(p.topicId)
+            if (topic) {
+                topic.pages = topic.pages.filter(page => page.id !== p.id)
+            }
+        })
+
+        const emptyTopics = this.topicsData.filter(t => (t.pages.length === 0))
+        emptyTopics.forEach(t => this.topics.delete(t.id))
     }
 
     addEmptyPage(): Page | null {
@@ -287,6 +302,8 @@ export class ContentStore {
         }
         const newPage: Page = { id: newPageId, blocks: [], topicId: prevTopic, order: this.pagesData.length }
         this.pages.set(newPageId, newPage)
+        this.topics.get(prevTopic)?.pages.push(newPage)
+        console.log('ADD EMPTY PAGE', newPage, 'TO', prevTopic)
 
         return newPage
     }

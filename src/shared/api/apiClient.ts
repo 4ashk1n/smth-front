@@ -67,6 +67,8 @@ export async function apiRequest<T>(path: string, options: ApiRequestOptions = {
         }
     }
 
+    console.log(requestInit)
+
     const response = await fetch(url, requestInit);
 
     if (!response.ok) {

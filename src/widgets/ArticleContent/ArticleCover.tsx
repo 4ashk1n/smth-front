@@ -1,15 +1,16 @@
-import React, { useMemo } from 'react'
-import { observer } from 'mobx-react-lite'
-import { useArticleStore } from '../../contexts/article.context'
 import { Group, Stack, Text } from '@mantine/core'
-import ResponsiveGridLayout from '../../../../shared/ui/grids/ResponsiveGridLayout'
-import { useIsMobileScreen } from '../../../../shared/lib/useIsMobile'
-import Object3dBlock from './Object3dBlock'
-import ImageBlock from './ImageBlock'
-import IconBlock from './IconBlock'
-import EditArticleTitle from '../../../../features/EditArticle/ui/cover/EditArticleTitle'
-import EditArticleDescription from '../../../../features/EditArticle/ui/cover/EditArticleDescription'
-import EditArticleCategories from '../../../../features/EditArticle/ui/cover/EditArticleCategories'
+import { observer } from 'mobx-react-lite'
+import React from 'react'
+import { useArticleStore } from '../../entities/article/contexts/article.context'
+import IconBlock from '../../entities/article/ui/ArticleContent/IconBlock'
+import ImageBlock from '../../entities/article/ui/ArticleContent/ImageBlock'
+import Object3dBlock from '../../entities/article/ui/ArticleContent/Object3dBlock'
+import EditArticleCategories from '../../features/EditArticle/ui/cover/EditArticleCategories'
+import EditArticleDescription from '../../features/EditArticle/ui/cover/EditArticleDescription'
+import EditArticleTitle from '../../features/EditArticle/ui/cover/EditArticleTitle'
+import SaveButton from '../../features/EditArticle/ui/tools/SaveButton'
+import { useIsMobileScreen } from '../../shared/lib/useIsMobile'
+import ResponsiveGridLayout from '../../shared/ui/grids/ResponsiveGridLayout'
 
 const ArticleCover: React.FC<{}> = observer(() => {
     const article = useArticleStore()
@@ -28,6 +29,20 @@ const ArticleCover: React.FC<{}> = observer(() => {
             maxRows={4}
             margin={{ lg: [36, 18], md: [36, 18], sm: [16, 16], xs: [16, 16], xxs: [16, 16] }}
         >
+            {
+                article.editMode ?
+                    <div
+                        key={'save-button'}
+                        data-grid={{ w: 1, h: 1, x: 1, y: 0, static: true }}
+                        style={{
+                            display: 'flex',
+                            justifyContent: 'flex-end'
+                        }}
+                    >
+                        <SaveButton />
+                    </div> :
+                    null
+            }
             <div
                 key={'title'}
                 data-grid={{ w: 2, h: 2, x: 0, y: 1, static: true }}
