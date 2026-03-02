@@ -1,5 +1,6 @@
 import { createContext, useEffect, useState } from 'react'
 import { createRoot } from 'react-dom/client'
+import AuthProvider from '../entities/user/contexts/auth.context.tsx'
 import App from './App.tsx'
 import './index.css'
 
@@ -16,9 +17,11 @@ const AppContainer = () => {
   }, [scrollContainer])
   return (
     // <ParallaxProvider scrollAxis='horizontal'>
-      <GlobalContext.Provider value={{ setScrollContainer }}>
+    <GlobalContext.Provider value={{ setScrollContainer }}>
+      <AuthProvider>
         <App />
-      </GlobalContext.Provider>
+      </AuthProvider>
+    </GlobalContext.Provider>
     // </ParallaxProvider>
   )
 }

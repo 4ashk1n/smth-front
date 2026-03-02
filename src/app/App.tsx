@@ -10,6 +10,7 @@ import ArticlePage from '../pages/Article/ui';
 import FeedPage from '../pages/Feed/ui';
 import LandingPage from '../pages/Landing/ui';
 import NewArticlePage from '../pages/NewArticle/ui';
+import ProfilePage from '../pages/Profile/ui';
 import Footer from '../widgets/NavBar/ui/Footer';
 import './App.css';
 import './styles/editorjs.css';
@@ -32,7 +33,7 @@ function App() {
 
     return (
         // <ParallaxProvider>
-        <MantineProvider theme={THEME}>
+        <MantineProvider theme={THEME} defaultColorScheme='dark'>
 
             {/* <ScrollArea scrollbars="y" onScrollCapture={() => {parallaxController?.update()}} type="scroll" h='100vh'> */}
 
@@ -59,6 +60,7 @@ function App() {
                             <Route path='/article/:id' element={<ArticlePage />} />
                             <Route path='/article/new' element={<NewArticlePage />} />
                             <Route path='/feed' element={<FeedPage />} />
+                            <Route path='/profile' element={<ProfilePage />} />
                         </Routes>
                     </div>
 

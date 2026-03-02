@@ -8,6 +8,7 @@ export type ApiRequestOptions = {
     signal?: AbortSignal;
     baseUrl?: string;
     responseType?: "json" | "text" | "blob";
+    credentials?: RequestCredentials;
 };
 
 export type ApiError = Error & {
@@ -45,6 +46,7 @@ export async function apiRequest<T>(path: string, options: ApiRequestOptions = {
         signal,
         baseUrl,
         responseType = "json",
+        credentials
     } = options;
 
     const url = buildUrl(path, query, baseUrl);
@@ -54,6 +56,7 @@ export async function apiRequest<T>(path: string, options: ApiRequestOptions = {
         method,
         headers: requestHeaders,
         signal,
+        credentials
     };
 
     if (body !== undefined) {
