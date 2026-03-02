@@ -1,31 +1,41 @@
 import { makeAutoObservable, runInAction } from "mobx";
 import { v4 as uuidv4 } from 'uuid';
 import { EMPTY_CATEGORY } from "../../category/samples/category.empty";
+import type { CategoriesStore } from "../../category/stores/CategoriesStore";
 import type { Category } from "../../category/types/category.types";
-import type { User } from "../../user/types/user.types";
 import { ARTICLE_EMPTY } from "../samples/article.empty";
 import type { ArticleDTO } from "../types/article.types";
 import { ContentStore } from "./content.store";
 
 export class ArticleStore {
+    private readonly categoriesStore: CategoriesStore
 
     id: string = ''
     title: string = ''
     description: string = ''
-    mainCategory: Category = { id: '', name: '', emoji: '', colors: { lightColor: '', darkColor: '', accentColor: '' } }
+    mainCategoryId: string = ''
     content: ContentStore = new ContentStore()
-    categories: Category[] = []
-    author: User = { id: '', username: '', firstname: '', lastname: '', avatar: '' }
+    categoryIds: string[] = []
+    authorId: string = ''
     status: 'published' | 'draft' | 'archived' | 'review' | undefined
 
     editMode: boolean = false
     swiping: boolean = false
 
 
-    constructor() {
-        makeAutoObservable(this, {}, { autoBind: true })
+    constructor(categoriesStore: CategoriesStore) {
+        this.categoriesStore = categoriesStore
+        makeAutoObservable(this, { categoriesStore: false }, { autoBind: true })
         this.content = new ContentStore()
         this.content.setSaveCallback(this.saveLocalDraft)
+    }
+
+    get mainCategory(): Category {
+        return this.categoriesStore.getById(this.mainCategoryId) ?? EMPTY_CATEGORY
+    }
+
+    get categories(): Category[] {
+        return this.categoriesStore.getMany(this.categoryIds)
     }
 
     fromDTO(article: ArticleDTO) {
@@ -33,15 +43,10 @@ export class ArticleStore {
             this.id = article.id
             this.title = article.title
             this.description = article.description
-            this.categories = article.categories
+            this.categoryIds = article.categories.map((category) => category.id)
+            this.mainCategoryId = article.mainCategory?.id ?? this.categoryIds[0] ?? ''
 
-            if (article.categories.length > 0) {
-                this.mainCategory = article.categories[0]
-            } else {
-                this.mainCategory = EMPTY_CATEGORY
-            }
-
-            this.author = article.author
+            this.authorId = article.author.id
             this.status = article.status
 
             this.content.fromDTO(article.content)
@@ -54,9 +59,18 @@ export class ArticleStore {
             this.id = article.id
             this.title = article.title
             this.description = article.description
-            this.categories = article.categories
-            this.mainCategory = article.mainCategory
-            this.author = article.author
+            const rawCategoryIds = Array.isArray(article.categoryIds)
+                ? article.categoryIds
+                : Array.isArray(article.categories)
+                    ? article.categories.map((category: Category | string) => typeof category === "string" ? category : category.id)
+                    : []
+            this.categoryIds = rawCategoryIds
+            this.mainCategoryId =
+                article.mainCategoryId ??
+                article.mainCategory?.id ??
+                this.categoryIds[0] ??
+                ''
+            this.authorId = article.authorId ?? article.author?.id ?? ''
             this.status = article.status
             this.content.fromJSON(article.content)
         })
@@ -80,15 +94,16 @@ export class ArticleStore {
         this.swiping = swiping
     }
 
-    setCategories(categories: Category[]) {
+    setCategories(categories: Category[] | string[]) {
         if (!this.editMode) return
-        if (categories.length > 0) {
-            this.mainCategory = categories[0]
-        }
-        else {
-            this.mainCategory = EMPTY_CATEGORY
-        }
-        this.categories = categories
+        const ids = categories.map((category) => typeof category === "string" ? category : category.id)
+        this.setCategoryIds(ids)
+    }
+
+    setCategoryIds(categoryIds: string[]) {
+        if (!this.editMode) return
+        this.categoryIds = Array.from(new Set(categoryIds))
+        this.mainCategoryId = this.categoryIds[0] ?? ''
         this.saveLocalDraft()
     }
 
@@ -104,14 +119,21 @@ export class ArticleStore {
         this.saveLocalDraft()
     }
 
+    setAuthorId(authorId: string) {
+        this.authorId = authorId
+        if (this.editMode) {
+            this.saveLocalDraft()
+        }
+    }
+
     toJSON() {
         return {
             id: this.id,
             title: this.title,
             description: this.description,
-            mainCategory: this.mainCategory,
-            categories: this.categories,
-            author: this.author,
+            mainCategoryId: this.mainCategoryId,
+            categories: this.categoryIds,
+            authorId: this.authorId,
             status: this.status,
             editMode: this.editMode,
             swiping: this.swiping,

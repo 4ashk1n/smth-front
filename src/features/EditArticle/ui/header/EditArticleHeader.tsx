@@ -2,6 +2,7 @@ import { Stack, Title, Text, TextInput } from "@mantine/core";
 import { useContext } from "react";
 import type { CategoryColors } from "../../../../entities/category/types/CategoryColors";
 import UserPill from "../../../../entities/user/ui/UserPill";
+import { useAuthStore } from "../../../../entities/user/contexts/auth.context";
 import HighlitedBlock from "../../../../shared/blocks/HighlitedBlock";
 import type ArticleHeader from "../../../../widgets/ArticleHeader/ui";
 import { ArticleContext } from "../../../stores/ArticleStore";
@@ -11,6 +12,7 @@ import { observer } from "mobx-react";
 
 const EditArticleHeader: React.FC<{}> = observer(() => {
     const { article } = useContext(ArticleContext)
+    const auth = useAuthStore()
     return (<>
         <HighlitedBlock
             p={40}
@@ -63,7 +65,7 @@ const EditArticleHeader: React.FC<{}> = observer(() => {
 
                 <EditArticleCategories />
             </Stack>
-            <UserPill size="md" user={article.author} />
+            <UserPill size="md" user={auth.user} />
         </HighlitedBlock>
     </>)
 })

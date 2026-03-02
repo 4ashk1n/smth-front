@@ -18,14 +18,16 @@ function buildContentPayload(article: ArticleStore): Content {
 }
 
 function buildCreatePayload(article: ArticleStore): ArticleCreate {
-    const mainCategoryId = article.mainCategory?.id || article.categories[0]?.id || "";
+    const mainCategoryId = article.mainCategoryId || article.categoryIds[0] || "";
 
     return {
-        id: article.id,
+    // id: article.id,
         title: article.title,
+        authorId: article.authorId,
         description: article.description,
-        mainCategory: mainCategoryId,
-        categoryIds: article.categories.map((category) => category.id),
+        mainCategoryId: mainCategoryId,
+        categoryIds: article.categoryIds,
+        categories: article.categoryIds,
         content: buildContentPayload(article),
         status: article.status ?? "draft",
     };

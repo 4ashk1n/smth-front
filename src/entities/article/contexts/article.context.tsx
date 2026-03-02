@@ -1,6 +1,10 @@
 import { createContext, useContext, useEffect, useState } from "react"
+import { observer } from "mobx-react"
 import { ArticleStore } from "../stores/article.store"
 import type { ArticleDTO } from "../types/article.types"
+import { useCategoriesStore } from "../../category/contexts/categories.context"
+import { useAuthStore } from "../../user/contexts/auth.context"
+import { useUsersStore } from "../../user/contexts/users.context"
 
 const ArticleContext = createContext<ArticleStore | null>(null)
 
@@ -23,25 +27,44 @@ const ArticleStoreProvider: React.FC<{
     article?: ArticleDTO
     editMode?: boolean
     empty?: boolean
-}> = ({ children, article, editMode, empty }) => {
-    
-    const [store] = useState(() => new ArticleStore())
+}> = observer(({ children, article, editMode, empty }) => {
+    const categoriesStore = useCategoriesStore()
+    const auth = useAuthStore()
+    const users = useUsersStore()
+    const [store] = useState(() => new ArticleStore(categoriesStore))
 
     useEffect(() => {
-        if (article) store.fromDTO(article);
+        if (article) {
+            if (article.mainCategory) {
+                categoriesStore.upsert(article.mainCategory)
+            }
+            categoriesStore.upsertMany(article.categories)
+            store.fromDTO(article);
+            users.upsert(article.author)
+        }
         else if (empty) store.createEmptyArticle();
         else return;
 
-        if (editMode) store.loadLocalDraft()
+        if (editMode) {
+            store.loadLocalDraft()
+        }
         store.setEditMode(editMode ?? false)
         store.content.changePage('cover')
-    }, [article])
+    }, [article, empty, editMode, users, categoriesStore, store])
+
+    useEffect(() => {
+        if (!auth.user) return
+        users.upsert(auth.user)
+        if (editMode) {
+            store.setAuthorId(auth.user.id)
+        }
+    }, [auth.user, editMode, users, store])
 
     return (
         <ArticleContext.Provider value={store}>
             {children}
         </ArticleContext.Provider>
     )
-}
+})
 
 export default ArticleStoreProvider
