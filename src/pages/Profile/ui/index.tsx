@@ -7,7 +7,6 @@ import ProfileArticles from "../../../widgets/ProfileArticles/ui";
 import ProfileInfo from "../../../widgets/ProfileInfo/ui";
 
 const ProfilePage = observer(() => {
-
     const auth = useAuthStore();
 
     useEffect(() => {
@@ -16,7 +15,8 @@ const ProfilePage = observer(() => {
         }
     }, [auth.isAuthenticated]);
 
-    if (!auth.isAuthenticated) {
+    if (!auth.user || !auth.isAuthenticated) {
+        console.log(auth.user, auth.isAuthenticated)
         return <>
             <Center w='100%' h='calc(100% - 80px)'><AuthWidget /></Center>
         </>;
@@ -32,7 +32,7 @@ const ProfilePage = observer(() => {
             gap={16}
         >
             <ProfileInfo />
-            <ProfileArticles />
+            <ProfileArticles userId={auth.user.id} />
         </Stack>
     )
 });

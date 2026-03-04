@@ -34,8 +34,8 @@ const Grid3ColumnsVertical: React.FC<{
     if (isLoading) return <GridSkeleton />
 
     return (
-        <Grid columns={3} w='100%' h='fit-content'>
-
+        <Grid columns={3} gutter={1} w='100%' h='fit-content'>
+            {children}
         </Grid>
     )
 }

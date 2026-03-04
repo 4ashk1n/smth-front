@@ -1,9 +1,12 @@
-import { makeAutoObservable, ObservableMap } from "mobx"
+import type { UserResponse } from "@smth/shared"
+import { makeAutoObservable, ObservableMap, runInAction } from "mobx"
+import { apiRequest } from "../../../shared/api"
 import { UserModel } from "../models/user.model"
 import type { User } from "../types/user.types"
 
 export class UsersStore {
     usersById: ObservableMap<string, UserModel> = new ObservableMap()
+    focusedUserId: string | null = null
 
     constructor() {
         makeAutoObservable(this, {}, { autoBind: true })
@@ -43,5 +46,24 @@ export class UsersStore {
 
     clear() {
         this.usersById.clear()
+    }
+
+    async fetchById(userId: string): Promise<UserModel | null> {
+        const existing = this.getById(userId)
+        if (existing) return existing
+
+        try {
+            const user = await apiRequest<UserResponse>('/users/' + userId)
+            if (!user.success || !user.data) {
+                return null
+            }
+            let model = null
+            runInAction(() => {
+                model = this.upsert(user.data)
+            })
+            return model
+        } catch {
+            return null
+        }
     }
 }

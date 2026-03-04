@@ -11,5 +11,5 @@ export function formatNumber(num: number) {
         num /= 1000
         thousands++
     }
-    return num.toFixed(0) + (LABELS[thousands] !== undefined ? LABELS[thousands] : '???')
+    return Math.floor(num) + (LABELS[thousands] !== undefined ? LABELS[thousands] : '???')
 }

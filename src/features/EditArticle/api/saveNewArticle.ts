@@ -1,4 +1,4 @@
-import type { Article, ArticleCreate } from "@smth/shared";
+import type { Article, ArticleCreate, CreateArticleResponse } from "@smth/shared";
 import type { ArticleStore } from "../../../entities/article/stores/article.store";
 import type { Content, Topic } from "../../../entities/article/types/content.types";
 import { apiRequest } from "../../../shared/api";
@@ -27,7 +27,6 @@ function buildCreatePayload(article: ArticleStore): ArticleCreate {
         description: article.description,
         mainCategoryId: mainCategoryId,
         categoryIds: article.categoryIds,
-        categories: article.categoryIds,
         content: buildContentPayload(article),
         status: article.status ?? "draft",
     };
@@ -35,8 +34,8 @@ function buildCreatePayload(article: ArticleStore): ArticleCreate {
 
 export async function saveNewArticle(article: ArticleStore): Promise<Article> {
     const payload = buildCreatePayload(article);
-    return apiRequest<Article>("/articles", {
+    return (await apiRequest<CreateArticleResponse>("/articles", {
         method: "POST",
         body: payload,
-    });
+    })).data;
 }

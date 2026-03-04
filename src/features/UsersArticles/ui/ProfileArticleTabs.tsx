@@ -24,8 +24,9 @@ const ProfileArticleTabs: React.FC<{
     };
 
     useEffect(() => {
-        setSelectedTab(selectedTab)
-    }, [selectedTab])
+        console.log(value)
+        setSelectedTab(value)
+    }, [value])
 
     return (
         <Tabs w='100%' c='white' variant="none" value={value} onChange={setValue as any}>
@@ -63,10 +64,6 @@ const ProfileArticleTabs: React.FC<{
                     parent={rootRef}
                 />
             </Tabs.List>
-
-            <Tabs.Panel value="1">First tab content</Tabs.Panel>
-            <Tabs.Panel value="2">Second tab content</Tabs.Panel>
-            <Tabs.Panel value="3">Third tab content</Tabs.Panel>
         </Tabs>
     )
 

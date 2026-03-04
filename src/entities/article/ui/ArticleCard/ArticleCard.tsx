@@ -1,16 +1,16 @@
-import type { GetArticleCardDTO } from "smth-shared/src/dto/article.dto"
-import ArticleCardCompact from "./ArticleCard.Compact"
-import ArticleCardLarge from "./ArticleCard.Large"
 
-type Props = GetArticleCardDTO & {
-    variant: 'large' | 'compact'
-}
+import type { Article } from "../../types/article.types"
+import VerticalArticleCard from "./ArticleCard.Vertical"
 
-const ArticleCard = (props: Props) => {
-    if (props.variant === 'compact') {
-        return ArticleCardCompact(props)
+const ArticleCard: React.FC<{
+    variant: 'vertical' | 'horizontal'
+    article: Article
+}> = ({variant, article}) => {
+
+    if (variant === 'vertical') {
+        return <VerticalArticleCard article={article} />
     }
-    return ArticleCardLarge(props);
+    return null
 }
 
-export default ArticleCard;
+export default ArticleCard

@@ -1,4 +1,6 @@
+import type { AuthRefreshResponse, UserResponse } from "@smth/shared";
 import { makeAutoObservable, runInAction } from "mobx";
+import { apiRequest, type ApiError, type ApiRequestOptions } from "../../../shared/api";
 import type { User } from "../types/user.types";
 
 type AuthSession = {
@@ -11,6 +13,7 @@ const AUTH_STORAGE_KEY = "authSession";
 const DEFAULT_API_BASE_URL = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "";
 const DEFAULT_GOOGLE_AUTH_PATH = "/auth/google";
 const DEFAULT_ME_PATH = "/auth/me";
+const DEFAULT_REFRESH_PATH = "/auth/refresh";
 
 type MeResponse = {
     user: User;
@@ -25,6 +28,7 @@ export class AuthStore {
     error: string | null = null;
 
     drawerOpened: boolean = false;
+    private refreshRequest: Promise<void> | null = null;
 
     constructor() {
         makeAutoObservable(this, {}, { autoBind: true });
@@ -88,11 +92,13 @@ export class AuthStore {
         const processed = await this.handleOAuthCallbackFromUrl();
         if (processed) return;
 
-        if (this.user) return;
-
         try {
             await this.fetchMe();
-        } catch {
+        } catch (error) {
+            const status = (error as ApiError).status;
+            if (status === 401 || status === 403) {
+                this.setError(null);
+            }
             // No active session is a valid state.
         }
     }
@@ -102,22 +108,14 @@ export class AuthStore {
         this.setError(null);
 
         try {
-            console.log('try me')
-            const response = await fetch(this.buildApiUrl(path), {
+            const data = await this.requestWithAutoRefresh<UserResponse>(path, {
                 method: "GET",
-                credentials: "include",
-                headers: this.accessToken ? { Authorization: `Bearer ${this.accessToken}` } : undefined,
             });
-
-            if (!response.ok) {
-                throw new Error(`Failed to fetch user: ${response.status}`);
-            }
-
-            const data = (await response.json()) as MeResponse | User;
-            console.log(data)
-            const user = "user" in data ? data.user : data;
+            const user = data.data;
             this.setUser(user);
+            console.log(this.isAuthenticated ? "Authenticated" : "Not authenticated");
         } catch (error) {
+            console.error("Failed to fetch user", error);
             this.setError(error instanceof Error ? error.message : "Failed to fetch user");
             throw error;
         } finally {
@@ -234,6 +232,54 @@ export class AuthStore {
         const base = DEFAULT_API_BASE_URL.replace(/\/+$/, "");
         const normalizedPath = path.startsWith("/") ? path : `/${path}`;
         return `${base}${normalizedPath}`;
+    }
+
+    async requestWithAutoRefresh<T>(path: string, options: ApiRequestOptions = {}): Promise<T> {
+        try {
+            return (await apiRequest<T>(path, {
+                ...options,
+                credentials: "include",
+            }));
+        } catch (error) {
+            const apiError = error as ApiError;
+            console.log(apiError.status)
+            if (apiError.status !== 401) {
+                throw error;
+            }
+
+            await this.refreshAccessToken();
+
+            return apiRequest<T>(path, {
+                ...options,
+                credentials: "include",
+            });
+        }
+    }
+
+    private async refreshAccessToken(): Promise<void> {
+        console.log("Refreshing access token");
+        if (this.refreshRequest) {
+            return this.refreshRequest;
+        }
+
+        this.refreshRequest = (async () => {
+            try {
+                await apiRequest<AuthRefreshResponse>(DEFAULT_REFRESH_PATH, {
+                    method: "POST",
+                    credentials: "include",
+                });
+            } catch (error) {
+                const apiError = error as ApiError;
+                if (apiError.status === 401) {
+                    this.logout();
+                }
+                throw error;
+            } finally {
+                this.refreshRequest = null;
+            }
+        })();
+
+        return this.refreshRequest;
     }
 
     private clearAuthParamsFromUrl(callbackUrl: URL) {
