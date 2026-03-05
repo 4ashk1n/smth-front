@@ -94,9 +94,9 @@ const Footer = () => {
                 url={'/notifications'} />
 
             <FooterButton
-                icon={location.pathname === `/profile/${authUser.user ? authUser.user.id : ''}` ? <PiUserFill size={20} color="white" /> : <PiUser size={20} color="white" />}
+                icon={location.pathname === (authUser.user ? `/profile/${authUser.user.id}` : '/auth') ? <PiUserFill size={20} color="white" /> : <PiUser size={20} color="white" />}
                 label={'Профиль'}
-                url={`/profile/${authUser.user ? authUser.user.id : ''}`} />
+                url={authUser.user ? `/profile/${authUser.user.id}` : '/auth'} />
 
 
 

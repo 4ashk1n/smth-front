@@ -1,12 +1,12 @@
 import { Group, Stack, Text, Title } from "@mantine/core"
-import type { Article } from "@smth/shared"
+import type { ArticleMeta } from "@smth/shared"
 import { PiEye } from "react-icons/pi"
 import { formatNumber } from "../../../../shared/lib/formatNumber"
 import { useCategoriesStore } from "../../../category/contexts/categories.context"
 import ArticleBackground from "../ArticleContent/ArticleBackground"
 
 const VerticalArticleCard: React.FC<{
-    article: Article
+    article: ArticleMeta
 }> = ({ article }) => {
     const mainCategory = useCategoriesStore().getById(article.mainCategoryId)
 

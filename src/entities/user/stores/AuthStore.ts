@@ -31,7 +31,7 @@ export class AuthStore {
     private refreshRequest: Promise<void> | null = null;
 
     constructor() {
-        makeAutoObservable(this, {}, { autoBind: true });
+        makeAutoObservable(this, {}, { autoBind: true, deep: true });
         this.loadLocalSession();
     }
 

@@ -1,10 +1,10 @@
 
-import type { Article } from "../../types/article.types"
+import type { ArticleMeta } from "../../types/article.types"
 import VerticalArticleCard from "./ArticleCard.Vertical"
 
 const ArticleCard: React.FC<{
     variant: 'vertical' | 'horizontal'
-    article: Article
+    article: ArticleMeta
 }> = ({variant, article}) => {
 
     if (variant === 'vertical') {

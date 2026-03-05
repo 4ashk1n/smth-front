@@ -1,25 +1,32 @@
-import { Center, Stack } from "@mantine/core";
+import { Stack } from "@mantine/core";
 import { observer } from "mobx-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router";
 import { useAuthStore } from "../../../entities/user/contexts/auth.context";
-import AuthWidget from "../../../widgets/AuthWidget/ui";
+import { useUsersStore } from "../../../entities/user/contexts/users.context";
+import type { UserModel } from "../../../entities/user/models/user.model";
 import ProfileArticles from "../../../widgets/ProfileArticles/ui";
 import ProfileInfo from "../../../widgets/ProfileInfo/ui";
 
 const ProfilePage = observer(() => {
     const auth = useAuthStore();
+    const params = useParams()
+    const [user, setUser] = useState<UserModel | null>(null)
+    const [loading, setLoading] = useState(true)
+    const users = useUsersStore()
 
     useEffect(() => {
-        if (!auth.isAuthenticated) {
-            auth.openDrawer();
+        setLoading(true)
+        if (params.userId) {
+            users.fetchById(params.userId).then((user) => {
+                setUser(user)
+                setLoading(false)
+            })
         }
-    }, [auth.isAuthenticated]);
-
-    if (!auth.user || !auth.isAuthenticated) {
-        console.log(auth.user, auth.isAuthenticated)
-        return <>
-            <Center w='100%' h='calc(100% - 80px)'><AuthWidget /></Center>
-        </>;
+    }, [params.userId])
+    
+    if (!user) {
+        return null
     }
 
     return (
@@ -31,8 +38,8 @@ const ProfilePage = observer(() => {
             style={{ overflow: "hidden" }}
             gap={16}
         >
-            <ProfileInfo />
-            <ProfileArticles userId={auth.user.id} />
+            <ProfileInfo user={user} />
+            <ProfileArticles userId={user.id} />
         </Stack>
     )
 });

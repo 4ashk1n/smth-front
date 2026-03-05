@@ -1,4 +1,4 @@
-import { createTheme, MantineProvider } from '@mantine/core';
+import { Center, createTheme, MantineProvider } from '@mantine/core';
 import '@mantine/core/styles.css';
 import '@mantine/tiptap/styles.css';
 import "animate.css/animate.min.css";
@@ -11,6 +11,7 @@ import FeedPage from '../pages/Feed/ui';
 import LandingPage from '../pages/Landing/ui';
 import NewArticlePage from '../pages/NewArticle/ui';
 import ProfilePage from '../pages/Profile/ui';
+import AuthWidget from '../widgets/AuthWidget/ui';
 import Footer from '../widgets/NavBar/ui/Footer';
 import './App.css';
 import './styles/editorjs.css';
@@ -62,6 +63,7 @@ function App() {
                             <Route path='/article/new' element={<NewArticlePage />} />
                             <Route path='/feed' element={<FeedPage />} />
                             <Route path={`/profile/:userId`} element={<ProfilePage />} />
+                            <Route path={'auth'} element={<Center w='100%' h='calc(100% - 80px)'><AuthWidget /></Center>} />
                         </Routes>
                     </div>
 

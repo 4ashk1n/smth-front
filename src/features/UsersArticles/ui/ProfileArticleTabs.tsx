@@ -1,6 +1,8 @@
 import { FloatingIndicator, Tabs } from "@mantine/core";
+import { observer } from "mobx-react";
 import React, { useEffect, useState } from "react";
 import { PiBooks, PiDownloadSimple, PiEyes, PiHeart, PiShareFat } from "react-icons/pi";
+import { useAuthStore } from "../../../entities/user/contexts/auth.context";
 import type { ProfileTabs } from "../../../widgets/ProfileArticles/types/tabs.types";
 
 const Icons: Record<ProfileTabs, React.ReactNode> = {
@@ -12,9 +14,10 @@ const Icons: Record<ProfileTabs, React.ReactNode> = {
 }
 
 const ProfileArticleTabs: React.FC<{
+    userId: string
     selectedTab: ProfileTabs
     setSelectedTab: (tab: ProfileTabs) => void
-}> = ({ selectedTab, setSelectedTab }) => {
+}> = observer(({ userId, selectedTab, setSelectedTab }) => {
     const [rootRef, setRootRef] = useState<HTMLDivElement | null>(null);
     const [value, setValue] = useState<ProfileTabs>(selectedTab);
     const [controlsRefs, setControlsRefs] = useState<Record<string, HTMLButtonElement | null>>({});
@@ -22,18 +25,25 @@ const ProfileArticleTabs: React.FC<{
         controlsRefs[val] = node;
         setControlsRefs(controlsRefs);
     };
+    const auth = useAuthStore()
 
     useEffect(() => {
-        console.log(value)
         setSelectedTab(value)
     }, [value])
+    
 
     return (
         <Tabs w='100%' c='white' variant="none" value={value} onChange={setValue as any}>
             <Tabs.List px={16} grow w='100%' ref={setRootRef} pos={'relative'}>
                 {
-                    Object.keys(Icons).map((tab) => (
-                        <Tabs.Tab
+                    Object.keys(Icons).map((tab) => {
+                        console.log(auth)
+                        if (!auth.user || !auth.isAuthenticated || auth.user.id !== userId) {
+                            if (tab === 'reviews' || tab === 'likes' || tab === 'saved') {
+                                return null
+                            }
+                        }
+                        return (<Tabs.Tab
                             key={tab}
                             value={tab}
                             ref={setControlRef(tab as ProfileTabs)}
@@ -52,7 +62,7 @@ const ProfileArticleTabs: React.FC<{
                         >
                             {Icons[tab as ProfileTabs]}
                         </Tabs.Tab>
-                    ))
+                    )})
                 }
 
                 <FloatingIndicator
@@ -67,7 +77,7 @@ const ProfileArticleTabs: React.FC<{
         </Tabs>
     )
 
-}
+})
 
 
 export default ProfileArticleTabs

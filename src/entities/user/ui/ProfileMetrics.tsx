@@ -1,6 +1,7 @@
 import { Group, Skeleton, Stack, Text } from "@mantine/core"
+import type { UserMetrics } from "@smth/shared"
+import { observer } from "mobx-react"
 import { useEffect, useState } from "react"
-import type { UserMetrics } from "../../../../../smth-shared/dist/cjs/types"
 import { formatNumber } from "../../../shared/lib/formatNumber"
 import type { UserModel } from "../models/user.model"
 
@@ -41,7 +42,7 @@ const Separator = () => {
 
 const ProfileMetrics: React.FC<{
     user: UserModel
-}> = ({ user }) => {
+}> = observer(({ user }) => {
 
     const [metrics, setMetrics] = useState<UserMetrics>({ // 100 for skeleton width
         articles: 100,
@@ -54,9 +55,13 @@ const ProfileMetrics: React.FC<{
         setLoading(true)
         user.fetchMetrics().then(() => {
             setLoading(false)
-            setMetrics(user.metrics)
         })
     }, [user])
+
+    useEffect(() => {
+        console.log(user.metrics)
+        setMetrics(user.metrics)
+    }, [user.metrics.articles, user.metrics.followers, user.metrics.following])
 
     return (
         <Group gap={12} wrap="nowrap">
@@ -67,6 +72,6 @@ const ProfileMetrics: React.FC<{
             <ProfileStatsItem title="Подписок" value={metrics.following} loading={loading} />
         </Group>
     )
-}
+})
 
 export default ProfileMetrics
