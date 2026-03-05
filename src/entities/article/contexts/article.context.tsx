@@ -1,23 +1,27 @@
-import { createContext, useContext, useEffect, useState } from "react"
 import { observer } from "mobx-react"
-import { ArticleStore } from "../stores/article.store"
-import type { ArticleDTO } from "../types/article.types"
+import { createContext, useContext, useEffect, useState } from "react"
 import { useCategoriesStore } from "../../category/contexts/categories.context"
 import { useAuthStore } from "../../user/contexts/auth.context"
 import { useUsersStore } from "../../user/contexts/users.context"
+import { ArticleModel } from "../models/article.model"
+import { ArticlesStore } from "../stores/articles.store"
+import type { ArticleDTO } from "../types/article.types"
 
-const ArticleContext = createContext<ArticleStore | null>(null)
+const ArticlesContext = createContext<ArticlesStore | null>(null)
 
-/**
- * Hook that returns the ArticleStore instance.
- * It should be used within the ArticleProvider component.
- * @returns {ArticleStore} The ArticleStore instance.
- * @throws {Error} If useArticleStore is used outside of the ArticleProvider component.
- */
+
 export const useArticleStore = () => {
-    const context = useContext(ArticleContext)
+    const context = useContext(ArticlesContext)
     if (!context) {
         throw new Error('useArticleStore must be used within a ArticleProvider')
+    }
+    return context.activeArticle
+}
+
+export const useArticlesStore = () => {
+    const context = useContext(ArticlesContext)
+    if (!context) {
+        throw new Error('useArticlesStore must be used within a ArticleProvider')
     }
     return context
 }
@@ -31,39 +35,44 @@ const ArticleStoreProvider: React.FC<{
     const categoriesStore = useCategoriesStore()
     const auth = useAuthStore()
     const users = useUsersStore()
-    const [store] = useState(() => new ArticleStore(categoriesStore))
+    const [articlesStore] = useState(() => new ArticlesStore(categoriesStore))
 
     useEffect(() => {
+        let currentArticle: ArticleModel | undefined
+
         if (article) {
-            if (article.mainCategory) {
-                categoriesStore.upsert(article.mainCategory)
-            }
-            categoriesStore.upsertMany(article.categories)
-            store.fromDTO(article);
-            users.upsert(article.author)
+            currentArticle = articlesStore.upsertFromDTO(article)
+            articlesStore.setActiveArticle(currentArticle.id)
         }
-        else if (empty) store.createEmptyArticle();
+        else if (empty) {
+            currentArticle = articlesStore.createEmptyArticle()
+            articlesStore.setActiveArticle(currentArticle.id)
+        }
         else return;
 
+        if (!currentArticle) return
+
         if (editMode) {
-            store.loadLocalDraft()
+            currentArticle.loadLocalDraft()
         }
-        store.setEditMode(editMode ?? false)
-        store.content.changePage('cover')
-    }, [article, empty, editMode, users, categoriesStore, store])
+        currentArticle.setEditMode(editMode ?? false)
+        currentArticle.content.changePage('cover')
+    }, [article, empty, editMode, users, categoriesStore, articlesStore])
 
     useEffect(() => {
+        const currentArticle = articlesStore.activeArticleOrUndefined
+        if (!currentArticle) return
         if (!auth.user) return
         users.upsert(auth.user)
         if (editMode) {
-            store.setAuthorId(auth.user.id)
+            currentArticle.setAuthorId(auth.user.id)
         }
-    }, [auth.user, editMode, users, store])
+    }, [auth.user, editMode, users, articlesStore])
 
     return (
-        <ArticleContext.Provider value={store}>
+        <ArticlesContext.Provider value={articlesStore}>
             {children}
-        </ArticleContext.Provider>
+        </ArticlesContext.Provider>
     )
 })
 

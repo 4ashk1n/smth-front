@@ -1,4 +1,4 @@
-import type { Article, ArticleDTO } from "../types/article.types";
+import type { ArticleDTO } from "../types/article.types";
 
 export const ARTICLE_EMPTY: ArticleDTO = {
     id: '3',
@@ -14,20 +14,9 @@ export const ARTICLE_EMPTY: ArticleDTO = {
         avatar: 'https://fbi.cults3d.com/uploaders/34973218/illustration-file/46f9a2d8-fb9a-482f-9b9f-8ba3c0701b6d/skiebob.jpg'
     },
     content: {
-        topics: [
-            {
-                id: 'cover',
-                pages: [
-                    {
-                        id: 'cover',
-                        topicId: 'cover',
-                        blocks: [],
-                        order: 0
-                    }
-                ],
-                order: 0,
-                title: 'cover'
-            }
-        ]
+        articleId: '3',
+        topics: [],
+        pages: [],
+        blocks: []
     }
-}
+} as any

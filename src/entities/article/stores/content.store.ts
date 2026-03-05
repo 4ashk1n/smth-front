@@ -2,15 +2,18 @@ import { makeAutoObservable, ObservableMap, runInAction } from "mobx";
 import type { Layout } from "react-grid-layout";
 import { v4 as uuidv4 } from 'uuid';
 import { findOptimalFreeSpot } from "../../../features/EditArticle/lib/findOptimalFreeSpot";
+import { IconModel, ImageModel, PageModel, ParagraphModel, TopicModel } from "../models/content.models";
 import type { Block, BlockType, Content, Icon, Image, Page, Paragraph, Topic } from "../types/content.types";
 
 export class ContentStore {
     private saveCallback: (() => void) | null = null
     private saveEnabled: boolean = true
 
-    topics: ObservableMap<string, Topic> = new ObservableMap();
-    pages: ObservableMap<string, Page> = new ObservableMap();
-    blocks: ObservableMap<string, Block> = new ObservableMap();
+    articleId: string = ''
+
+    topics: ObservableMap<string, TopicModel> = new ObservableMap();
+    pages: ObservableMap<string, PageModel> = new ObservableMap();
+    blocks: ObservableMap<string, ParagraphModel | IconModel | ImageModel> = new ObservableMap();
 
     editMode: boolean = false
     dragMode: boolean = false
@@ -27,48 +30,32 @@ export class ContentStore {
     }
 
     fromDTO(content: Content) {
-        // Группируем все изменения в одну транзакцию
         runInAction(() => {
             this.topics.clear()
             this.pages.clear()
             this.blocks.clear()
 
-            // Заполняем данные
-            content.topics.forEach(t => this.topics.set(t.id, t))
-            content.topics.forEach(t =>
-                t.pages.forEach(p => this.pages.set(p.id, p))
-            )
-            content.topics.forEach(t =>
-                t.pages.forEach(p =>
-                    p.blocks.forEach(b => this.blocks.set(b.id, b))
-                )
-            )
+            this.articleId = content.articleId
 
-            // Добавляем обложку
-            this.topics.set('cover', {
-                id: 'cover',
-                pages: [{ id: 'cover', topicId: '-1', blocks: [], order: 0 }],
-                order: 0,
-                title: 'cover'
-            })
-            this.pages.set('cover', {
-                id: 'cover',
-                topicId: 'cover',
-                blocks: [],
-                order: 0
-            })
 
-            // Устанавливаем текущие страницы
-            if (content.topics.length > 0 && content.topics[0].pages.length > 0) {
-                this.currentPageId = content.topics[0].pages[0].id
-                this.currentTopicId = content.topics[0].id
-            }
+            content.blocks.forEach(b => this.blocks.set(b.id,
+                b.type === 'paragraph' ? new ParagraphModel(b as Paragraph) :
+                    b.type === 'icon' ? new IconModel(b as Icon) : new ImageModel(b as Image)
+            ))
+            content.pages.forEach(p => this.pages.set(p.id, new PageModel(p, Array.from(this.blocks.values()))))
+            content.topics.forEach(t => this.topics.set(t.id, new TopicModel(t, Array.from(this.pages.values()))))
+
+
+            this.topics.set('cover', new TopicModel({ id: 'cover', title: 'cover', order: 0, articleId: content.articleId }, []))
+            this.pages.set('cover', new PageModel({ id: 'cover', topicId: 'cover', order: 0 }, []))
+
+            this.currentPageId = 'cover'
+            this.currentTopicId = 'cover'
         })
     }
 
     toJSON() {
         return {
-            // Преобразуем ObservableMap в массив пар ключ-значение
             topics: Array.from(this.topics.entries()),
             pages: Array.from(this.pages.entries()),
             blocks: Array.from(this.blocks.entries()),
@@ -98,27 +85,33 @@ export class ContentStore {
                 this.pages.clear()
                 this.blocks.clear()
 
+                this.articleId = content.articleId
+
                 // Восстанавливаем из данных
                 const topics = content.topics ?? []
                 const pages = content.pages ?? []
                 const blocks = content.blocks ?? []
 
-                // Заполняем мапы
-                topics.forEach(([id, topic]: [string, Topic]) => {
-                    if (topic && id) {
-                        this.topics.set(id, topic)
+
+                blocks.forEach(([id, block]: [string, Block]) => {
+                    if (block && id) {
+                        switch (block.type) {
+                            case 'paragraph': this.blocks.set(id, new ParagraphModel(block as Paragraph)); break;
+                            case 'icon': this.blocks.set(id, new IconModel(block as Icon)); break;
+                            case 'image': this.blocks.set(id, new ImageModel(block as Image)); break;
+                        }
                     }
                 })
 
                 pages.forEach(([id, page]: [string, Page]) => {
                     if (page && id) {
-                        this.pages.set(id, page)
+                        this.pages.set(id, new PageModel(page, Array.from(this.blocks.values())))
                     }
                 })
 
-                blocks.forEach(([id, block]: [string, Block]) => {
-                    if (block && id) {
-                        this.blocks.set(id, block)
+                topics.forEach(([id, topic]: [string, Topic]) => {
+                    if (topic && id) {
+                        this.topics.set(id, new TopicModel(topic, Array.from(this.pages.values())))
                     }
                 })
 
@@ -141,44 +134,40 @@ export class ContentStore {
     }
 
 
-    get currentTopic(): Topic | undefined {
+    get currentTopic(): TopicModel | undefined {
         return this.topics.get(this.currentTopicId) ?? undefined;
     }
 
-    get currentPage(): Page | undefined {
+    get currentPage(): PageModel | undefined {
         return this.pages.get(this.currentPageId) ?? undefined;
     }
 
-    get topicsData(): Topic[] {
+    get topicsData(): TopicModel[] {
         return Array.from(this.topics.values());
     }
 
-    get pagesData(): Page[] {
+    get pagesData(): PageModel[] {
         return Array.from(this.pages.values()).sort((a, b) => a.order - b.order);
     }
 
-    get coverBlock(): Image | Icon {
+    get coverBlock(): ImageModel | IconModel {
         const blocks_values = this.blocks.values()
         const images_and_icons = Array.from(blocks_values).filter(b => b.type === 'image' || b.type === 'icon')
-        if (images_and_icons.length === 0) return { id: '', type: 'icon', name: 'MdQuestionMark', layout: { i: '', x: 0, y: 0, w: 1, h: 1 } }
+        if (images_and_icons.length === 0) return new IconModel({
+            id: '',
+            type: 'icon',
+            name: 'MdQuestionMark',
+            layout: { i: '', x: 0, y: 0, w: 1, h: 1 },
+            pageId: 'cover',
+            object3d: null
+        })
 
         const chosen_block = images_and_icons[Math.floor(Math.random() * images_and_icons.length)]
 
-        if (chosen_block.type === 'image') return {
-            id: chosen_block.id,
-            type: 'image',
-            url: chosen_block.url,
-            layout: { i: '', x: 0, y: 0, w: 1, h: 1 }
-        }
-        return {
-            id: chosen_block.id,
-            type: 'icon',
-            name: chosen_block.name,
-            layout: { i: '', x: 0, y: 0, w: 1, h: 1 }
-        }
+        return chosen_block
     }
 
-    getPageByOrder(order: number): Page | undefined {
+    getPageByOrder(order: number): PageModel | undefined {
         return this.pagesData.find((p) => p.order === order);
     }
 
@@ -250,11 +239,13 @@ export class ContentStore {
 
 
 
-    addNewTopic(): Topic | null {
+    addNewTopic(): TopicModel | null {
         if (!this.editMode) return null
 
         const newTopicId = uuidv4()
-        const newTopic: Topic = { id: newTopicId, pages: [], order: this.topicsData.length, title: '' }
+        const newTopic = new TopicModel({
+            id: newTopicId, order: this.topicsData.length, title: '', articleId: this.articleId
+        }, [])
         this.topics.set(newTopicId, newTopic)
 
         return newTopic
@@ -277,7 +268,7 @@ export class ContentStore {
             p.order !== lastPageOrder
         ))
         emptyPages.forEach(p => {
-            this.pages.delete(p.id) 
+            this.pages.delete(p.id)
             const topic = this.topics.get(p.topicId)
             if (topic) {
                 topic.pages = topic.pages.filter(page => page.id !== p.id)
@@ -288,7 +279,7 @@ export class ContentStore {
         emptyTopics.forEach(t => this.topics.delete(t.id))
     }
 
-    addEmptyPage(): Page | null {
+    addEmptyPage(): PageModel | null {
         if (!this.editMode) return null
         // TODO: Выбор топика (старый или новый)
         const newPageId = uuidv4()
@@ -300,7 +291,7 @@ export class ContentStore {
             prevTopic = newTopic.id
             console.log(prevTopic)
         }
-        const newPage: Page = { id: newPageId, blocks: [], topicId: prevTopic, order: this.pagesData.length }
+        const newPage = new PageModel({ id: newPageId, topicId: prevTopic, order: this.pagesData.length }, [])
         this.pages.set(newPageId, newPage)
         this.topics.get(prevTopic)?.pages.push(newPage)
         console.log('ADD EMPTY PAGE', newPage, 'TO', prevTopic)
@@ -308,7 +299,7 @@ export class ContentStore {
         return newPage
     }
 
-    addBlockToCurrentPage(block: Block) {
+    addBlockToCurrentPage(block: ParagraphModel | IconModel | ImageModel) {
         if (!this.currentPage || !this.editMode) return
         this.currentPage.blocks.push(block)
 
@@ -329,34 +320,41 @@ export class ContentStore {
 
         switch (blocktype) {
             case 'image': {
-                const newBlock: Image = {
+                const newBlock = new ImageModel({
                     id: newBlockId,
                     type: 'image',
                     url: '',
+                    source: '',
+                    sourceUrl: '',
+                    label: '',
+                    pageId: this.currentPageId,
+                    object3d: null,
                     layout: { i: newBlockId, x, y, w: 1, h: 2 }
-                };
+                });
                 this.addBlockToCurrentPage(newBlock);
                 break;
             }
             case 'icon': {
-                const newBlock: Icon = {
+                const newBlock = new IconModel({
                     id: newBlockId,
                     type: 'icon',
                     name: '',
+                    pageId: this.currentPageId,
+                    object3d: null,
                     layout: { i: newBlockId, x, y, w: 1, h: 2 }
-                };
+                });
                 this.addBlockToCurrentPage(newBlock);
                 break;
             }
             case 'paragraph': {
-                const newBlock: Paragraph = {
+                const newBlock = new ParagraphModel({
                     id: newBlockId,
                     type: 'paragraph',
-                    content: {
-                        blocks: [],
-                    },
+                    content: '{"blocks": []}',
+                    pageId: this.currentPageId,
+                    object3d: null,
                     layout: { i: newBlockId, x, y, w: 1, h: 2 }
-                };
+                });
                 this.addBlockToCurrentPage(newBlock);
                 break;
             }
@@ -366,7 +364,7 @@ export class ContentStore {
         }
     }
 
-    editBlock(block: Block) {
+    editBlock(block: ImageModel | ParagraphModel | IconModel) {
         if (!this.currentPage || !this.editMode) return
         const index = this.currentPage.blocks.findIndex(b => b.id === block.id)
         if (index === -1) return
@@ -395,7 +393,7 @@ export class ContentStore {
             const blockLayout = layout.find(l => l.i === b.layout.i)
             console.log(b.layout, blockLayout)
             if (!blockLayout) return
-            this.editBlock({ ...b, layout: blockLayout })
+            this.editBlock({ ...b as ParagraphModel | ImageModel | IconModel, layout: blockLayout })
         })
     }
 
