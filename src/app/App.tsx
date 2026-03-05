@@ -31,6 +31,7 @@ function App() {
         // document.documentElement.requestFullscreen();
     }, [])
 
+
     return (
         // <ParallaxProvider>
         <MantineProvider theme={THEME} defaultColorScheme='dark'>
@@ -60,7 +61,7 @@ function App() {
                             <Route path='/article/:id' element={<ArticlePage />} />
                             <Route path='/article/new' element={<NewArticlePage />} />
                             <Route path='/feed' element={<FeedPage />} />
-                            <Route path='/profile' element={<ProfilePage />} />
+                            <Route path={`/profile/:userId`} element={<ProfilePage />} />
                         </Routes>
                     </div>
 

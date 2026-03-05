@@ -1,12 +1,11 @@
 import { Avatar } from "@mantine/core";
-import { useAuthStore } from "../contexts/auth.context";
+import type { UserModel } from "../models/user.model";
 
-const ProfilePhoto = () => {
-    const { user } = useAuthStore();
+const ProfilePhoto: React.FC<{user: UserModel}> = ({user}) => {
 
     return (
         <Avatar
-            src={user?.avatar || null}
+            src={user.data.avatar}
             w={100}
             h={100}
             size={'xl'}

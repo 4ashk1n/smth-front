@@ -1,8 +1,21 @@
 import { makeAutoObservable } from "mobx"
+import type { UserMetricsResponse } from "../../../../../smth-shared/dist/cjs/types"
+import { apiRequest } from "../../../shared/api"
 import type { User } from "../types/user.types"
 
 export class UserModel {
     data: User
+    metrics: {
+        articles: number 
+        followers: number
+        following: number
+        loaded: boolean
+    } = {
+        articles: 0,
+        followers: 0,
+        following: 0,
+        loaded: false
+    }
 
     constructor(user: User) {
         this.data = user
@@ -35,6 +48,16 @@ export class UserModel {
 
     is(userId: string): boolean {
         return this.id === userId
+    }
+
+    async fetchMetrics(): Promise<void> {
+        if (this.metrics.loaded) return
+        const metrics = await apiRequest<UserMetricsResponse>(`/users/${this.id}/metrics`)
+        this.metrics = {
+            ...this.metrics,
+            ...metrics.data,
+            loaded: true,
+        }
     }
 
     toJSON(): User {

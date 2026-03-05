@@ -1,11 +1,9 @@
 import { Stack, Text } from "@mantine/core";
-import { useAuthStore } from "../contexts/auth.context";
+import type { UserModel } from "../models/user.model";
 
-const ProfileName = () => {
-    const { user } = useAuthStore();
-    if (!user) {
-        return null;
-    }
+const ProfileName: React.FC<{
+    user: UserModel
+}> = ({ user }) => {
 
     return (
         <Stack gap={4} align="center">
@@ -15,7 +13,7 @@ const ProfileName = () => {
                 fw={600}
                 c='white'
             >
-                { user.firstname } { user.lastname }
+                { user.data.firstname } { user.data.lastname }
             </Text>
             <Text
                 fz={14}
@@ -24,7 +22,7 @@ const ProfileName = () => {
                 c='white'
                 opacity={0.5}
             >
-                @{ user.username }
+                @{ user.data.username }
             </Text>
         </Stack>
 

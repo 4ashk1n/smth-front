@@ -1,6 +1,16 @@
 import { Button } from "@mantine/core"
+import type React from "react"
+import { useAuthStore } from "../../../entities/user/contexts/auth.context"
+import type { UserModel } from "../../../entities/user/models/user.model"
 
-const SubscribeButton = () => {
+const SubscribeButton: React.FC<{
+    user: UserModel
+}> = ({user}) => {
+
+    const authUser = useAuthStore()
+    if (authUser.user && authUser.user.id === user.id) {
+        return null;
+    }
 
     return (
         <Button
