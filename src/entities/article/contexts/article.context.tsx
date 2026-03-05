@@ -1,79 +1,131 @@
-import { observer } from "mobx-react"
-import { createContext, useContext, useEffect, useState } from "react"
-import { useCategoriesStore } from "../../category/contexts/categories.context"
-import { useAuthStore } from "../../user/contexts/auth.context"
-import { useUsersStore } from "../../user/contexts/users.context"
-import { ArticleModel } from "../models/article.model"
-import { ArticlesStore } from "../stores/articles.store"
-import type { ArticleDTO } from "../types/article.types"
+import { observer } from "mobx-react";
+import { createContext, useContext, useEffect, useState } from "react";
+import { useCategoriesStore } from "../../category/contexts/categories.context";
+import { useAuthStore } from "../../user/contexts/auth.context";
+import { useUsersStore } from "../../user/contexts/users.context";
+import { ArticleModel } from "../models/article.model";
+import { ArticlesStore } from "../stores/articles.store";
 
-const ArticlesContext = createContext<ArticlesStore | null>(null)
-
+const ArticlesContext = createContext<ArticlesStore | null>(null);
+const ArticleScopeContext = createContext<string | null>(null);
 
 export const useArticleStore = () => {
-    const context = useContext(ArticlesContext)
-    if (!context) {
-        throw new Error('useArticleStore must be used within a ArticleProvider')
+    const articlesStore = useContext(ArticlesContext);
+    const articleId = useContext(ArticleScopeContext);
+
+    if (!articlesStore || !articleId) {
+        throw new Error("useArticleStore must be used within a ArticleProvider");
     }
-    return context.activeArticle
-}
+
+    const article = articlesStore.getById(articleId);
+    if (!article) {
+        throw new Error(`Article "${articleId}" not found in ArticlesStore`);
+    }
+
+    return article;
+};
 
 export const useArticlesStore = () => {
-    const context = useContext(ArticlesContext)
+    const context = useContext(ArticlesContext);
     if (!context) {
-        throw new Error('useArticlesStore must be used within a ArticleProvider')
+        throw new Error("useArticlesStore must be used within a ArticleProvider");
     }
-    return context
-}
+    return context;
+};
+
+export const ArticlesProvider: React.FC<{
+    children: React.ReactNode;
+    store: ArticlesStore;
+}> = ({ children, store }) => {
+    return (
+        <ArticlesContext.Provider value={store}>
+            {children}
+        </ArticlesContext.Provider>
+    );
+};
+
+export const ArticleScopeProvider: React.FC<{
+    children: React.ReactNode;
+    articleId: string;
+}> = ({ children, articleId }) => {
+    return (
+        <ArticleScopeContext.Provider value={articleId}>
+            {children}
+        </ArticleScopeContext.Provider>
+    );
+};
 
 const ArticleStoreProvider: React.FC<{
-    children: React.ReactNode
-    article?: ArticleDTO
-    editMode?: boolean
-    empty?: boolean
+    children: React.ReactNode;
+    article?: ArticleModel;
+    editMode?: boolean;
+    empty?: boolean;
 }> = observer(({ children, article, editMode, empty }) => {
-    const categoriesStore = useCategoriesStore()
-    const auth = useAuthStore()
-    const users = useUsersStore()
-    const [articlesStore] = useState(() => new ArticlesStore(categoriesStore))
+    const parentArticlesStore = useContext(ArticlesContext);
+    const categoriesStore = useCategoriesStore();
+    const auth = useAuthStore();
+    const users = useUsersStore();
+    const [localArticlesStore] = useState(() => new ArticlesStore(categoriesStore));
+    const articlesStore = parentArticlesStore ?? localArticlesStore;
+
+    const [scopeArticleId, setScopeArticleId] = useState<string>(() => {
+        if (article) {
+            articlesStore.upsert(article);
+            return article.id;
+        }
+
+        if (empty) {
+            const emptyArticle = articlesStore.createEmptyArticle();
+            return emptyArticle.id;
+        }
+
+        return "";
+    });
 
     useEffect(() => {
-        let currentArticle: ArticleModel | undefined
+        let currentArticle: ArticleModel | undefined;
 
         if (article) {
-            currentArticle = articlesStore.upsertFromDTO(article)
-            articlesStore.setActiveArticle(currentArticle.id)
+            currentArticle = articlesStore.upsert(article);
+            setScopeArticleId(currentArticle.id);
+        } else if (empty) {
+            currentArticle = articlesStore.getById(scopeArticleId) ?? articlesStore.createEmptyArticle();
+            setScopeArticleId(currentArticle.id);
+        } else {
+            return;
         }
-        else if (empty) {
-            currentArticle = articlesStore.createEmptyArticle()
-            articlesStore.setActiveArticle(currentArticle.id)
-        }
-        else return;
-
-        if (!currentArticle) return
 
         if (editMode) {
-            currentArticle.loadLocalDraft()
+            currentArticle.loadLocalDraft();
         }
-        currentArticle.setEditMode(editMode ?? false)
-        currentArticle.content.changePage('cover')
-    }, [article, empty, editMode, users, categoriesStore, articlesStore])
+        currentArticle.setEditMode(editMode ?? false);
+
+        if (!currentArticle.content || currentArticle.content.blocks.size === 0) {
+            currentArticle.fetchContent().then((content) => content.changePage("cover"));
+            return;
+        }
+        currentArticle.content.changePage("cover");
+    }, [article, empty, editMode, articlesStore, scopeArticleId]);
 
     useEffect(() => {
-        const currentArticle = articlesStore.activeArticleOrUndefined
-        if (!currentArticle) return
-        if (!auth.user) return
-        users.upsert(auth.user)
+        if (!scopeArticleId) return;
+        const currentArticle = articlesStore.getById(scopeArticleId);
+        if (!currentArticle) return;
+        if (!auth.user) return;
+
+        users.upsert(auth.user);
         if (editMode) {
-            currentArticle.setAuthorId(auth.user.id)
+            currentArticle.setAuthorId(auth.user.id);
         }
-    }, [auth.user, editMode, users, articlesStore])
+    }, [auth.user, editMode, users, articlesStore, scopeArticleId]);
 
     return (
         <ArticlesContext.Provider value={articlesStore}>
-            {children}
+            <ArticleScopeContext.Provider value={scopeArticleId || null}>
+                {children}
+            </ArticleScopeContext.Provider>
         </ArticlesContext.Provider>
-    )
-})
+    );
+});
 
-export default ArticleStoreProvider
+export default ArticleStoreProvider;

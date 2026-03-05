@@ -1,5 +1,7 @@
+import type { ArticleContentResponse, ArticleMeta } from "@smth/shared";
 import { makeAutoObservable, runInAction } from "mobx";
 import { v4 as uuidv4 } from "uuid";
+import { apiRequest } from "../../../shared/api";
 import { EMPTY_CATEGORY } from "../../category/samples/category.empty";
 import type { CategoriesStore } from "../../category/stores/CategoriesStore";
 import type { Category } from "../../category/types/category.types";
@@ -14,10 +16,14 @@ export class ArticleModel {
     title: string = "";
     description: string = "";
     mainCategoryId: string = "";
-    content: ContentStore = new ContentStore();
+    content: ContentStore | undefined = undefined;
     categoryIds: string[] = [];
     authorId: string = "";
-    status: "published" | "draft" | "archived" | "review" | undefined;
+    status: "published" | "draft" | "archived" | "review" = "archived";
+
+    createdAt: string | Date = "";
+    updatedAt: string | Date = "";
+    publishedAt: string | Date | null = null;
 
     editMode: boolean = false;
     swiping: boolean = false;
@@ -52,7 +58,26 @@ export class ArticleModel {
             this.authorId = article.authorId;
             this.status = article.status;
 
+            if (!this.content) {
+                this.content = new ContentStore();
+            }
             this.content.fromDTO(article.content);
+
+            this.createdAt = article.createdAt;
+            this.updatedAt = article.updatedAt;
+            this.publishedAt = article.publishedAt;
+        });
+    }
+
+    fromMetaDTO(articleMeta: ArticleMeta) {
+        runInAction(() => {
+            this.id = articleMeta.id;
+            this.title = articleMeta.title;
+            this.description = articleMeta.description ?? "";
+            this.categoryIds = articleMeta.categories;
+            this.mainCategoryId = articleMeta.mainCategoryId;
+            this.authorId = articleMeta.authorId;
+            this.status = articleMeta.status;
         });
     }
 
@@ -75,8 +100,30 @@ export class ArticleModel {
                 "";
             this.authorId = article.authorId ?? article.author?.id ?? "";
             this.status = article.status;
+
+            if (!this.content) {
+                this.content = new ContentStore();
+            }
             this.content.fromJSON(article.content);
         });
+    }
+
+    async fetchContent(): Promise<ContentStore> {
+        if (!this.id) {
+            throw new Error("Article id is required to fetch content");
+        }
+
+        if (this.content && this.content.isLoaded) {
+            return this.content;
+        }
+
+        const contentPayload = await apiRequest<ArticleContentResponse>(`/articles/${this.id}/content`);
+
+        if (!this.content) {
+            this.content = new ContentStore();
+        }
+        this.content.fromDTO(contentPayload.data);
+        return this.content;
     }
 
     createEmptyArticle() {
@@ -86,6 +133,9 @@ export class ArticleModel {
 
     setEditMode(editMode: boolean) {
         this.editMode = editMode;
+        if (!this.content) {
+            this.content = new ContentStore();
+        }
         this.content.setEditMode(editMode);
 
         if (editMode) {
@@ -130,6 +180,9 @@ export class ArticleModel {
     }
 
     toJSON() {
+        if (!this.content) {
+            this.content = new ContentStore();
+        }
         return {
             id: this.id,
             title: this.title,
@@ -143,6 +196,26 @@ export class ArticleModel {
             content: this.content.toJSON(),
         };
     }
+
+    toDTO(): ArticleDTO {
+        if (!this.content) {
+            this.content = new ContentStore();
+        }
+        return {
+            id: this.id,
+            title: this.title,
+            description: this.description,
+            mainCategoryId: this.mainCategoryId,
+            categories: this.categoryIds,
+            authorId: this.authorId,
+            status: this.status,
+            content: this.content.toDTO(),
+            createdAt: this.createdAt,
+            updatedAt: this.updatedAt,
+            publishedAt: this.publishedAt
+        };
+    }
+
 
     saveLocalDraft() {
         console.log("Saving draft...");
@@ -159,6 +232,9 @@ export class ArticleModel {
 
         if (draft) {
             const article = JSON.parse(draft);
+            if (!this.content) {
+                this.content = new ContentStore();
+            }
 
             this.content.disableSave();
             try {

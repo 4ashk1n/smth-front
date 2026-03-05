@@ -25,6 +25,8 @@ export class ContentStore {
     isDragging: boolean = false
     currentDragPos: { x: number, y: number } = { x: 0, y: 0 }
 
+    isLoaded: boolean = false
+
     constructor() {
         makeAutoObservable(this, {}, { autoBind: true })
     }
@@ -51,11 +53,28 @@ export class ContentStore {
 
             this.currentPageId = 'cover'
             this.currentTopicId = 'cover'
+
+            this.isLoaded = true
         })
+    }
+
+    toDTO(): Content {
+        return {
+            articleId: this.articleId,
+            topics: Array.from(this.topics.values()),
+            pages: Array.from(this.pages.values()),
+            blocks: Array.from(this.blocks.values()).map(b => {
+                switch (b.type) {
+                    case 'paragraph': return { ...b, content: JSON.stringify(b.content) }
+                    default: return b
+                }
+            })
+        }
     }
 
     toJSON() {
         return {
+            articleId: this.articleId,
             topics: Array.from(this.topics.entries()),
             pages: Array.from(this.pages.entries()),
             blocks: Array.from(this.blocks.entries()),
@@ -124,6 +143,8 @@ export class ContentStore {
                 this.isDragging = content.isDragging ?? false
                 this.currentDragPos = content.currentDragPos ?? { x: 0, y: 0 }
 
+                this.isLoaded = true
+
                 if (this.editMode) this.clearExtraEmptyPages()
             })
         } finally {
@@ -143,7 +164,9 @@ export class ContentStore {
     }
 
     get topicsData(): TopicModel[] {
-        return Array.from(this.topics.values());
+        const coverTopic = this.topics.get('cover');
+        if (!coverTopic) return Array.from(this.topics.values());
+        return [coverTopic, ...Array.from(this.topics.values()).filter(t => t.id !== 'cover')];
     }
 
     get pagesData(): PageModel[] {
