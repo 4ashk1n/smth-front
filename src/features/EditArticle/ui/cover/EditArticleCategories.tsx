@@ -1,30 +1,26 @@
 import { useDisclosure } from "@mantine/hooks"
 import { ActionIcon, Button, Drawer, Grid } from "@mantine/core";
+import { observer } from "mobx-react";
 import { PiPencil } from "react-icons/pi";
 import { useArticleStore } from "../../../../entities/article/contexts/article.context";
-import { ALL_CATEGORIES } from "../../../../entities/category/samples/category.samples";
-import { useEffect, useState } from "react";
 import type { Category } from "../../../../entities/category/types/category.types";
+import { useCategoriesStore } from "../../../../entities/category/contexts/categories.context";
 
 
 
-const EditArticleCategories: React.FC<{}> = () => {
+const EditArticleCategories: React.FC<{}> = observer(() => {
 
     const [opened, { open, close }] = useDisclosure(false);
+    const categoriesStore = useCategoriesStore()
     const article = useArticleStore();
-    const [selectedCategories, setSelectedCategories] = useState(article.categories);
 
-    const handleCategorySelect = (category: Category) => {
-        if (selectedCategories.includes(category)) {
-            setSelectedCategories(selectedCategories.filter((c) => c !== category));
+    const handleCategorySelect = (categoryId: string) => {
+        if (article.categoryIds.includes(categoryId)) {
+            article.setCategoryIds(article.categoryIds.filter((id) => id !== categoryId))
         } else {
-            setSelectedCategories([...selectedCategories, category]);
+            article.setCategoryIds([...article.categoryIds, categoryId])
         }
     };
-
-    useEffect(() => {
-        article.setCategories(selectedCategories);
-    }, [selectedCategories.length]);
 
     return (<>
         <ActionIcon size='md' c={article.mainCategory.colors.accentColor} radius={8} w='fit-content' variant="subtle" onClick={open}>
@@ -69,7 +65,7 @@ const EditArticleCategories: React.FC<{}> = () => {
                 columns={2}
             >
                 {
-                    ALL_CATEGORIES.map((category: Category, i) => (
+                    categoriesStore.categories.map((category: Category, i) => (
                         <Grid.Col
                             key={i}
                             span={1}
@@ -84,15 +80,15 @@ const EditArticleCategories: React.FC<{}> = () => {
                                 w='100%'
                                 radius={8}
                                 variant="filled"
-                                bg={selectedCategories.includes(category) ? category.colors.accentColor : '#00000080'}
-                                c={selectedCategories.includes(category) ? 'white' : '#bbbbbbff'}
+                                bg={article.categoryIds.includes(category.id) ? category.colors.accentColor : '#00000080'}
+                                c={article.categoryIds.includes(category.id) ? 'white' : '#bbbbbbff'}
                                 fz={12}
 
                                 style={{
-                                    boxShadow: selectedCategories.includes(category) ? `0 0 5px ${category.colors.accentColor}` : 'none'
+                                    boxShadow: article.categoryIds.includes(category.id) ? `0 0 5px ${category.colors.accentColor}` : 'none'
                                 }}
 
-                                onClick={() => handleCategorySelect(category)}
+                                onClick={() => handleCategorySelect(category.id)}
                             >
                                 {category.name}
                             </Button>
@@ -102,6 +98,6 @@ const EditArticleCategories: React.FC<{}> = () => {
             </Grid>
         </Drawer>
     </>)
-}
+})
 
 export default EditArticleCategories

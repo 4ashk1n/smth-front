@@ -1,8 +1,11 @@
 import { observer } from "mobx-react"
+import type { Category } from "../../../category/types/category.types"
 import { useArticleStore } from "../../contexts/article.context"
 
-const ArticleBackground = observer(() => {
-    const { mainCategory } = useArticleStore()
+const ArticleBackground: React.FC<{
+    mainCategory?: Category
+}> = observer(({ mainCategory }) => {
+    if (!mainCategory) mainCategory = useArticleStore().mainCategory
     return (
         <div
             style={{
@@ -10,7 +13,7 @@ const ArticleBackground = observer(() => {
                 top: 0,
                 left: 0,
                 width: '100%',
-                height: '100vh',
+                height: '100%',
                 background: `linear-gradient(0deg, ${mainCategory.colors.accentColor}, #000000 80%)`,
 
                 pointerEvents: "none", // 🔥 ОБЯЗАТЕЛЬНО 

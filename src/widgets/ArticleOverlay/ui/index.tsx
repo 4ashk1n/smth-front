@@ -9,7 +9,7 @@ import ActionsMenu from "./ActionsMenu"
 
 const ArticleOverlay = observer(() => {
   const article = useArticleStore()
-  const visible = article.content.currentPageId !== "cover"
+  const visible = article.content ? article.content.currentPageId !== "cover" : false
 
 
   return (
@@ -44,7 +44,7 @@ const ArticleOverlay = observer(() => {
       >
         <PageManager />
         {
-          article.content.editMode && <DeleteBlockArea />
+          article.content && article.content.editMode && <DeleteBlockArea />
         }
         <ArticleHeader />
         <ActionsMenu />

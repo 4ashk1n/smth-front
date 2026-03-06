@@ -1,315 +1,63 @@
-import type { Article, ArticleDTO } from "../types/article.types";
+import type { ArticleDTO } from "../types/article.types";
 
 export const ARTICLE_DTO_SAMPLE_2: ArticleDTO = {
-    id: '1',
-    title: 'Наш слон',
-    description: 'Мы взяли интервью у Павла Дурова',
-    mainCategory: {
-        id: '2',
-        emoji: '🐘',
-        name: 'bebobo',
-        colors: {
-            lightColor: '#f7ede0ff',
-            darkColor: '#793000ff',
-            accentColor: '#f08000ff'
-        }
-    },
-    categories: [{
-        id: '1',
-        emoji: '🐘',
-        name: 'bebobo',
-        colors: {
-            lightColor: '#f7ede0ff',
-            darkColor: '#793000ff',
-            accentColor: '#f08000ff'
-        }
-    }],
-    status: 'published',
-    author: {
-        id: '1',
-        firstname: 'skebob',
-        lastname: 'abob',
-        username: 'zverinus',
-        avatar: 'https://fbi.cults3d.com/uploaders/34973218/illustration-file/46f9a2d8-fb9a-482f-9b9f-8ba3c0701b6d/skiebob.jpg'
-    },
-     content: {
+    id: "2",
+    title: "Наш слон 2",
+    description: "Продолжение интервью у Павла Дурова",
+    mainCategoryId: "14517b75-44ac-45d9-9d4c-14c9d93aac97",
+    categories: ["14517b75-44ac-45d9-9d4c-14c9d93aac97"],
+    status: "published",
+    authorId: "df0db949-bf41-4596-b14d-0c8ce0ad2424",
+    content: {
+        articleId: "2",
         topics: [
             {
-                id: '1',
-                title: 'Кто такой Дуров и почему он до сих пор на хайпе?',
-                pages: [
-                    {
-                        id: '1',
-                        blocks: [
-                            {
-                                id: '1',
-                                type: 'paragraph',
-                                content: 'Павел Дуров — это не просто основатель ВКонтакте и Telegram. Это человек, который выбрал путь одиночки, отказался от миллиардов и убежал от всего, что его ограничивало. У него нет дома, нет гражданства, нет офиса. Зато есть миллионы пользователей и чёткая позиция — свобода личных данных превыше всего. \n\n Мы встретились с Павлом онлайн. Он отвечал голосом, но без камеры. Фоном был глухой ветер и иногда слышался шум моря.',
-                                layout: {
-                                    i: '0',
-                                    x: 0,
-                                    y: 1,
-                                    w: 1,
-                                    h: 4
-                                }
-                            },
-                            {
-                                id: '2',
-                                type: 'image',
-                                url: 'https://s0.rbk.ru/v6_top_pics/media/img/5/27/347495348582275.jpeg',
-                                source: 'РБК',
-                                label: 'Павел Дуров сидит',
-                                object3d: {
-                                    depth: 5,
-                                    translateX: 0,
-                                    translateY: 0,
-                                    translateZ: 3,
-                                    rotateX: 5,
-                                    rotateY: 10,
-                                    rotateZ: 0,
-                                    scale: 1
-                                },
-                                layout: {
-                                    i: '1',
-                                    x: 1,
-                                    y: 1,
-                                    w: 1,
-                                    h: 2
-                                },
-                            },
-                            {
-                                id: '3',
-                                type: 'icon',
-                                name: 'FaTelegram',
-                                layout: {
-                                    i: '2',
-                                    x: 0,
-                                    y: 6,
-                                    w: 2,
-                                    h: 2
-                                },
-                                // object3d: {
-                                //     depth: 5,
-                                //     translateX: 0,
-                                //     translateY: 0,
-                                //     translateZ: 3,
-                                //     rotateX: -15,
-                                //     rotateY: 20,
-                                //     rotateZ: 0,
-                                //     scale: 1
-                                // },
-                            }
-                        ],
-                        topicId: '1',
-                        order: 1
-                    },
-                    {
-                        id: '2',
-                        blocks: [
-                            {
-                                id: '3',
-                                type: 'icon',
-                                name: 'FaTelegram',
-                                layout: {
-                                    i: '2',
-                                    x: 0,
-                                    y: 2,
-                                    w: 2,
-                                    h: 4
-                                }
-                            }
-                        ],
-                        topicId: '1',
-                        order: 2
-                    }
-                ],
-                order: 1
+                id: "topic-21",
+                articleId: "2",
+                title: "Новая глава",
+                order: 1,
+            },
+        ],
+        pages: [
+            { id: "page-21", topicId: "topic-21", order: 1 },
+            { id: "page-22", topicId: "topic-21", order: 2 },
+        ],
+        blocks: [
+            {
+                id: "block-21",
+                pageId: "page-21",
+                type: "paragraph",
+                content: JSON.stringify({
+                    time: 0,
+                    blocks: [
+                        {
+                            id: "p21",
+                            type: "paragraph",
+                            data: { text: "Во второй части разговора мы обсудили принципы приватности." },
+                        },
+                    ],
+                    version: "2.28.2",
+                }),
+                object3d: null,
+                layout: { i: "block-21", x: 0, y: 1, w: 2, h: 3 },
             },
             {
-                id: '2',
-                title: 'Свобода мысли',
-                pages: [
-
-                    {
-                        id: '22',
-                        blocks: [
-                            {
-                                id: '4',
-                                type: 'icon',
-                                name: 'FaX',
-                                layout: {
-                                    i: '0',
-                                    x: 0,
-                                    y: 2,
-                                    w: 2,
-                                    h: 4
-                                },
-                                object3d: {
-                                    depth: 5,
-                                    translateX: 0,
-                                    translateY: 0,
-                                    translateZ: 3,
-                                    rotateX: 5,
-                                    rotateY: 10,
-                                    rotateZ: 0,
-                                    scale: 1
-                                }
-                            }
-                        ],
-                        topicId: '2',
-                        order: 3
-                    }
-                ],
-                order: 2
+                id: "block-22",
+                pageId: "page-22",
+                type: "icon",
+                name: "FaX",
+                object3d: {
+                    depth: 5,
+                    translateX: 0,
+                    translateY: 0,
+                    translateZ: 3,
+                    rotateX: 5,
+                    rotateY: 10,
+                    rotateZ: 0,
+                    scale: 1,
+                },
+                layout: { i: "block-22", x: 0, y: 2, w: 2, h: 4 },
             },
-            {
-                id: '3',
-                title: 'Свобода мысли',
-                pages: [
-
-                    {
-                        id: '3',
-                        blocks: [
-                            {
-                                id: '5',
-                                type: 'icon',
-                                name: 'FaX',
-                                layout: {
-                                    i: '0',
-                                    x: 0,
-                                    y: 2,
-                                    w: 2,
-                                    h: 4
-                                },
-                                object3d: {
-                                    depth: 5,
-                                    translateX: 0,
-                                    translateY: 0,
-                                    translateZ: 3,
-                                    rotateX: 5,
-                                    rotateY: 10,
-                                    rotateZ: 0,
-                                    scale: 1
-                                }
-                            }
-                        ],
-                        topicId: '3',
-                        order: 4
-                    }
-                ],
-                order: 3
-            },
-            {
-                id: '5',
-                title: 'Свобода мысли',
-                pages: [
-
-                    {
-                        id: '5',
-                        blocks: [
-                            {
-                                id: '7',
-                                type: 'icon',
-                                name: 'FaX',
-                                layout: {
-                                    i: '0',
-                                    x: 0,
-                                    y: 2,
-                                    w: 2,
-                                    h: 4
-                                },
-                                object3d: {
-                                    depth: 5,
-                                    translateX: 0,
-                                    translateY: 0,
-                                    translateZ: 3,
-                                    rotateX: 5,
-                                    rotateY: 10,
-                                    rotateZ: 0,
-                                    scale: 1
-                                }
-                            }
-                        ],
-                        topicId: '5',
-                        order: 5
-                    }
-                ],
-                order: 4
-            },
-            {
-                id: '6',
-                title: 'Свобода мысли',
-                pages: [
-
-                    {
-                        id: '6',
-                        blocks: [
-                            {
-                                id: '8',
-                                type: 'icon',
-                                name: 'FaX',
-                                layout: {
-                                    i: '0',
-                                    x: 0,
-                                    y: 2,
-                                    w: 2,
-                                    h: 4
-                                },
-                                object3d: {
-                                    depth: 5,
-                                    translateX: 0,
-                                    translateY: 0,
-                                    translateZ: 3,
-                                    rotateX: 5,
-                                    rotateY: 10,
-                                    rotateZ: 0,
-                                    scale: 1
-                                }
-                            }
-                        ],
-                        topicId: '6',
-                        order: 6
-                    }
-                ],
-                order: 5
-            },
-            {
-                id: '7',
-                title: 'Свобода мысли',
-                pages: [
-
-                    {
-                        id: '7',
-                        blocks: [
-                            {
-                                id: '9',
-                                type: 'icon',
-                                name: 'FaX',
-                                layout: {
-                                    i: '0',
-                                    x: 0,
-                                    y: 2,
-                                    w: 2,
-                                    h: 4
-                                },
-                                object3d: {
-                                    depth: 5,
-                                    translateX: 0,
-                                    translateY: 0,
-                                    translateZ: 3,
-                                    rotateX: 5,
-                                    rotateY: 10,
-                                    rotateZ: 0,
-                                    scale: 1
-                                }
-                            }
-                        ],
-                        topicId: '7',
-                        order: 7
-                    }
-                ],
-                order: 6
-            }
-        ]
-    }
-}
+        ],
+    },
+} as any;

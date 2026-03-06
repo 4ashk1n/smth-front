@@ -3,6 +3,7 @@ import type React from "react"
 import type { ReactNode } from "react"
 import { PiBell, PiBellFill, PiHouse, PiHouseFill, PiMagnifyingGlass, PiMagnifyingGlassBold, PiPlusBold, PiUser, PiUserFill } from "react-icons/pi"
 import { useLocation, useNavigate } from "react-router"
+import { useAuthStore } from "../../../entities/user/contexts/auth.context"
 
 const FooterButton: React.FC<{
     icon: ReactNode
@@ -53,6 +54,8 @@ const NewArticleIcon: React.FC = () => {
 const Footer = () => {
     const location = useLocation()
 
+    const authUser = useAuthStore()
+
     return (<>
 
         <Grid
@@ -91,9 +94,9 @@ const Footer = () => {
                 url={'/notifications'} />
 
             <FooterButton
-                icon={location.pathname === '/profile' ? <PiUserFill size={20} color="white" /> : <PiUser size={20} color="white" />}
+                icon={location.pathname === (authUser.user ? `/profile/${authUser.user.id}` : '/auth') ? <PiUserFill size={20} color="white" /> : <PiUser size={20} color="white" />}
                 label={'Профиль'}
-                url={'/profile'} />
+                url={authUser.user ? `/profile/${authUser.user.id}` : '/auth'} />
 
 
 

@@ -1,16 +1,22 @@
 // pages/Feed/ui/index.tsx
-import { useContext, useEffect, useRef, useState } from "react"
-import VerticalArticleSwipeContainer from "../../../features/FeedNavigation/ui/VerticalArticleSwipeContainer"
+import { type ArticleListResponse, type ArticleMeta } from "@smth/shared"
+import { useEffect, useRef, useState } from "react"
+import { ArticleScopeProvider, ArticlesProvider } from "../../../entities/article/contexts/article.context"
+import { ArticleModel } from "../../../entities/article/models/article.model"
+import { ArticlesStore } from "../../../entities/article/stores/articles.store"
+import { useCategoriesStore } from "../../../entities/category/contexts/categories.context"
 import SlidingFeedContent from "../../../features/FeedNavigation/ui/SlidingFeedContent"
-import { ARTICLES_FEED } from "../samples/feed.sample"
-import ArticleStoreProvider from "../../../entities/article/contexts/article.context"
+import VerticalArticleSwipeContainer from "../../../features/FeedNavigation/ui/VerticalArticleSwipeContainer"
+import { apiRequest } from "../../../shared/api"
 import ArticleScreen from "../../Article/ui/screen"
-import { GlobalContext } from "../../../app/main"
 
 const FeedPage: React.FC = () => {
     const [currentIndex, setCurrentIndex] = useState(0)
     const [containerHeight, setContainerHeight] = useState(0)
     const containerRef = useRef<HTMLDivElement | null>(null)
+    const categories = useCategoriesStore()
+    const [articlesStore] = useState(() => new ArticlesStore(categories))
+    const [articleIds, setArticleIds] = useState<string[]>([])
 
     useEffect(() => {
         const el = containerRef.current
@@ -30,9 +36,24 @@ const FeedPage: React.FC = () => {
         }
     }, [])
 
+    useEffect(() => {
+        (async () => {
+            const res = await apiRequest<ArticleListResponse>('/articles?limit=10', {method: 'GET'})
+            const ids = res.data.items.map((item: ArticleMeta) => {
+                const existing = articlesStore.getById(item.id)
+                const article = existing ?? new ArticleModel(categories)
+                article.fromMetaDTO(item)
+                articlesStore.upsert(article)
+                article.fetchContent()
+                return article.id
+            })
+            setArticleIds(ids)
+            
+        })()
+    }, [articlesStore, categories])
 
-    if (containerHeight === 0) {
-        // можно отрисовать скелетон / ничего, пока не измерили
+
+    if (containerHeight === 0 || articleIds.length === 0) {
         return (
             <div
                 ref={containerRef}
@@ -48,31 +69,33 @@ const FeedPage: React.FC = () => {
             style={{
                 position: "relative",
                 width: "100%",
-                height: "100%",     // 👈 ровно область под статью, без футера
+                height: "100%",
                 overflow: "hidden",
                 touchAction: "none",
             }}
         >
             
-            <VerticalArticleSwipeContainer
-                index={currentIndex}
-                maxIndex={ARTICLES_FEED.length - 1}
-                onChange={setCurrentIndex}
-                height={containerHeight}                // 👈 передаём вниз
-                content={(swipeY) => (
-                    <SlidingFeedContent
-                        swipeY={swipeY}
-                        itemsCount={ARTICLES_FEED.length}
-                        currentIndex={currentIndex}
-                        slideHeight={containerHeight}                // 👈 и сюда
-                        renderItem={(idx) => (
-                            <ArticleStoreProvider article={ARTICLES_FEED[idx]}>
-                                <ArticleScreen />
-                            </ArticleStoreProvider>
-                        )}
-                    />
-                )}
-            />
+            <ArticlesProvider store={articlesStore}>
+                <VerticalArticleSwipeContainer
+                    index={currentIndex}
+                    maxIndex={articleIds.length - 1}
+                    onChange={setCurrentIndex}
+                    height={containerHeight}
+                    content={(swipeY) => (
+                        <SlidingFeedContent
+                            swipeY={swipeY}
+                            itemsCount={articleIds.length}
+                            currentIndex={currentIndex}
+                            slideHeight={containerHeight}
+                            renderItem={(idx) => (
+                                <ArticleScopeProvider articleId={articleIds[idx]}>
+                                    <ArticleScreen />
+                                </ArticleScopeProvider>
+                            )}
+                        />
+                    )}
+                />
+            </ArticlesProvider>
         </div>
     )
 }

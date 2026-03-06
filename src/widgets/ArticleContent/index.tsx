@@ -6,7 +6,6 @@ import { observer } from "mobx-react";
 import { type Layout } from "react-grid-layout";
 import { useArticleStore } from "../../entities/article/contexts/article.context";
 import type { Block, Icon, Image, Page, Paragraph } from "../../entities/article/types/content.types";
-import ArticleCover from "../../entities/article/ui/ArticleContent/ArticleCover";
 import ParagraphBlock from "../../entities/article/ui/ArticleContent/ParagraphBlock";
 import TopicHeader from "../../entities/article/ui/ArticleContent/TopicHeader";
 import IconBlockEdit from "../../features/EditArticle/ui/blocks/IconBlockEdit";
@@ -15,6 +14,7 @@ import ParagraphBlockEdit from "../../features/EditArticle/ui/blocks/ParagraphBl
 import EditTopicHeader from "../../features/EditArticle/ui/content/EditTopicHeader";
 import ResizeHandle from "../../features/EditArticle/ui/tools/ResizeHandle";
 import ResponsiveGridLayout from "../../shared/ui/grids/ResponsiveGridLayout";
+import ArticleCover from "./ArticleCover";
 
 
 export const ArticleBlock = ({ block }: { block: Block }) => {
