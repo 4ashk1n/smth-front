@@ -8,7 +8,7 @@ import { PiBookmarkSimpleFill, PiChatCenteredDotsFill, PiHeartFill, PiShareFatFi
 import { useArticleStore } from "../../../entities/article/contexts/article.context"
 import { useAuthStore } from "../../../entities/user/contexts/auth.context"
 import { formatNumber } from "../../../shared/lib/formatNumber"
-import { likeArticle } from "../api/LikeArticle"
+import { likeArticle } from "../api/likeArticle"
 import { repostArticle } from "../api/repostArticle"
 import { saveArticle } from "../api/saveArticle"
 
