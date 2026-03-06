@@ -1,4 +1,4 @@
-import type { ArticleContentResponse, ArticleMeta } from "@smth/shared";
+import type { ArticleContentResponse, ArticleMeta, ArticleMetrics, ArticleMetricsResponse } from "@smth/shared";
 import { makeAutoObservable, runInAction } from "mobx";
 import { v4 as uuidv4 } from "uuid";
 import { apiRequest } from "../../../shared/api";
@@ -27,6 +27,21 @@ export class ArticleModel {
 
     editMode: boolean = false;
     swiping: boolean = false;
+
+    metrics: {
+        loaded: boolean,
+    } & ArticleMetrics = {
+            loaded: false,
+            views: 0,
+            liked: false,
+            likes: 0,
+            comments: 0,
+            reposts: 0,
+            reposted: false,
+            saves: 0,
+            saved: false,
+        }
+
 
     constructor(categoriesStore: CategoriesStore) {
         this.categoriesStore = categoriesStore;
@@ -129,6 +144,23 @@ export class ArticleModel {
     createEmptyArticle() {
         this.fromDTO(ARTICLE_EMPTY);
         this.id = uuidv4();
+    }
+
+    async fetchMetrics(): Promise<void> {
+        if (this.metrics.loaded) return
+        const metrics = await apiRequest<ArticleMetricsResponse>(`/articles/${this.id}/metrics`, { credentials: "include" })
+        this.metrics = {
+            ...this.metrics,
+            ...metrics.data,
+            loaded: true,
+        }
+    }
+
+    updateMetrics(metrics: Partial<ArticleMetrics>) {
+        this.metrics = {
+            ...this.metrics,
+            ...metrics,
+        }
     }
 
     setEditMode(editMode: boolean) {

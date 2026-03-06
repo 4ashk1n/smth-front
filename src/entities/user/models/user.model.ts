@@ -6,11 +6,8 @@ import type { User } from "../types/user.types"
 export class UserModel {
     data: User
     metrics: {
-        articles: number 
-        followers: number
-        following: number
         loaded: boolean
-    } = {
+    } & UserMetrics = {
         articles: 0,
         followers: 0,
         following: 0,
