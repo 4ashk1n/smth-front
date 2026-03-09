@@ -6,6 +6,8 @@ import { IconModel, ImageModel, PageModel, ParagraphModel, TopicModel } from "..
 import type { Block, BlockType, Content, Icon, Image, Page, Paragraph, Topic } from "../types/content.types";
 
 export class ContentStore {
+    private static readonly COVER_ID = "cover"
+
     private saveCallback: (() => void) | null = null
     private saveEnabled: boolean = true
 
@@ -31,6 +33,20 @@ export class ContentStore {
         makeAutoObservable(this, {}, { autoBind: true })
     }
 
+    private normalizeDraftItems<T>(items: unknown): T[] {
+        if (!Array.isArray(items)) return [];
+        if (items.length === 0) return [];
+
+        // Legacy format: [ [id, entity], ... ]
+        if (Array.isArray(items[0])) {
+            return (items as Array<[string, T]>)
+                .map(([, entity]) => entity)
+                .filter(Boolean);
+        }
+
+        return items as T[];
+    }
+
     fromDTO(content: Content) {
         runInAction(() => {
             this.topics.clear()
@@ -48,36 +64,70 @@ export class ContentStore {
             content.topics.forEach(t => this.topics.set(t.id, new TopicModel(t, Array.from(this.pages.values()))))
 
 
-            this.topics.set('cover', new TopicModel({ id: 'cover', title: 'cover', order: 0, articleId: content.articleId }, []))
-            this.pages.set('cover', new PageModel({ id: 'cover', topicId: 'cover', order: 0 }, []))
+            this.topics.set(ContentStore.COVER_ID, new TopicModel({ id: ContentStore.COVER_ID, title: ContentStore.COVER_ID, order: 0, articleId: content.articleId }, []))
+            this.pages.set(ContentStore.COVER_ID, new PageModel({ id: ContentStore.COVER_ID, topicId: ContentStore.COVER_ID, order: 0 }, []))
 
-            this.currentPageId = 'cover'
-            this.currentTopicId = 'cover'
+            this.currentPageId = ContentStore.COVER_ID
+            this.currentTopicId = ContentStore.COVER_ID
 
             this.isLoaded = true
         })
     }
 
+    syncArticleId(articleId: string) {
+        runInAction(() => {
+            this.articleId = articleId
+            this.topics.forEach((topic) => {
+                topic.articleId = articleId
+            })
+        })
+    }
+
     toDTO(): Content {
+        const topics = this.topicsData
+            .filter((topic) => topic.id !== ContentStore.COVER_ID)
+            .map((topic) => ({
+                id: topic.id,
+                articleId: topic.articleId,
+                title: topic.title,
+                order: topic.order,
+            }))
+            .sort((a, b) => a.order - b.order);
+
+        const pages = this.pagesData
+            .filter((page) => page.id !== ContentStore.COVER_ID && page.topicId !== ContentStore.COVER_ID)
+            .map((page) => ({
+                id: page.id,
+                topicId: page.topicId,
+                order: page.order,
+            }))
+            .sort((a, b) => a.order - b.order);
+
+        const blocks = Array.from(this.blocks.values())
+            .filter((block) => block.pageId !== ContentStore.COVER_ID)
+            .map((block) => {
+                if (block.type === 'paragraph') {
+                    return { ...block, content: JSON.stringify(block.content) };
+                }
+                return block;
+            });
+
         return {
             articleId: this.articleId,
-            topics: Array.from(this.topics.values()),
-            pages: Array.from(this.pages.values()),
-            blocks: Array.from(this.blocks.values()).map(b => {
-                switch (b.type) {
-                    case 'paragraph': return { ...b, content: JSON.stringify(b.content) }
-                    default: return b
-                }
-            })
+            topics,
+            pages,
+            blocks
         }
     }
 
     toJSON() {
+        const dto = this.toDTO();
         return {
-            articleId: this.articleId,
-            topics: Array.from(this.topics.entries()),
-            pages: Array.from(this.pages.entries()),
-            blocks: Array.from(this.blocks.entries()),
+            version: 2,
+            articleId: dto.articleId,
+            topics: dto.topics,
+            pages: dto.pages,
+            blocks: dto.blocks,
             editMode: this.editMode,
             dragMode: this.dragMode,
             currentPageId: this.currentPageId,
@@ -93,62 +143,48 @@ export class ContentStore {
             throw new Error('Invalid JSON')
         }
 
-        // Отключаем сохранение на время загрузки
         const wasSaveEnabled = this.saveEnabled
         this.saveEnabled = false
 
         try {
+            const topics = this.normalizeDraftItems<Topic>(content.topics);
+            const pages = this.normalizeDraftItems<Page>(content.pages);
+            const blocks = this.normalizeDraftItems<Block>(content.blocks).map((block) => {
+                if (!block || block.type !== "paragraph") return block;
+                if (typeof (block as Paragraph).content === "string") return block;
+                return {
+                    ...block,
+                    content: JSON.stringify((block as any).content ?? { blocks: [] }),
+                } as Paragraph;
+            });
+
+            this.fromDTO({
+                articleId: content.articleId ?? this.articleId,
+                topics,
+                pages,
+                blocks,
+            });
+
             runInAction(() => {
-                // Очищаем существующие данные
-                this.topics.clear()
-                this.pages.clear()
-                this.blocks.clear()
-
-                this.articleId = content.articleId
-
-                // Восстанавливаем из данных
-                const topics = content.topics ?? []
-                const pages = content.pages ?? []
-                const blocks = content.blocks ?? []
-
-
-                blocks.forEach(([id, block]: [string, Block]) => {
-                    if (block && id) {
-                        switch (block.type) {
-                            case 'paragraph': this.blocks.set(id, new ParagraphModel(block as Paragraph)); break;
-                            case 'icon': this.blocks.set(id, new IconModel(block as Icon)); break;
-                            case 'image': this.blocks.set(id, new ImageModel(block as Image)); break;
-                        }
-                    }
-                })
-
-                pages.forEach(([id, page]: [string, Page]) => {
-                    if (page && id) {
-                        this.pages.set(id, new PageModel(page, Array.from(this.blocks.values())))
-                    }
-                })
-
-                topics.forEach(([id, topic]: [string, Topic]) => {
-                    if (topic && id) {
-                        this.topics.set(id, new TopicModel(topic, Array.from(this.pages.values())))
-                    }
-                })
-
-                // Восстанавливаем остальные поля
-                this.editMode = content.editMode ?? false
+                this.editMode = content.editMode ?? this.editMode
                 this.dragMode = content.dragMode ?? false
-                this.currentPageId = content.currentPageId ?? ''
-                this.currentTopicId = content.currentTopicId ?? ''
                 this.currentBlockId = content.currentBlockId ?? ''
                 this.isDragging = content.isDragging ?? false
                 this.currentDragPos = content.currentDragPos ?? { x: 0, y: 0 }
+
+                const requestedPageId = typeof content.currentPageId === "string" ? content.currentPageId : ContentStore.COVER_ID;
+                this.currentPageId = this.pages.has(requestedPageId) ? requestedPageId : ContentStore.COVER_ID;
+
+                const requestedTopicId = typeof content.currentTopicId === "string" ? content.currentTopicId : this.pages.get(this.currentPageId)?.topicId;
+                this.currentTopicId = (requestedTopicId && this.topics.has(requestedTopicId))
+                    ? requestedTopicId
+                    : (this.pages.get(this.currentPageId)?.topicId ?? ContentStore.COVER_ID);
 
                 this.isLoaded = true
 
                 if (this.editMode) this.clearExtraEmptyPages()
             })
         } finally {
-            // Восстанавливаем флаг сохранения
             this.saveEnabled = wasSaveEnabled
         }
 
@@ -164,9 +200,9 @@ export class ContentStore {
     }
 
     get topicsData(): TopicModel[] {
-        const coverTopic = this.topics.get('cover');
+        const coverTopic = this.topics.get(ContentStore.COVER_ID);
         if (!coverTopic) return Array.from(this.topics.values());
-        return [coverTopic, ...Array.from(this.topics.values()).filter(t => t.id !== 'cover')];
+        return [coverTopic, ...Array.from(this.topics.values()).filter(t => t.id !== ContentStore.COVER_ID)];
     }
 
     get pagesData(): PageModel[] {
@@ -181,7 +217,7 @@ export class ContentStore {
             type: 'icon',
             name: 'MdQuestionMark',
             layout: { i: '', x: 0, y: 0, w: 1, h: 1 },
-            pageId: 'cover',
+            pageId: ContentStore.COVER_ID,
             object3d: null
         })
 
@@ -208,6 +244,7 @@ export class ContentStore {
     }
 
     changePage(pageId: string) {
+        if (!pageId || !this.pages.has(pageId)) return
         this.currentPageId = pageId
         this.currentTopicId = this.pages.get(pageId)?.topicId ?? ''
 
@@ -216,7 +253,7 @@ export class ContentStore {
         if (
             this.editMode &&
             this.currentPage?.order === this.pagesData.length - 1 &&
-            (this.currentPage?.blocks.length !== 0 || this.currentPage?.topicId === 'cover')
+            (this.currentPage?.blocks.length !== 0 || this.currentPage?.topicId === ContentStore.COVER_ID)
         ) {
             this.addEmptyPage()
         }
@@ -248,6 +285,12 @@ export class ContentStore {
 
     setEditMode(editMode: boolean) {
         this.editMode = editMode
+
+        if (!editMode) return
+        const hasEditablePage = this.pagesData.some((page) => page.id !== ContentStore.COVER_ID)
+        if (!hasEditablePage) {
+            this.addEmptyPage()
+        }
     }
 
     setDragMode(dragMode: boolean) {
@@ -267,7 +310,7 @@ export class ContentStore {
 
         const newTopicId = uuidv4()
         const newTopic = new TopicModel({
-            id: newTopicId, order: this.topicsData.length, title: '', articleId: this.articleId
+            id: newTopicId, order: this.topicsData.length, title: `Topic ${this.topicsData.length}`, articleId: this.articleId
         }, [])
         this.topics.set(newTopicId, newTopic)
 
@@ -287,7 +330,7 @@ export class ContentStore {
 
         const emptyPages = pages.filter(p => (
             p.blocks.length === 0 &&
-            p.topicId !== 'cover' &&
+            p.topicId !== ContentStore.COVER_ID &&
             p.order !== lastPageOrder
         ))
         emptyPages.forEach(p => {
@@ -300,6 +343,12 @@ export class ContentStore {
 
         const emptyTopics = this.topicsData.filter(t => (t.pages.length === 0))
         emptyTopics.forEach(t => this.topics.delete(t.id))
+
+        const orderedTopics = this.topicsData.filter((topic) => topic.id !== ContentStore.COVER_ID).sort((a, b) => a.order - b.order);
+        orderedTopics.forEach((topic, index) => { topic.order = index + 1; });
+
+        const orderedPages = this.pagesData.filter((page) => page.id !== ContentStore.COVER_ID).sort((a, b) => a.order - b.order);
+        orderedPages.forEach((page, index) => { page.order = index + 1; });
     }
 
     addEmptyPage(): PageModel | null {
@@ -308,13 +357,14 @@ export class ContentStore {
         const newPageId = uuidv4()
         let prevTopic = this.getPageByOrder(this.pagesData.length - 1)?.topicId
         console.log(prevTopic)
-        if (!prevTopic || prevTopic === 'cover' || prevTopic === '') {
+        if (!prevTopic || prevTopic === ContentStore.COVER_ID || prevTopic === '') {
             const newTopic = this.addNewTopic()
             if (!newTopic) return null
             prevTopic = newTopic.id
             console.log(prevTopic)
         }
-        const newPage = new PageModel({ id: newPageId, topicId: prevTopic, order: this.pagesData.length }, [])
+        const maxOrder = this.pagesData.reduce((max, page) => Math.max(max, page.order), 0)
+        const newPage = new PageModel({ id: newPageId, topicId: prevTopic, order: maxOrder + 1 }, [])
         this.pages.set(newPageId, newPage)
         this.topics.get(prevTopic)?.pages.push(newPage)
         console.log('ADD EMPTY PAGE', newPage, 'TO', prevTopic)
@@ -324,6 +374,7 @@ export class ContentStore {
 
     addBlockToCurrentPage(block: ParagraphModel | IconModel | ImageModel) {
         if (!this.currentPage || !this.editMode) return
+        this.blocks.set(block.id, block)
         this.currentPage.blocks.push(block)
 
         if (this.currentPage.order === this.pagesData.length - 1) {
@@ -336,8 +387,26 @@ export class ContentStore {
     addEmptyBlock(blocktype: BlockType) {
         if (!this.currentPage || !this.editMode) return
 
-        const { x, y } = findOptimalFreeSpot(this.currentPage);
-        if (x === -1 || y === -1) return
+        if (this.currentPage.id === ContentStore.COVER_ID) {
+            const firstEditablePage = this.pagesData.find((page) => page.id !== ContentStore.COVER_ID);
+            const targetPage = firstEditablePage ?? this.addEmptyPage();
+            if (!targetPage) return;
+            this.changePage(targetPage.id);
+        }
+
+        let page = this.currentPage;
+        if (!page) return;
+
+        let { x, y } = findOptimalFreeSpot(page);
+        if (x === -1 || y === -1) {
+            const newPage = this.addEmptyPage();
+            if (!newPage) return;
+            this.changePage(newPage.id);
+            page = this.currentPage;
+            if (!page) return;
+            ({ x, y } = findOptimalFreeSpot(page));
+            if (x === -1 || y === -1) return;
+        }
 
         const newBlockId = uuidv4();
 
@@ -350,7 +419,7 @@ export class ContentStore {
                     source: '',
                     sourceUrl: '',
                     label: '',
-                    pageId: this.currentPageId,
+                    pageId: page.id,
                     object3d: null,
                     layout: { i: newBlockId, x, y, w: 1, h: 2 }
                 });
@@ -362,7 +431,7 @@ export class ContentStore {
                     id: newBlockId,
                     type: 'icon',
                     name: '',
-                    pageId: this.currentPageId,
+                    pageId: page.id,
                     object3d: null,
                     layout: { i: newBlockId, x, y, w: 1, h: 2 }
                 });
@@ -374,7 +443,7 @@ export class ContentStore {
                     id: newBlockId,
                     type: 'paragraph',
                     content: '{"blocks": []}',
-                    pageId: this.currentPageId,
+                    pageId: page.id,
                     object3d: null,
                     layout: { i: newBlockId, x, y, w: 1, h: 2 }
                 });
@@ -392,6 +461,7 @@ export class ContentStore {
         const index = this.currentPage.blocks.findIndex(b => b.id === block.id)
         if (index === -1) return
         this.currentPage.blocks[index] = block
+        this.blocks.set(block.id, block)
 
         this.triggerSave()
     }
@@ -399,6 +469,7 @@ export class ContentStore {
     deleteBlock(blockId: string) {
         if (!this.currentPage || !this.editMode) return
         this.currentPage.blocks = this.currentPage.blocks.filter(b => b.id !== blockId)
+        this.blocks.delete(blockId)
 
         if (this.currentPage.blocks.length === 0) {
             // this.clearExtraEmptyPages() - #TO FIX: Rendered fewer hooks than expected

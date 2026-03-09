@@ -8,7 +8,8 @@ import Object3dBlock from '../../entities/article/ui/ArticleContent/Object3dBloc
 import EditArticleCategories from '../../features/EditArticle/ui/cover/EditArticleCategories'
 import EditArticleDescription from '../../features/EditArticle/ui/cover/EditArticleDescription'
 import EditArticleTitle from '../../features/EditArticle/ui/cover/EditArticleTitle'
-import SaveButton from '../../features/EditArticle/ui/tools/SaveButton'
+import { GoBackModal } from '../../features/EditArticle/ui/tools/GoBack'
+import SendForReviewButton from '../../features/EditArticle/ui/tools/SendForReviewButton'
 import { useIsMobileScreen } from '../../shared/lib/useIsMobile'
 import ResponsiveGridLayout from '../../shared/ui/grids/ResponsiveGridLayout'
 
@@ -16,6 +17,9 @@ const ArticleCover: React.FC<{}> = observer(() => {
     const article = useArticleStore()
     const isMobile = useIsMobileScreen()
 
+    if (!article.content) {
+        return null
+    }
     const coverBlock = article.content.coverBlock
 
 
@@ -33,13 +37,15 @@ const ArticleCover: React.FC<{}> = observer(() => {
                 article.editMode ?
                     <div
                         key={'save-button'}
-                        data-grid={{ w: 1, h: 1, x: 1, y: 0, static: true }}
+                        data-grid={{ w: 2, h: 1, x: 0, y: 0, static: true }}
                         style={{
                             display: 'flex',
-                            justifyContent: 'flex-end'
                         }}
                     >
-                        <SaveButton />
+                        <Group gap={0} justify='space-between' align='start' wrap='nowrap' w='100%'>
+                            <GoBackModal />
+                            <SendForReviewButton />
+                        </Group>
                     </div> :
                     null
             }

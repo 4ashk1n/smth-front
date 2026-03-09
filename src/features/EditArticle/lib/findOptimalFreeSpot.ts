@@ -1,9 +1,19 @@
-import type { Layout } from "react-grid-layout"
-import type { Content, Page } from "../../../entities/article/types/content.types"
+import type { Page } from "../../../entities/article/types/content.types"
+
+type PageWithBlocks = Page & {
+    blocks?: Array<{
+        layout: {
+            x: number
+            y: number
+            w: number
+            h: number
+        }
+    }>
+}
 
 
-export function findOptimalFreeSpot(page: Page) {
-    const existingLayout = page.blocks.map(block => block.layout);
+export function findOptimalFreeSpot(page: PageWithBlocks) {
+    const existingLayout = (page.blocks ?? []).map(block => block.layout);
     const occupied = Array(8).fill(0).map(() => Array(2).fill(false));
 
     existingLayout.forEach(item => {

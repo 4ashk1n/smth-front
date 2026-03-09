@@ -7,11 +7,12 @@ import ArticleBackground from "../ArticleContent/ArticleBackground"
 
 const VerticalArticleCard: React.FC<{
     article: ArticleMeta
-}> = ({ article }) => {
+    onClick: () => void
+}> = ({ article, onClick }) => {
     const mainCategory = useCategoriesStore().getById(article.mainCategoryId)
 
     return (
-        <Stack h='100%' w='100%' pos='relative' justify="space-between">
+        <Stack h='100%' w='100%' pos='relative' justify="space-between" onClick={onClick}>
             <ArticleBackground mainCategory={mainCategory} />
             <Stack w='100%' gap={'4px'} style={{ zIndex: 1 }} p={8}>
                 <Title fz={20} order={3} c='white'>

@@ -1,3 +1,4 @@
+import { makeAutoObservable } from "mobx";
 import type { Layout } from "react-grid-layout";
 import type { Block as BlockBase, Icon, Image, Object3d, Page, Paragraph, Topic } from "../types/content.types";
 
@@ -110,6 +111,7 @@ export class PageModel {
         this.topicId = page.topicId;
         this.order = page.order;
         this.blocks = blocks.filter(b => b.pageId === page.id);
+        makeAutoObservable(this, {}, { autoBind: true });
     }
 
     static get empty(): PageModel {
@@ -135,5 +137,6 @@ export class TopicModel {
         this.title = topic.title;
         this.articleId = topic.articleId;
         this.pages = pages.filter(p => p.topicId === topic.id);
+        makeAutoObservable(this, {}, { autoBind: true });
     }
 }

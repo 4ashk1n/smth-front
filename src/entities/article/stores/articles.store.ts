@@ -33,9 +33,9 @@ export class ArticlesStore {
         return article;
     }
 
-    createEmptyArticle(): ArticleModel {
+    createEmptyArticle(id?: string): ArticleModel {
         const article = new ArticleModel(this.categoriesStore);
-        article.createEmptyArticle();
+        article.createEmptyArticle(id);
         this.articles.set(article.id, article);
         return article;
     }
