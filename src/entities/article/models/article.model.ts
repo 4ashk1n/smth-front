@@ -28,6 +28,8 @@ export class ArticleModel {
     editMode: boolean = false;
     swiping: boolean = false;
 
+    invalidFields: string[] = [];
+
     metrics: {
         loaded: boolean,
     } & ArticleMetrics = {
@@ -338,5 +340,9 @@ export class ArticleModel {
                 this.content.enableSave();
             }
         }
+    }
+
+    setInvalidFields(invalidFields: string[]) {
+        this.invalidFields = invalidFields;
     }
 }

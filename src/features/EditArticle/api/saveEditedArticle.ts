@@ -2,7 +2,7 @@ import type { Article, ArticleUpdate, UpdateArticleResponse } from "@smth/shared
 import type { ArticleStore } from "../../../entities/article/stores/article.store";
 import { apiRequest } from "../../../shared/api";
 
-function buildUpdatePayload(article: ArticleStore): ArticleUpdate {
+export function buildUpdatePayload(article: ArticleStore): ArticleUpdate {
     const mainCategoryId = article.mainCategoryId || article.categoryIds[0] || "";
 
     return {

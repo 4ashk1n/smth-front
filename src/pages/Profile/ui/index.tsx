@@ -1,4 +1,4 @@
-import { Stack } from "@mantine/core";
+import { ScrollArea, Stack } from "@mantine/core";
 import { observer } from "mobx-react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
@@ -24,23 +24,26 @@ const ProfilePage = observer(() => {
             })
         }
     }, [params.userId])
-    
+
     if (!user) {
         return null
     }
 
     return (
-        <Stack
-            align="center"
-            w="100%"
-            h="100%"
-            mt={24}
-            style={{ overflow: "hidden" }}
-            gap={16}
-        >
-            <ProfileInfo user={user} />
-            <ProfileArticles userId={user.id} />
-        </Stack>
+        <ScrollArea scrollbars="y" onScrollCapture={() => { }} type="scroll" h='calc(100vh)' scrollbarSize={0}>
+            <Stack
+                align="center"
+                w="100%"
+                h="100%"
+                mt={24}
+                style={{ overflow: "hidden" }}
+                gap={16}
+            >
+                <ProfileInfo user={user} />
+                <ProfileArticles userId={user.id} />
+            </Stack>
+            <div style={{ height: 100 }} />
+        </ScrollArea>
     )
 });
 

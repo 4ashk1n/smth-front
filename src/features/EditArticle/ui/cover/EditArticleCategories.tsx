@@ -1,10 +1,11 @@
-import { useDisclosure } from "@mantine/hooks"
 import { ActionIcon, Button, Drawer, Grid } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import { observer } from "mobx-react";
 import { PiPencil } from "react-icons/pi";
 import { useArticleStore } from "../../../../entities/article/contexts/article.context";
-import type { Category } from "../../../../entities/category/types/category.types";
 import { useCategoriesStore } from "../../../../entities/category/contexts/categories.context";
+import type { Category } from "../../../../entities/category/types/category.types";
+import InfoPopover from "../../../../shared/ui/popover/InfoPopover";
 
 
 
@@ -23,10 +24,12 @@ const EditArticleCategories: React.FC<{}> = observer(() => {
     };
 
     return (<>
-        <ActionIcon size='md' c={article.mainCategory.colors.accentColor} radius={8} w='fit-content' variant="subtle" onClick={open}>
-            <PiPencil />
-        </ActionIcon>
+        <InfoPopover level='error' message='Выберите хотя бы одну категорию' opened={article.invalidFields.includes('mainCategoryId')}>
+            <ActionIcon size='md' c={article.mainCategory.colors.accentColor} radius={8} w='fit-content' variant="subtle" onClick={open}>
+                <PiPencil />
+            </ActionIcon>
 
+        </InfoPopover>
         <Drawer
             opened={opened}
             onClose={close}

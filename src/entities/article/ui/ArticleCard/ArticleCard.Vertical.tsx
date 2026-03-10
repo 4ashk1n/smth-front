@@ -5,6 +5,59 @@ import { formatNumber } from "../../../../shared/lib/formatNumber"
 import { useCategoriesStore } from "../../../category/contexts/categories.context"
 import ArticleBackground from "../ArticleContent/ArticleBackground"
 
+const VerticalArticleCardOverlay: React.FC<{
+    article: ArticleMeta
+}> = ({ article }) => {
+
+    return (
+        <Group
+            px={8}
+            py={4}
+            align="center"
+            gap={4}
+            style={{
+                zIndex: 1
+            }}
+        >
+            {
+                article.status === 'published' ?
+                    <>
+                        <PiEye size={16} />
+                        <Text c='white' lh={1} fz={12}>
+                            {formatNumber(999999)}
+                        </Text>
+                    </>
+                
+                : article.status === 'draft' ?
+                    <>
+                        <Text c='white' lh={1} fz={12}>
+                            Черновик
+                        </Text>    
+                    </>
+
+                : article.status === 'archived' ?
+                    <>
+                        <Text c='white' lh={1} fz={12}>
+                            Архив
+                        </Text>    
+                    </>
+
+                : article.status === 'review' ?
+                    <>
+                        <Text c='white' lh={1} fz={12}>
+                            На проверке
+                        </Text>    
+                    </>
+                : null
+            }
+
+        </Group>
+    )
+
+
+
+}
+
 const VerticalArticleCard: React.FC<{
     article: ArticleMeta
     onClick: () => void
@@ -23,21 +76,8 @@ const VerticalArticleCard: React.FC<{
                 </Text>
             </Stack>
 
-            <Group
-                px={8}
-                py={4}
-                align="center"
-                gap={4}
-                style={{
-                    zIndex: 1
-                }}
-            
-            >
-                <PiEye size={16} />
-                <Text c='white' lh={1} fz={12}>
-                    {formatNumber(999999)}
-                </Text>
-            </Group>
+            <VerticalArticleCardOverlay article={article} />
+
 
         </Stack>
     )

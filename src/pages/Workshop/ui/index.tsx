@@ -1,4 +1,4 @@
-import { Stack } from "@mantine/core";
+import { ScrollArea, Stack } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import type { ArticleMeta } from "../../../entities/article/types/article.types";
@@ -31,12 +31,17 @@ export const WorkshopPage = () => {
     const handleCardClick = (articleId: string) => navigate(`/article/${articleId}/edit`)
 
     return (
-        <Stack mt={24} gap={16}>
-            <CreateNewArticleButton />
-            <hr style={{margin: '0 24px', opacity: 0.2}} />
-            <ArticlesListWithStatus status="review" articles={articles.filter(a => a.status === 'review')} loading={isLoading} onCardClick={handleCardClick} />
-            <hr style={{margin: '0 24px', opacity: 0.2}} />
-            <ArticlesListWithStatus status="draft" articles={articles.filter(a => a.status === 'draft')} loading={isLoading} onCardClick={handleCardClick} />
-        </Stack>
+        <ScrollArea scrollbars="y" onScrollCapture={() => { }} type="scroll" h='calc(100vh)' scrollbarSize={0}>
+
+            <Stack mt={24} gap={16}>
+                <CreateNewArticleButton />
+                <hr style={{ margin: '0 24px', opacity: 0.2 }} />
+                <ArticlesListWithStatus status="review" articles={articles.filter(a => a.status === 'review')} loading={isLoading} onCardClick={handleCardClick} />
+                <hr style={{ margin: '0 24px', opacity: 0.2 }} />
+                <ArticlesListWithStatus status="draft" articles={articles.filter(a => a.status === 'draft')} loading={isLoading} onCardClick={handleCardClick} />
+            </Stack>
+
+            <div style={{ height: 100 }} />
+        </ScrollArea>
     )
 }

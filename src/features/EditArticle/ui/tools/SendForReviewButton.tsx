@@ -1,45 +1,81 @@
-import { Button } from "@mantine/core"
-import { useState } from "react"
-import { PiArrowRightBold } from "react-icons/pi"
-import { useArticleStore } from "../../../../entities/article/contexts/article.context"
-import { useAuthStore } from "../../../../entities/user/contexts/auth.context"
-import { createNewArticle } from "../../api/createNewArticle"
-import { saveEditedArticle } from "../../api/saveEditedArticle"
+import { Button, Modal, Stack, Text } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import { useState } from "react";
+import { PiArrowRight } from "react-icons/pi";
+import { useNavigate } from "react-router";
+import { useArticleStore } from "../../../../entities/article/contexts/article.context";
+import { useAuthStore } from "../../../../entities/user/contexts/auth.context";
+import { getInvalidFields, sendArticleForReview } from "../../api/sendArticleForReview";
 
 const SendForReviewButton = () => {
-    const article = useArticleStore()
-    const auth = useAuthStore()
-    const [isSaving, setIsSaving] = useState(false)
+    const article = useArticleStore();
+    const auth = useAuthStore();
+    const [isSaving, setIsSaving] = useState(false);
+    const [invalidFields, setInvalidFields] = useState<string[]>([]);
+    const [opened, { open, close }] = useDisclosure(false);
+    const navigate = useNavigate()
 
-    const handleSave = async () => {
+    const handleValidate = async () => {
+        if (isSaving || !auth.user) return;
+
+        setIsSaving(true);
+        setInvalidFields([]);
+
+        try {
+            article.setAuthorId(auth.user.id);
+
+            const invalidFields = getInvalidFields(article);
+            if (invalidFields.length) {
+                setInvalidFields(invalidFields);
+                article.setInvalidFields(invalidFields);
+                article.content?.changePage("cover");
+            }
+            else {
+                open()
+            }
+        } catch (error) {
+            console.error("Failed to validate article for review", error);
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    const handleSend = async () => {
         if (isSaving) return
         if (!auth.user) return
         setIsSaving(true)
         try {
-            article.setAuthorId(auth.user.id)
-            if (window.location.pathname.includes('/edit')) {
-                await saveEditedArticle(article)
-            } else if (window.location.pathname.includes('/new')) {
-                await createNewArticle(article)
-            }
+            await sendArticleForReview(article)
+            setIsSaving(false)
+            navigate('/workshop')
         } catch (error) {
-            console.error("Failed to save article", error)
+            console.error("Failed to send article for review", error)
         } finally {
             setIsSaving(false)
         }
     }
 
-    return (<>
-        <Button
-            size='xs'
-            color={article.mainCategory.colors.accentColor}
-            onClick={handleSave}
-            loading={isSaving}
-            rightSection={<PiArrowRightBold size={16} />}
-        >
+    const SendButton = ({ onClick, size }: { onClick: () => void, size?: string }) => (
+        <Button size={size} bg={article.mainCategory.colors.accentColor} onClick={onClick} variant="filled" loading={isSaving} rightSection={<PiArrowRight size={16} />}>
             На проверку
         </Button>
-    </>)
-}
+    )
 
-export default SendForReviewButton
+    return (
+        <>
+            <Modal opened={opened} radius={10} onClose={close} withCloseButton={false} centered>
+                <Stack gap={8}>
+                    <Text size={'lg'} style={{ textAlign: 'center', textWrap: 'pretty' }}>Вы уверены, что хотите отправить статью на модерацию?</Text>
+                    <SendButton size='sm' onClick={handleSend} />
+                    <Button size='sm' color={article.mainCategory.colors.accentColor} onClick={close} variant="default">
+                        Отмена
+                    </Button>
+                </Stack>
+            </Modal>
+
+            <SendButton size='xs' onClick={handleValidate} />
+        </>
+    );
+};
+
+export default SendForReviewButton;
