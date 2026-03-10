@@ -60,7 +60,8 @@ const ArticleStoreProvider: React.FC<{
     article?: ArticleModel;
     editMode?: boolean;
     empty?: boolean;
-}> = observer(({ children, article, editMode, empty }) => {
+    emptyArticleId?: string;
+}> = observer(({ children, article, editMode, empty, emptyArticleId }) => {
     const parentArticlesStore = useContext(ArticlesContext);
     const categoriesStore = useCategoriesStore();
     const auth = useAuthStore();
@@ -75,7 +76,7 @@ const ArticleStoreProvider: React.FC<{
         }
 
         if (empty) {
-            const emptyArticle = articlesStore.createEmptyArticle();
+            const emptyArticle = articlesStore.createEmptyArticle(emptyArticleId);
             return emptyArticle.id;
         }
 
@@ -89,23 +90,31 @@ const ArticleStoreProvider: React.FC<{
             currentArticle = articlesStore.upsert(article);
             setScopeArticleId(currentArticle.id);
         } else if (empty) {
-            currentArticle = articlesStore.getById(scopeArticleId) ?? articlesStore.createEmptyArticle();
+            currentArticle =
+                articlesStore.getById(scopeArticleId) ??
+                (emptyArticleId ? articlesStore.getById(emptyArticleId) : undefined) ??
+                articlesStore.createEmptyArticle(emptyArticleId);
             setScopeArticleId(currentArticle.id);
         } else {
             return;
         }
 
-        if (editMode) {
+        currentArticle.setEditMode(editMode ?? false);
+        if (editMode && !window.location.pathname.includes("/edit")) {
             currentArticle.loadLocalDraft();
         }
-        currentArticle.setEditMode(editMode ?? false);
+
+        if (empty) {
+            currentArticle.content?.changePage("cover");
+            return;
+        }
 
         if (!currentArticle.content || currentArticle.content.blocks.size === 0) {
             currentArticle.fetchContent().then((content) => content.changePage("cover"));
             return;
         }
         currentArticle.content.changePage("cover");
-    }, [article, empty, editMode, articlesStore, scopeArticleId]);
+    }, [article, empty, editMode, articlesStore, scopeArticleId, emptyArticleId]);
 
     useEffect(() => {
         if (!scopeArticleId) return;

@@ -1,11 +1,16 @@
 import { observer } from "mobx-react"
+import { EMPTY_CATEGORY } from "../../../category/samples/category.empty"
 import type { Category } from "../../../category/types/category.types"
 import { useArticleStore } from "../../contexts/article.context"
 
 const ArticleBackground: React.FC<{
     mainCategory?: Category
 }> = observer(({ mainCategory }) => {
-    if (!mainCategory) mainCategory = useArticleStore().mainCategory
+    if (!mainCategory) try {
+        mainCategory = useArticleStore().mainCategory
+    } catch {
+        mainCategory = EMPTY_CATEGORY
+    }
     return (
         <div
             style={{

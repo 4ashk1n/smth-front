@@ -1,5 +1,6 @@
 import { Grid, Stack } from "@mantine/core";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import type { ArticleMeta } from "../../../entities/article/types/article.types";
 import ArticleCard from "../../../entities/article/ui/ArticleCard/ArticleCard";
 import { getArticlesByTab } from "../../../features/UsersArticles/api/getArticlesByTab";
@@ -11,6 +12,7 @@ const ProfileArticles: React.FC<{ userId: string }> = ({ userId }) => {
     const [openedTab, setOpenedTab] = useState<ProfileTabs>('articles');
     const [isLoading, setIsLoading] = useState(false);
     const [articles, setArticles] = useState<ArticleMeta[]>([]);
+    const navigate = useNavigate()
 
     useEffect(() => {
         setIsLoading(true);
@@ -20,6 +22,8 @@ const ProfileArticles: React.FC<{ userId: string }> = ({ userId }) => {
             setIsLoading(false);
         })();
     }, [openedTab])
+
+    const handleCardClick = (articleId: string) => navigate(`/article/${articleId}`)
 
     return (
         <Stack
@@ -32,7 +36,7 @@ const ProfileArticles: React.FC<{ userId: string }> = ({ userId }) => {
                 {
                     articles.map((article, i) => (
                         <Grid.Col span={1} key={i} h={180} >
-                            <ArticleCard variant="vertical" article={article} key={i} />
+                            <ArticleCard variant="vertical" article={article} key={i} onClick={() => handleCardClick(article.id)} />
                         </Grid.Col>
                     ))
                 }

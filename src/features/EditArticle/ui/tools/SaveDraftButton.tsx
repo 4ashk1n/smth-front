@@ -1,26 +1,24 @@
 import { Button } from "@mantine/core"
 import { useState } from "react"
+import { useNavigate } from "react-router"
 import { useArticleStore } from "../../../../entities/article/contexts/article.context"
 import { useAuthStore } from "../../../../entities/user/contexts/auth.context"
 import { saveEditedArticle } from "../../api/saveEditedArticle"
-import { saveNewArticle } from "../../api/saveNewArticle"
 
-const SaveButton = () => {
+const SaveDraftButton = () => {
     const article = useArticleStore()
     const auth = useAuthStore()
     const [isSaving, setIsSaving] = useState(false)
+    const navigate = useNavigate()
 
     const handleSave = async () => {
         if (isSaving) return
         if (!auth.user) return
         setIsSaving(true)
         try {
-            article.setAuthorId(auth.user.id)
-            if (window.location.pathname.includes('/edit')) {
-                await saveEditedArticle(article)
-            } else if (window.location.pathname.includes('/new')) {
-                await saveNewArticle(article)
-            }
+            await saveEditedArticle(article)
+            setIsSaving(false)
+            navigate('/workshop')
         } catch (error) {
             console.error("Failed to save article", error)
         } finally {
@@ -30,8 +28,8 @@ const SaveButton = () => {
 
     return (<>
         <Button
-            size='xs'
-            color={article.mainCategory.colors.accentColor}
+            size='sm'
+            variant="default"
             onClick={handleSave}
             loading={isSaving}
         >
@@ -40,4 +38,4 @@ const SaveButton = () => {
     </>)
 }
 
-export default SaveButton
+export default SaveDraftButton

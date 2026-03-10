@@ -86,7 +86,7 @@ const Footer = () => {
             <FooterButton
                 icon={<NewArticleIcon />}
                 label={''}
-                url={'/article/new'} />
+                url={'/workshop'} />
 
             <FooterButton
                 icon={location.pathname === '/notifications' ? <PiBellFill size={20} color="white" /> : <PiBell size={20} color="white" />}

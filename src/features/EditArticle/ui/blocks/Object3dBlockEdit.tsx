@@ -2,7 +2,7 @@ import { useContext, useState } from "react"
 import type { BlockTypes } from "../../../../entities/article/types/Content"
 import Object3dBlock from "../../../../shared/blocks/Object3dBlock"
 import { ArticleContext } from "../../../stores/ArticleStore"
-import Transform3dTooltip from "../Transform3dTooltip"
+import Transform3dTooltip from "../archive/Transform3dTooltip"
 
 const Object3dBlockEdit: React.FC<{
     block: BlockTypes,

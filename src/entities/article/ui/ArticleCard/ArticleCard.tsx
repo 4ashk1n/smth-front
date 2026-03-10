@@ -4,11 +4,12 @@ import VerticalArticleCard from "./ArticleCard.Vertical"
 
 const ArticleCard: React.FC<{
     variant: 'vertical' | 'horizontal'
-    article: ArticleMeta
-}> = ({variant, article}) => {
+    article: ArticleMeta,
+    onClick: () => void
+}> = ({variant, article, onClick}) => {
 
     if (variant === 'vertical') {
-        return <VerticalArticleCard article={article} />
+        return <VerticalArticleCard article={article} onClick={onClick} />
     }
     return null
 }

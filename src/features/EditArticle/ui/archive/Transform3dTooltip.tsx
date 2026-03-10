@@ -1,9 +1,9 @@
-import { Stack, Group, Slider, AngleSlider, Text } from "@mantine/core"
-import { useState, useEffect, useContext } from "react"
+import { AngleSlider, Group, Slider, Stack, Text } from "@mantine/core"
+import { useContext, useEffect, useState } from "react"
+import { useMove } from "../../../../shared/hooks/useMove"
 import type { Object3d } from "../../../entities/article/types/blocks/Object3d"
 import type { BlockTypes } from "../../../entities/article/types/Content"
 import { ArticleContext } from "../../stores/ArticleStore"
-import { useMove } from "../../../shared/hooks/useMove"
 
 const Transform3dTooltip: React.FC<{
     block: BlockTypes,

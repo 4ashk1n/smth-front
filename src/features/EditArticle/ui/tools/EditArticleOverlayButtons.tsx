@@ -33,36 +33,32 @@ const EditArticleActionButton: React.FC<{
 
 const EditArticleOverlayButtons: React.FC<{}> = observer(() => {
     const article = useArticleStore();
+    if (!article.content) return null
     return (<>
         <EditArticleActionButton
             active={article.content.currentPage?.blocks.length !== 0}
             icon={article.content.dragMode ? PiLockSimpleDuotone : PiSelectionBackgroundDuotone}
-            onClick={() => {article.content.setDragMode(!article.content.dragMode)}}
+            onClick={() => {article.content && article.content.setDragMode(!article.content.dragMode)}}
         />
 
         <EditArticleActionButton
             active
             icon={PiStarDuotone}
-            onClick={() => article.content.addEmptyBlock('icon')}
+            onClick={() => article.content && article.content.addEmptyBlock('icon')}
         />
 
 
         <EditArticleActionButton
             active
             icon={PiImageSquareDuotone}
-            onClick={() => article.content.addEmptyBlock('image')}
+            onClick={() => article.content && article.content.addEmptyBlock('image')}
         />
 
         <EditArticleActionButton
             active
             icon={PiTextAaDuotone}
-            onClick={() => article.content.addEmptyBlock('paragraph')}
+            onClick={() => article.content && article.content.addEmptyBlock('paragraph')}
         />
-
-        {/* <EditArticleActionButton
-            icon={PiShareFatFill}
-            onClick={() => { }}
-        /> */}
     </>)
 })
 

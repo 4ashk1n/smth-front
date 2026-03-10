@@ -14,7 +14,8 @@ const PageSwipeContainer = observer(({ children, overlay, lockAxis }: Props) => 
   const ref = useRef<HTMLDivElement>(null)
   const article = useArticleStore()
   const pages = article.content.pagesData
-  const order = article.content.currentPage?.order ?? 0
+  const currentPageId = article.content.currentPage?.id
+  const pageIndex = Math.max(0, pages.findIndex((page) => page.id === currentPageId))
 
   const x = useMotionValue(0)
   const width = typeof window !== "undefined" ? window.innerWidth : 375
@@ -46,20 +47,20 @@ const PageSwipeContainer = observer(({ children, overlay, lockAxis }: Props) => 
           return
         }
 
-        console.log(order)
+        console.log(pageIndex)
         // mx < 0 => влево => next
-        if (mx < 0 && order < pages.length - 1) {
+        if (mx < 0 && pageIndex < pages.length - 1) {
           animate(x, -width).then(() => {
-            article.content.changePage(article.content.getPageByOrder(order + 1)?.id ?? "")
+            article.content.changePage(pages[pageIndex + 1]?.id ?? "")
             x.set(0)
           })
           return
         }
 
         // mx > 0 => вправо => prev
-        if (mx > 0 && order > 0) {
+        if (mx > 0 && pageIndex > 0) {
           animate(x, width).then(() => {
-            article.content.changePage(article.content.getPageByOrder(order - 1)?.id ?? "")
+            article.content.changePage(pages[pageIndex - 1]?.id ?? "")
             x.set(0)
           })
           return

@@ -28,6 +28,8 @@ export class ArticleModel {
     editMode: boolean = false;
     swiping: boolean = false;
 
+    invalidFields: string[] = [];
+
     metrics: {
         loaded: boolean,
     } & ArticleMetrics = {
@@ -58,8 +60,42 @@ export class ArticleModel {
         return this.categoriesStore.getMany(this.categoryIds);
     }
 
+    private get isPersistedArticle(): boolean {
+        return Boolean(this.createdAt || this.updatedAt || this.publishedAt);
+    }
+
     private get localDraftKey(): string {
+        if (!this.isPersistedArticle) {
+            return "articleDraft:new";
+        }
         return `articleDraft:${this.id || "new"}`;
+    }
+
+    private cleanupLegacyNewDraftKeys() {
+        if (this.isPersistedArticle) return;
+
+        const keysToRemove: string[] = [];
+        for (let index = 0; index < window.localStorage.length; index++) {
+            const key = window.localStorage.key(index);
+            if (!key) continue;
+            if (!key.startsWith("articleDraft:")) continue;
+            if (key === "articleDraft:new") continue;
+
+            const value = window.localStorage.getItem(key);
+            if (!value) continue;
+
+            try {
+                const parsed = JSON.parse(value);
+                const hasPersistenceDates = Boolean(parsed?.createdAt || parsed?.updatedAt || parsed?.publishedAt);
+                if (!hasPersistenceDates) {
+                    keysToRemove.push(key);
+                }
+            } catch {
+                keysToRemove.push(key);
+            }
+        }
+
+        keysToRemove.forEach((key) => window.localStorage.removeItem(key));
     }
 
     fromDTO(article: ArticleDTO) {
@@ -77,6 +113,9 @@ export class ArticleModel {
                 this.content = new ContentStore();
             }
             this.content.fromDTO(article.content);
+            if (this.id) {
+                this.content.syncArticleId(this.id);
+            }
 
             this.createdAt = article.createdAt;
             this.updatedAt = article.updatedAt;
@@ -99,9 +138,9 @@ export class ArticleModel {
     fromJSON(article: any) {
         runInAction(() => {
             console.log("Loading from JSON:", article);
-            this.id = article.id;
-            this.title = article.title;
-            this.description = article.description;
+            this.id = article.id ?? this.id;
+            this.title = article.title ?? "";
+            this.description = article.description ?? "";
             const rawCategoryIds = Array.isArray(article.categoryIds)
                 ? article.categoryIds
                 : Array.isArray(article.categories)
@@ -114,12 +153,15 @@ export class ArticleModel {
                 this.categoryIds[0] ??
                 "";
             this.authorId = article.authorId ?? article.author?.id ?? "";
-            this.status = article.status;
+            this.status = article.status ?? this.status;
 
             if (!this.content) {
                 this.content = new ContentStore();
             }
-            this.content.fromJSON(article.content);
+            this.content.fromJSON(article.content ?? {});
+            if (this.id) {
+                this.content.syncArticleId(this.id);
+            }
         });
     }
 
@@ -141,9 +183,12 @@ export class ArticleModel {
         return this.content;
     }
 
-    createEmptyArticle() {
+    createEmptyArticle(id?: string) {
         this.fromDTO(ARTICLE_EMPTY);
-        this.id = uuidv4();
+        this.id = id ?? uuidv4();
+        if (this.content) {
+            this.content.syncArticleId(this.id);
+        }
     }
 
     async fetchMetrics(): Promise<void> {
@@ -169,10 +214,6 @@ export class ArticleModel {
             this.content = new ContentStore();
         }
         this.content.setEditMode(editMode);
-
-        if (editMode) {
-            this.content.addEmptyPage();
-        }
     }
 
     setSwiping(swiping: boolean) {
@@ -216,11 +257,13 @@ export class ArticleModel {
             this.content = new ContentStore();
         }
         return {
+            version: 2,
             id: this.id,
             title: this.title,
             description: this.description,
             mainCategoryId: this.mainCategoryId,
-            categories: this.categoryIds,
+            categoryIds: this.categoryIds,
+            categories: this.categoryIds, // legacy compatibility
             authorId: this.authorId,
             status: this.status,
             editMode: this.editMode,
@@ -251,19 +294,34 @@ export class ArticleModel {
 
     saveLocalDraft() {
         console.log("Saving draft...");
+        this.cleanupLegacyNewDraftKeys();
         const serialized = JSON.stringify(this.toJSON());
         console.log("Before save:", window.localStorage.getItem(this.localDraftKey));
         window.localStorage.setItem(this.localDraftKey, serialized);
+        // Keep one legacy fallback key for older sessions.
+        window.localStorage.setItem("articleDraft", serialized);
         console.log("After save:", window.localStorage.getItem(this.localDraftKey));
     }
 
     loadLocalDraft() {
+        this.cleanupLegacyNewDraftKeys();
         const keyedDraft = window.localStorage.getItem(this.localDraftKey);
         const legacyDraft = window.localStorage.getItem("articleDraft");
-        const draft = keyedDraft ?? legacyDraft;
+        const idDraft = this.id ? window.localStorage.getItem(`articleDraft:${this.id}`) : null;
+        const draft = keyedDraft ?? idDraft ?? legacyDraft;
 
         if (draft) {
-            const article = JSON.parse(draft);
+            let article: any;
+            try {
+                article = JSON.parse(draft);
+            } catch {
+                window.localStorage.removeItem(this.localDraftKey);
+                if (this.id) {
+                    window.localStorage.removeItem(`articleDraft:${this.id}`);
+                }
+                window.localStorage.removeItem("articleDraft");
+                return;
+            }
             if (!this.content) {
                 this.content = new ContentStore();
             }
@@ -271,9 +329,20 @@ export class ArticleModel {
             this.content.disableSave();
             try {
                 this.fromJSON(article);
+                if (this.id) {
+                    this.content.syncArticleId(this.id);
+                }
+                // Migrate successfully loaded legacy/id-specific draft to the active key.
+                const normalized = JSON.stringify(this.toJSON());
+                window.localStorage.setItem(this.localDraftKey, normalized);
+                window.localStorage.setItem("articleDraft", normalized);
             } finally {
                 this.content.enableSave();
             }
         }
+    }
+
+    setInvalidFields(invalidFields: string[]) {
+        this.invalidFields = invalidFields;
     }
 }
