@@ -11,6 +11,7 @@ import FeedPage from '../pages/Feed/ui';
 import LandingPage from '../pages/Landing/ui';
 import NewArticlePage from '../pages/NewArticle/ui';
 import ProfilePage from '../pages/Profile/ui';
+import SearchPage from '../pages/Search/ui';
 import { WorkshopPage } from '../pages/Workshop/ui';
 import AuthWidget from '../widgets/AuthWidget/ui';
 import Footer from '../widgets/NavBar/ui/Footer';
@@ -66,6 +67,7 @@ function App() {
                             <Route path='/feed' element={<FeedPage />} />
                             <Route path={`/profile/:userId`} element={<ProfilePage />} />
                             <Route path={'/auth'} element={<Center w='100%' h='calc(100% - 80px)'><AuthWidget /></Center>} />
+                            <Route path={'/search'} element={<SearchPage />} />
                         </Routes>
                     </div>
 
