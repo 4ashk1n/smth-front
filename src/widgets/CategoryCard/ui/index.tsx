@@ -17,21 +17,21 @@ const CategoryCard: React.FC<{
     const isList = variant === "list";
 
     return (
-        <Group
-            style={{
-                background: `linear-gradient(90deg, ${colors.accentColor} -100%, ${colors.lightColor} 100%)`,
-                borderRadius: "10px",
-                zIndex: 1,
-            }}
-            p={isList ? 12 : 40}
-            justify={isList ? "space-between" : "center"}
-        >
-            <Skeleton visible={loading} w={isList ? "100%" : "fit-content"}>
-                <Text fz={isList ? 18 : 36} fw={700} c={colors.darkColor}>
+        <Skeleton visible={loading} w={isList ? "100%" : "fit-content"} radius={10}>
+            <Group
+                style={{
+                    background: `linear-gradient(90deg, ${colors.accentColor} 0%, ${colors.darkColor} 100%)`,
+                    borderRadius: "10px",
+                    zIndex: 1,
+                }}
+                p={isList ? 12 : 40}
+                justify={isList ? "space-between" : "center"}
+            >
+                <Text fz={isList ? 18 : 36} fw={700} c={colors.lightColor}>
                     {category ? `${category.emoji} ${category.name}` : "Category Name"}
                 </Text>
-            </Skeleton>
-        </Group>
+            </Group>
+        </Skeleton>
     );
 };
 
