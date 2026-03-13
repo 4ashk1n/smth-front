@@ -1,11 +1,12 @@
 
 import type { API, BlockMutationEvent } from "@editorjs/editorjs";
 import { observer } from "mobx-react";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { createReactEditorJS } from 'react-editor-js';
 import { useArticleStore } from "../../../../entities/article/contexts/article.context";
 import type { Paragraph } from "../../../../entities/article/types/content.types";
 import { EDITOR_JS_TOOLS } from "../../../../shared/config/editorjs.config";
+import MultiPopoverWithDrawer from "../../../../shared/ui/popover/MultiPopoverWithDrawer";
 
 const ParagraphBlockEdit: React.FC<{
     block: Paragraph
@@ -14,6 +15,11 @@ const ParagraphBlockEdit: React.FC<{
     const ReactEditorJS = createReactEditorJS()
 
     const holderId = `${props.block.id}-editorjs`;
+    const blockSuggestions = useMemo(
+        () => article.aiSuggestions.filter((suggestion) => suggestion.blockId === props.block.id),
+        [article.aiSuggestions, props.block.id],
+    );
+
     useEffect(() => {
         const portalRoot =
             document.querySelector('[data-mantine-shared-portal-node="true"]') ??
@@ -81,20 +87,30 @@ const ParagraphBlockEdit: React.FC<{
             onReady={checkOverflow}
             defaultValue={props.block.content}
         >
-            {/* <HighlitedBlock id={`${block.id}-editorjs`} onBlur={saveChanges} style={{ zIndex: 10 }} p={40} w='100%' h={'100%'} direction={'column'} gap={10} {...article.mainCategory.colors}> */}
-            <div
-                id={holderId}
-                style={{
-                    width: '100%',
-                    height: '100%',
-                    border: '2px dashed ' + article.mainCategory.colors.accentColor + '80',
-                    borderRadius: '10px',
-                }}
-            >
+            <div style={{ position: "relative", width: "100%", height: "100%" }}>
+                <div
+                    id={holderId}
+                    style={{
+                        width: '100%',
+                        height: '100%',
+                        border: '2px dashed ' + article.mainCategory.colors.accentColor + '80',
+                        borderRadius: '10px',
+                    }}
+                >
 
+                </div>
+                <div
+                    style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 10,
+                        transform: "translateY(-100%)",
+                        zIndex: 30,
+                    }}
+                >
+                    <MultiPopoverWithDrawer suggestions={blockSuggestions} hidden={article.swiping} />
+                </div>
             </div>
-
-            {/* </HighlitedBlock > */}
         </ReactEditorJS >
     </>)
 })

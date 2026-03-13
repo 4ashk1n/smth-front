@@ -18,7 +18,7 @@ const Object3dBlock: React.FC<Object3dBlockProps> = observer((props) => {
     const [tiltAngleY, setTiltAngleY] = useState(props.rotateY)
     const [parallaxDepth, setParallaxDepth] = useState(props.translateZ)
     const deviceType = useDeviceType();
-    
+
     const article = useArticleStore()
     const parallaxId = useMemo(() => 'parallax-' + article.id + '-' + Math.floor(Math.random() * 100000000), [article.id])
 
@@ -54,66 +54,66 @@ const Object3dBlock: React.FC<Object3dBlockProps> = observer((props) => {
                 onMouseEnter={() => setParallaxDepth(0)}
                 onMouseLeave={() => setParallaxDepth(props.translateZ)}
             > */}
-                <Stack pos='relative' w='100%' h='100%'>
-                    {
-                        Array(props.depth).fill(0).map((_, i) => {
-                            return (
-                                <div
-                                    style={{
-                                        rotate: `${props.rotateZ}deg`,
-                                        transform: `perspective(1000px) 
+            <Stack pos='relative' w='100%' h='100%'>
+                {
+                    Array(props.depth).fill(0).map((_, i) => {
+                        return (
+                            <div
+                                style={{
+                                    rotate: `${props.rotateZ}deg`,
+                                    transform: `perspective(5000px) 
                                                 rotateX(${tiltAngleX}deg) 
                                                 rotateY(${tiltAngleY}deg) 
                                                 scale3d(1, 1, 1) 
                                                 translate3d(
                                                     ${(props.depth - i) * (- tiltAngleY / 10)}px, 
-                                                    ${(props.depth - i) * tiltAngleX / 10 }px, 
+                                                    ${(props.depth - i) * tiltAngleX / 10}px, 
                                                     ${-(props.depth - i) * (props.blocktype == 'icon' ? 0.5 : 3)}px)`,
-                                        position: 'absolute',
-                                        willChange: 'transform',
-                                        transition: '400ms cubic-bezier(0.03, 0.98, 0.52, 0.99)',
-                                        width: '100%',
-                                        height: '100%',
-                                        borderRadius: '10px',
-                                        filter: `brightness(0.5) ${props.blocktype !== 'icon' ? `contrast(${1 - (props.depth - i) * .05})` : ''}`,
-                                        mixBlendMode: props.blocktype === 'icon' ? 'luminosity' : 'luminosity',
-                                        
-                                    }}
-                                >
-                                    {
-                                        props.blocktype === 'icon' ?
-                                            props.children
-                                            : props.blocktype === 'paragraph' || props.blocktype === 'article' ?
-                                                <HighlitedBlock
-                                                    glow={false}
-                                                    borderWidth={5}
-                                                    display={'block'}
-                                                    w='100%'
-                                                    h='100%'
-                                                    style={{
-                                                        opacity: (i) / props.depth * .2
-                                                    }}
-                                                    lightColor={props.lightColor}
-                                                    accentColor={props.accentColor}
-                                                    darkColor={props.darkColor}
-                                                />
-                                                :
-                                                <div
-                                                    style={{
-                                                        borderRadius: '10px',
-                                                        width: '100%',
-                                                        height: '100%',
-                                                        background: `linear-gradient(180deg, ${props.accentColor} 0%, ${props.darkColor}`
-                                                    }}
-                                                >
+                                    position: 'absolute',
+                                    willChange: 'transform',
+                                    transition: '400ms cubic-bezier(0.03, 0.98, 0.52, 0.99)',
+                                    width: '100%',
+                                    height: '100%',
+                                    borderRadius: '10px',
+                                    filter: `brightness(0.5) ${props.blocktype !== 'icon' ? `contrast(${1 - (props.depth - i) * .05})` : ''}`,
+                                    mixBlendMode: props.blocktype === 'icon' ? 'luminosity' : 'luminosity',
+
+                                }}
+                            >
+                                {
+                                    props.blocktype === 'icon' ?
+                                        props.children
+                                        : props.blocktype === 'paragraph' || props.blocktype === 'article' ?
+                                            <HighlitedBlock
+                                                glow={false}
+                                                borderWidth={5}
+                                                display={'block'}
+                                                w='100%'
+                                                h='100%'
+                                                style={{
+                                                    opacity: (i) / props.depth * .2
+                                                }}
+                                                lightColor={props.lightColor}
+                                                accentColor={props.accentColor}
+                                                darkColor={props.darkColor}
+                                            />
+                                            :
+                                            <div
+                                                style={{
+                                                    borderRadius: '10px',
+                                                    width: '100%',
+                                                    height: '100%',
+                                                    background: `linear-gradient(180deg, ${props.accentColor} 0%, ${props.darkColor}`
+                                                }}
+                                            >
 
                                         // </div>
-                                    }
-                                </div>
-                            )
-                        })
-                    }
-                    {/* <Tilt
+                                }
+                            </div>
+                        )
+                    })
+                }
+                {/* <Tilt
                         trackOnWindow={deviceType === 'Desktop'}
                         gyroscope={deviceType !== 'Desktop'}
                         tiltAngleXManual={tiltAngleX}
@@ -134,9 +134,39 @@ const Object3dBlock: React.FC<Object3dBlockProps> = observer((props) => {
                         }}
                     > */}
 
-                        {props.children}
-                    {/* </Tilt> */}
-                </Stack>
+                <div
+                    style={{
+                        // // backdropFilter: props.blocktype === 'icon' ? 'none' : 'blur(10px)',
+                        // width: '100%',
+                        // height: '100%',
+                        // rotate: `${props.rotateZ}deg`,
+                        // transform: `rotateX(${tiltAngleX}deg) rotateY(${tiltAngleY}deg)`,
+                        // // translate: 'translateZ(5px)',
+                        // opacity: props.blocktype === 'icon' ? 0.9 : 1,
+                        // mixBlendMode: props.blocktype === 'icon' ? 'luminosity' : 'normal',
+                        // borderRadius: '10px',
+                        rotate: `${props.rotateZ}deg`,
+                        transform: `perspective(5000px) 
+                                                rotateX(${tiltAngleX}deg) 
+                                                rotateY(${tiltAngleY}deg) 
+                                                scale3d(1, 1, 1) 
+                                                translate3d(
+                                                    ${(props.depth - 0) * (- tiltAngleY / 10)}px, 
+                                                    ${(props.depth - 0) * tiltAngleX / 10}px, 
+                                                    ${-(props.depth - 0) * (props.blocktype == 'icon' ? 0.5 : 3)}px)`,
+                        position: 'absolute',
+                        willChange: 'transform',
+                        transition: '400ms cubic-bezier(0.03, 0.98, 0.52, 0.99)',
+                        width: '100%',
+                        height: '100%',
+                        borderRadius: '10px',
+                    }}
+                >
+
+                    {props.children}
+                </div>
+                {/* </Tilt> */}
+            </Stack>
             {/* </Parallax> */}
 
         </div>
