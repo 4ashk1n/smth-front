@@ -1,4 +1,4 @@
-import type { ArticleContentResponse, ArticleMeta, ArticleMetrics, ArticleMetricsResponse } from "@smth/shared";
+import type { AiSuggestion, ArticleContentResponse, ArticleMeta, ArticleMetrics, ArticleMetricsResponse } from "@smth/shared";
 import { makeAutoObservable, runInAction } from "mobx";
 import { v4 as uuidv4 } from "uuid";
 import { apiRequest } from "../../../shared/api";
@@ -29,6 +29,7 @@ export class ArticleModel {
     swiping: boolean = false;
 
     invalidFields: string[] = [];
+    aiSuggestions: AiSuggestion[] = [];
 
     metrics: {
         loaded: boolean,
@@ -108,6 +109,7 @@ export class ArticleModel {
 
             this.authorId = article.authorId;
             this.status = article.status;
+            this.aiSuggestions = [];
 
             if (!this.content) {
                 this.content = new ContentStore();
@@ -154,6 +156,7 @@ export class ArticleModel {
                 "";
             this.authorId = article.authorId ?? article.author?.id ?? "";
             this.status = article.status ?? this.status;
+            this.aiSuggestions = Array.isArray(article.aiSuggestions) ? article.aiSuggestions : [];
 
             if (!this.content) {
                 this.content = new ContentStore();
@@ -269,6 +272,7 @@ export class ArticleModel {
             editMode: this.editMode,
             swiping: this.swiping,
             content: this.content.toJSON(),
+            aiSuggestions: this.aiSuggestions,
         };
     }
 
@@ -344,5 +348,12 @@ export class ArticleModel {
 
     setInvalidFields(invalidFields: string[]) {
         this.invalidFields = invalidFields;
+    }
+
+    setAISuggestions(suggestions: AiSuggestion[]) {
+        this.aiSuggestions = suggestions;
+        if (this.editMode) {
+            this.saveLocalDraft();
+        }
     }
 }

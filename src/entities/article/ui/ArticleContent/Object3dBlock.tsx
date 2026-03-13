@@ -1,14 +1,12 @@
-import { Stack, type FlexProps } from "@mantine/core"
-import Tilt from 'react-parallax-tilt';
+import { Stack, type FlexProps } from "@mantine/core";
 import { useEffect, useMemo, useState } from "react";
 import HighlitedBlock from "../../../../shared/ui/blocks/HighlitedBlock";
 
-import { Parallax, useParallax } from "react-scroll-parallax";
-import type { CategoryColors } from "../../../category/types/category.types";
-import type { Object3d } from "../../types/content.types";
-import { useDeviceType } from "../../../../shared/lib/useDeviceType";
-import { useArticleStore } from "../../contexts/article.context";
 import { observer } from "mobx-react";
+import { useDeviceType } from "../../../../shared/lib/useDeviceType";
+import type { CategoryColors } from "../../../category/types/category.types";
+import { useArticleStore } from "../../contexts/article.context";
+import type { Object3d } from "../../types/content.types";
 
 type Object3dBlockProps = FlexProps & Object3d & CategoryColors & {
     blocktype: string,
@@ -115,7 +113,7 @@ const Object3dBlock: React.FC<Object3dBlockProps> = observer((props) => {
                             )
                         })
                     }
-                    <Tilt
+                    {/* <Tilt
                         trackOnWindow={deviceType === 'Desktop'}
                         gyroscope={deviceType !== 'Desktop'}
                         tiltAngleXManual={tiltAngleX}
@@ -134,10 +132,10 @@ const Object3dBlock: React.FC<Object3dBlockProps> = observer((props) => {
                             setTiltAngleX(tiltAngleX)
                             setTiltAngleY(tiltAngleY)
                         }}
-                    >
+                    > */}
 
                         {props.children}
-                    </Tilt>
+                    {/* </Tilt> */}
                 </Stack>
             {/* </Parallax> */}
 
