@@ -6,12 +6,14 @@ import { useNavigate } from "react-router";
 import { useArticleStore } from "../../../../entities/article/contexts/article.context";
 import { useAuthStore } from "../../../../entities/user/contexts/auth.context";
 import { getInvalidFields, sendArticleForReview } from "../../api/sendArticleForReview";
+import GetAISuggestionsButton from "./GetAISuggestionsButton";
 
 const SendForReviewButton = () => {
     const article = useArticleStore();
     const auth = useAuthStore();
     const [isSaving, setIsSaving] = useState(false);
     const [invalidFields, setInvalidFields] = useState<string[]>([]);
+
     const [opened, { open, close }] = useDisclosure(false);
     const navigate = useNavigate()
 
@@ -66,8 +68,9 @@ const SendForReviewButton = () => {
             <Modal opened={opened} radius={10} onClose={close} withCloseButton={false} centered>
                 <Stack gap={8}>
                     <Text size={'lg'} style={{ textAlign: 'center', textWrap: 'pretty' }}>Вы уверены, что хотите отправить статью на модерацию?</Text>
+                    <GetAISuggestionsButton onSuggestionsSaved={close} />
                     <SendButton size='sm' onClick={handleSend} />
-                    <Button size='sm' color={article.mainCategory.colors.accentColor} onClick={close} variant="default">
+                    <Button size='sm' onClick={close} variant="default">
                         Отмена
                     </Button>
                 </Stack>

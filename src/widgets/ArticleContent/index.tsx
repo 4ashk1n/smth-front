@@ -95,7 +95,7 @@ const ArticleContent: React.FC<{ page?: Page }> = observer(({ page }) => {
             key={'RGL-' + article.id}
             cols={{ lg: 2, md: 2, sm: 2, xs: 2, xxs: 2 }}
             rowHeight={80}
-            compactType={null}
+            compactType={'vertical'}
             containerPadding={{ lg: [0, 0], md: [0, 0], sm: [0, 0], xs: [0, 0] }}
             maxRows={8}
             margin={{ lg: [36, 18], md: [36, 18], sm: [16, 16], xs: [16, 16], xxs: [16, 16] }}
