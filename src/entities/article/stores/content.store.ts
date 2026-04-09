@@ -3,7 +3,7 @@ import type { Layout } from "react-grid-layout";
 import { v4 as uuidv4 } from 'uuid';
 import { findOptimalFreeSpot } from "../../../features/EditArticle/lib/findOptimalFreeSpot";
 import { IconModel, ImageModel, PageModel, ParagraphModel, TopicModel } from "../models/content.models";
-import type { Block, BlockType, Content, Icon, Image, Page, Paragraph, Topic } from "../types/content.types";
+import type { BlockType, BlockUnion, Content, Icon, Image, Page, Paragraph, Topic } from "../types/content.types";
 
 export class ContentStore {
     private static readonly COVER_ID = "cover"
@@ -149,7 +149,7 @@ export class ContentStore {
         try {
             const topics = this.normalizeDraftItems<Topic>(content.topics);
             const pages = this.normalizeDraftItems<Page>(content.pages);
-            const blocks = this.normalizeDraftItems<Block>(content.blocks).map((block) => {
+            const blocks = this.normalizeDraftItems<BlockUnion>(content.blocks).map((block) => {
                 if (!block || block.type !== "paragraph") return block;
                 if (typeof (block as Paragraph).content === "string") return block;
                 return {
@@ -460,9 +460,14 @@ export class ContentStore {
         if (!this.currentPage || !this.editMode) return
         const index = this.currentPage.blocks.findIndex(b => b.id === block.id)
         if (index === -1) return
+
+
+        if (block.type === 'image' && !block.sourceUrl) {
+            block.sourceUrl = null
+        }
+
         this.currentPage.blocks[index] = block
         this.blocks.set(block.id, block)
-
         this.triggerSave()
     }
 
