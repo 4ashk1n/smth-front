@@ -1,66 +1,12 @@
 import { Anchor, Image as MantineImage, Stack, Text } from "@mantine/core";
+import { buildPublicS3Url } from "../../../../shared/api";
 import HighlitedBlock from "../../../../shared/ui/blocks/HighlitedBlock";
 import { useArticleStore } from "../../contexts/article.context";
 import type { Image } from "../../types/content.types";
 import Object3dBlock from "./Object3dBlock";
 
-const S3_PUBLIC_BASE_URL = (import.meta.env.VITE_S3_PUBLIC_BASE_URL as string | undefined) ?? "";
-
-function normalizeKey(raw: string): string {
-    return raw
-        .split("/")
-        .map((part) => {
-            try {
-                return decodeURIComponent(part);
-            } catch {
-                return part;
-            }
-        })
-        .join("/")
-        .replace(/^\/+/, "");
-}
-
-function extractObjectKey(value: string): string {
-    const trimmed = (value ?? "").trim();
-    if (!trimmed) return "";
-
-    if (!trimmed.startsWith("http://") && !trimmed.startsWith("https://")) {
-        return normalizeKey(trimmed);
-    }
-
-    try {
-        const parsed = new URL(trimmed);
-        const path = parsed.pathname.replace(/^\/+/, "");
-        if (!path) return "";
-
-        // path-style URL: s3.cloud.ru/<bucket>/<key>
-        const pathSegments = path.split("/");
-        if (parsed.hostname === "s3.cloud.ru" && pathSegments.length > 1) {
-            return normalizeKey(pathSegments.slice(1).join("/"));
-        }
-
-        // virtual-hosted URL: <bucket>.s3.cloud.ru/<key>
-        return normalizeKey(path);
-    } catch {
-        return normalizeKey(trimmed);
-    }
-}
-
 function resolveImageSrc(block: Image): string {
-    const key = extractObjectKey(block.url ?? "");
-    if (!key) return "";
-
-    if (!S3_PUBLIC_BASE_URL) {
-        return key;
-    }
-
-    const base = S3_PUBLIC_BASE_URL.endsWith("/") ? S3_PUBLIC_BASE_URL.slice(0, -1) : S3_PUBLIC_BASE_URL;
-    const encodedKey = key
-        .split("/")
-        .map((part) => encodeURIComponent(part))
-        .join("/");
-
-    return `${base}/${encodedKey}`;
+    return buildPublicS3Url(block.url ?? "") ?? "";
 }
 
 const ImageBlock: React.FC<{ block: Image }> = (props) => {

@@ -10,10 +10,19 @@ type Props = {
     valueUrl?: string | null;
     style?: React.CSSProperties;
     dropzoneProps?: Partial<DropzoneProps>;
+    showClearButton?: boolean;
+    allowReplace?: boolean;
 };
 
-const ImageInput: React.FC<Props> = ({ onImageLoad, onImageClear, valueUrl, style, dropzoneProps }) => {
-    const [file, setFile] = useState<FileWithPath | null>(null);
+const ImageInput: React.FC<Props> = ({
+    onImageLoad,
+    onImageClear,
+    valueUrl,
+    style,
+    dropzoneProps,
+    showClearButton = true,
+    allowReplace = false,
+}) => {
     const [previewURL, setPreviewURL] = useState<string | null>(null);
 
     const displayedUrl = useMemo(() => previewURL || valueUrl || null, [previewURL, valueUrl]);
@@ -26,7 +35,6 @@ const ImageInput: React.FC<Props> = ({ onImageLoad, onImageClear, valueUrl, styl
             URL.revokeObjectURL(previewURL);
         }
 
-        setFile(selectedFile);
         const fileURL = URL.createObjectURL(selectedFile);
         setPreviewURL(fileURL);
         onImageLoad(fileURL, selectedFile);
@@ -37,7 +45,6 @@ const ImageInput: React.FC<Props> = ({ onImageLoad, onImageClear, valueUrl, styl
             URL.revokeObjectURL(previewURL);
         }
 
-        setFile(null);
         setPreviewURL(null);
         onImageClear();
     };
@@ -60,17 +67,45 @@ const ImageInput: React.FC<Props> = ({ onImageLoad, onImageClear, valueUrl, styl
             }}
         >
             {displayedUrl ? (
-                <ActionIcon
-                    size={'md'}
-                    color={(dropzoneProps?.c as string) || 'white'}
-                    pos={'absolute'}
-                    top={0}
-                    left={0}
-                    autoContrast
-                    onClick={handleImageClear}
-                >
-                    <PiTrashDuotone />
-                </ActionIcon>
+                <>
+                    {showClearButton ? (
+                        <ActionIcon
+                            size={'md'}
+                            color={(dropzoneProps?.c as string) || 'white'}
+                            pos={'absolute'}
+                            top={0}
+                            left={0}
+                            autoContrast
+                            onClick={handleImageClear}
+                            style={{ zIndex: 2 }}
+                        >
+                            <PiTrashDuotone />
+                        </ActionIcon>
+                    ) : null}
+
+                    {allowReplace ? (
+                        <Dropzone
+                            accept={IMAGE_MIME_TYPE}
+                            bg='transparent'
+                            multiple={false}
+                            onDrop={handleImageLoad}
+                            activateOnDrag
+                            activateOnClick
+                            style={{
+                                position: "absolute",
+                                inset: 0,
+                                opacity: 0,
+                                width: "100%",
+                                height: "100%",
+                                zIndex: 1,
+                                ...dropzoneProps?.style,
+                            }}
+                            {...dropzoneProps}
+                        >
+                            <></>
+                        </Dropzone>
+                    ) : null}
+                </>
             ) : (
                 <Dropzone
                     accept={IMAGE_MIME_TYPE}
