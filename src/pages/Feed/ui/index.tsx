@@ -38,7 +38,7 @@ const FeedPage: React.FC = () => {
 
     useEffect(() => {
         (async () => {
-            const res = await apiRequest<ArticleListResponse>('/articles?limit=10', {method: 'GET'})
+            const res = await apiRequest<ArticleListResponse>('/articles?limit=10&status=published', {method: 'GET'})
             const ids = res.data.items.map((item: ArticleMeta) => {
                 const existing = articlesStore.getById(item.id)
                 const article = existing ?? new ArticleModel(categories)
