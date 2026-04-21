@@ -3,14 +3,13 @@ import { observer } from "mobx-react";
 import { useEffect, useMemo, useState } from "react";
 import { useArticleStore } from "../../../../entities/article/contexts/article.context";
 import type { Image } from "../../../../entities/article/types/content.types";
-import { uploadFileToS3 } from "../../../../shared/api";
+import { buildPublicS3Url, resolveUploadedS3Url, type S3ConfirmPayloadLike, uploadFileToS3 } from "../../../../shared/api";
 import HighlitedBlock from "../../../../shared/ui/blocks/HighlitedBlock";
 import ImageInput from "../../../../shared/ui/inputs/ImageInput/ui";
 import MultiPopoverWithDrawer from "../../../../shared/ui/popover/MultiPopoverWithDrawer";
 
 const PREPARE_UPLOAD_PATH = (import.meta.env.VITE_S3_IMAGE_PREPARE_PATH as string | undefined) ?? "/uploads/images/upload-url";
 const CONFIRM_UPLOAD_PATH = (import.meta.env.VITE_S3_IMAGE_CONFIRM_PATH as string | undefined) ?? "/uploads/images/confirm";
-const S3_PUBLIC_BASE_URL = (import.meta.env.VITE_S3_PUBLIC_BASE_URL as string | undefined) ?? "";
 
 type PrepareUploadResponse = {
   key?: string;
@@ -23,84 +22,7 @@ type PrepareUploadResponse = {
   };
 };
 
-type ConfirmUploadResponse = {
-  url?: string;
-  imageUrl?: string;
-  data?: {
-    url?: string;
-    imageUrl?: string;
-    avatarUrl?: string;
-  };
-};
-
-function normalizeKey(raw: string): string {
-  return raw
-    .split("/")
-    .map((part) => {
-      try {
-        return decodeURIComponent(part);
-      } catch {
-        return part;
-      }
-    })
-    .join("/")
-    .replace(/^\/+/, "");
-}
-
-function extractObjectKey(value: string): string {
-  const trimmed = value.trim();
-  if (!trimmed) return "";
-
-  if (!trimmed.startsWith("http://") && !trimmed.startsWith("https://")) {
-    return normalizeKey(trimmed);
-  }
-
-  try {
-    const parsed = new URL(trimmed);
-    const path = parsed.pathname.replace(/^\/+/, "");
-    if (!path) return "";
-
-    // path-style URL: s3.cloud.ru/<bucket>/<key>
-    const pathSegments = path.split("/");
-    if (parsed.hostname === "s3.cloud.ru" && pathSegments.length > 1) {
-      return normalizeKey(pathSegments.slice(1).join("/"));
-    }
-
-    // virtual-hosted URL: <bucket>.s3.cloud.ru/<key>
-    return normalizeKey(path);
-  } catch {
-    return normalizeKey(trimmed);
-  }
-}
-
-function buildUrlFromPublicBase(keyOrUrl: string): string | null {
-  const key = extractObjectKey(keyOrUrl);
-  if (!key) return null;
-  if (!S3_PUBLIC_BASE_URL) return key;
-
-  const base = S3_PUBLIC_BASE_URL.endsWith("/") ? S3_PUBLIC_BASE_URL.slice(0, -1) : S3_PUBLIC_BASE_URL;
-  const encodedKey = key
-    .split("/")
-    .map((part) => encodeURIComponent(part))
-    .join("/");
-
-  return `${base}/${encodedKey}`;
-}
-
-function resolveImageUrl(key: string, confirmResponse?: ConfirmUploadResponse): string | null {
-  // Prefer key + VITE_S3_PUBLIC_BASE_URL. confirm url can be API endpoint format.
-  const byKey = buildUrlFromPublicBase(key);
-  if (byKey) return byKey;
-
-  const direct = confirmResponse?.url
-    ?? confirmResponse?.imageUrl
-    ?? confirmResponse?.data?.url
-    ?? confirmResponse?.data?.imageUrl
-    ?? confirmResponse?.data?.avatarUrl;
-
-  if (!direct) return null;
-  return buildUrlFromPublicBase(direct) ?? direct;
-}
+type ConfirmUploadResponse = S3ConfirmPayloadLike;
 
 const ImageBlockEdit: React.FC<{
   block: Image;
@@ -147,7 +69,7 @@ const ImageBlockEdit: React.FC<{
         },
       });
 
-      const uploadedUrl = resolveImageUrl(uploadResult.key, uploadResult.confirmResponse);
+      const uploadedUrl = resolveUploadedS3Url(uploadResult.key, uploadResult.confirmResponse);
       if (uploadedUrl) {
         setBlock((prev) => ({ ...prev, url: uploadedUrl }));
       }
@@ -173,7 +95,7 @@ const ImageBlockEdit: React.FC<{
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
       <HighlitedBlock p={0} w="100%" h="100%" glow {...article.mainCategory.colors}>
         <ImageInput
-          valueUrl={buildUrlFromPublicBase(block.url) ?? block.url}
+          valueUrl={buildPublicS3Url(block.url) ?? block.url}
           onImageClear={handleImageClear}
           onImageLoad={handleImageLoad}
           dropzoneProps={{
