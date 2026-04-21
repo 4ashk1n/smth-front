@@ -2,12 +2,13 @@
 import { Stack, Text } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import { observer } from "mobx-react"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import type { IconType } from "react-icons"
 import { PiBookmarkSimpleFill, PiChatCenteredDotsFill, PiHeartFill, PiShareFatFill } from "react-icons/pi"
 import { useArticleStore } from "../../../entities/article/contexts/article.context"
 import { useAuthStore } from "../../../entities/user/contexts/auth.context"
 import { formatNumber } from "../../../shared/lib/formatNumber"
+import ArticleCommentsDrawer from "../../ArticleComments/ui/ArticleCommentsDrawer"
 import { likeArticle } from "../api/likeArticle"
 import { repostArticle } from "../api/repostArticle"
 import { saveArticle } from "../api/saveArticle"
@@ -42,15 +43,10 @@ const ArticleActionButton: React.FC<{
 const ActionButtons: React.FC<{}> = observer(() => {
     const article = useArticleStore()
     const auth = useAuthStore()
-    const [opened, { toggle }] = useDisclosure();
-
-    const [loading, setLoading] = useState(false)
+    const [commentsOpened, { open: openComments, close: closeComments }] = useDisclosure(false);
 
     useEffect(() => {
-        setLoading(true)
-        article.fetchMetrics().then(() => {
-            setLoading(false)
-        })
+        article.fetchMetrics().catch(() => {})
     }, [article])
 
     return (<>
@@ -63,11 +59,11 @@ const ActionButtons: React.FC<{}> = observer(() => {
         />
 
         <ArticleActionButton
-            counter={0}
+            counter={article.metrics.comments}
             pressedColor="white"
-            pressed={false}
+            pressed={commentsOpened}
             icon={PiChatCenteredDotsFill}
-            onClick={() => { }}
+            onClick={openComments}
         />
 
         <ArticleActionButton
@@ -84,6 +80,17 @@ const ActionButtons: React.FC<{}> = observer(() => {
             pressedColor="blue"
             icon={PiShareFatFill}
             onClick={() => repostArticle(article, auth.user?.id || "")}
+        />
+
+        <ArticleCommentsDrawer
+            opened={commentsOpened}
+            articleId={article.id}
+            commentsCount={article.metrics.comments}
+            currentUserId={auth.user?.id}
+            onClose={closeComments}
+            onCommentsCountChange={(count) => {
+                article.updateMetrics({ comments: count })
+            }}
         />
     </>)
 })
