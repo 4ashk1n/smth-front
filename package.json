@@ -19,6 +19,7 @@
     "@mantine/form": "^9.0.2",
     "@mantine/hooks": "^8.2.8",
     "@mantine/tiptap": "^8.2.8",
+    "@smth/shared": "file:../smth-shared",
     "@tailwindcss/vite": "^4.1.11",
     "@tiptap/extension-bubble-menu": "^3.3.0",
     "@tiptap/extension-link": "^3.3.0",
