@@ -130,14 +130,22 @@ const FeedPage: React.FC = () => {
         }
 
         try {
-            const res = await apiRequest<ArticleListResponse>("/articles", {
-                method: "GET",
-                query: {
-                    page: pageToLoad,
-                    limit: FEED_PAGE_LIMIT,
-                    status: "published",
-                },
-            })
+            const res = auth.user
+                ? await auth.requestWithAutoRefresh<ArticleListResponse>("/articles/feed", {
+                    method: "GET",
+                    query: {
+                        page: pageToLoad,
+                        limit: FEED_PAGE_LIMIT,
+                    },
+                })
+                : await apiRequest<ArticleListResponse>("/articles", {
+                    method: "GET",
+                    query: {
+                        page: pageToLoad,
+                        limit: FEED_PAGE_LIMIT,
+                        status: "published",
+                    },
+                })
 
             const ids = res.data.items.map((item: ArticleMeta) => {
                 const existing = articlesStore.getById(item.id)
