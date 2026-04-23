@@ -1,3 +1,4 @@
+﻿import type { AiSuggestion } from "@smth/shared";
 import { Button, Loader, Modal, Stack, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
@@ -9,6 +10,15 @@ import { saveEditedArticle } from "../../api/saveEditedArticle";
 type GetAISuggestionsButtonProps = {
   onSuggestionsSaved?: () => void;
 };
+
+const MODERATION_SOURCE = "moderation-remark";
+
+function keepModerationSuggestions(suggestions: AiSuggestion[]): AiSuggestion[] {
+  return suggestions.filter((suggestion) => {
+    const meta = suggestion.meta as Record<string, unknown> | undefined;
+    return meta?.source === MODERATION_SOURCE;
+  });
+}
 
 const GetAISuggestionsButton = ({ onSuggestionsSaved }: GetAISuggestionsButtonProps) => {
   const article = useArticleStore();
@@ -25,8 +35,8 @@ const GetAISuggestionsButton = ({ onSuggestionsSaved }: GetAISuggestionsButtonPr
     try {
       await saveEditedArticle(article);
       const response = await getAISuggestions(article.id, { mode: "all" });
-      article.setAISuggestions(response.suggestions);
-      console.log(article.aiSuggestions);
+      const moderationSuggestions = keepModerationSuggestions(article.aiSuggestions);
+      article.setAISuggestions([...moderationSuggestions, ...response.suggestions]);
       close();
       onSuggestionsSaved?.();
     } catch (error) {
@@ -40,7 +50,7 @@ const GetAISuggestionsButton = ({ onSuggestionsSaved }: GetAISuggestionsButtonPr
   return (
     <>
       <Button size="sm" color={article.mainCategory.colors.accentColor} onClick={handleGetSuggestions}>
-        Проверить с помощью ИИ
+        РџСЂРѕРІРµСЂРёС‚СЊ СЃ РїРѕРјРѕС‰СЊСЋ РР
       </Button>
 
       <Modal
@@ -54,7 +64,7 @@ const GetAISuggestionsButton = ({ onSuggestionsSaved }: GetAISuggestionsButtonPr
       >
         <Stack gap={8} align="center">
           <Text size="lg" fw={400}>
-            Подбор ИИ-подсказок
+            РџРѕРґР±РѕСЂ РР-РїРѕРґСЃРєР°Р·РѕРє
           </Text>
           <Loader color="white" />
         </Stack>
