@@ -50,7 +50,7 @@ const GetAISuggestionsButton = ({ onSuggestionsSaved }: GetAISuggestionsButtonPr
   return (
     <>
       <Button size="sm" color={article.mainCategory.colors.accentColor} onClick={handleGetSuggestions}>
-        РџСЂРѕРІРµСЂРёС‚СЊ СЃ РїРѕРјРѕС‰СЊСЋ РР
+        Проверить с помощью ИИ
       </Button>
 
       <Modal
@@ -64,7 +64,7 @@ const GetAISuggestionsButton = ({ onSuggestionsSaved }: GetAISuggestionsButtonPr
       >
         <Stack gap={8} align="center">
           <Text size="lg" fw={400}>
-            РџРѕРґР±РѕСЂ РР-РїРѕРґСЃРєР°Р·РѕРє
+            Подбор ИИ-подсказок
           </Text>
           <Loader color="white" />
         </Stack>
