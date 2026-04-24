@@ -1,7 +1,8 @@
 
 import { Avatar, Stack, Text } from "@mantine/core"
+import { useDisclosure } from "@mantine/hooks"
 import { observer } from "mobx-react"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import type { IconType } from "react-icons"
 import { PiBookmarkSimpleFill, PiChatCenteredDotsFill, PiHeartFill, PiShareFatFill } from "react-icons/pi"
 import { useNavigate } from "react-router"
