@@ -28,6 +28,7 @@ export class ContentStore {
     currentDragPos: { x: number, y: number } = { x: 0, y: 0 }
 
     isLoaded: boolean = false
+    private readonly pageChangeListeners: Set<(pageId: string) => void> = new Set()
 
     constructor() {
         makeAutoObservable(this, {}, { autoBind: true })
@@ -247,6 +248,7 @@ export class ContentStore {
         if (!pageId || !this.pages.has(pageId)) return
         this.currentPageId = pageId
         this.currentTopicId = this.pages.get(pageId)?.topicId ?? ''
+        this.pageChangeListeners.forEach((listener) => listener(pageId))
 
         if (this.editMode) this.clearExtraEmptyPages()
 
@@ -256,6 +258,13 @@ export class ContentStore {
             (this.currentPage?.blocks.length !== 0 || this.currentPage?.topicId === ContentStore.COVER_ID)
         ) {
             this.addEmptyPage()
+        }
+    }
+
+    subscribePageChanges(listener: (pageId: string) => void): () => void {
+        this.pageChangeListeners.add(listener)
+        return () => {
+            this.pageChangeListeners.delete(listener)
         }
     }
 

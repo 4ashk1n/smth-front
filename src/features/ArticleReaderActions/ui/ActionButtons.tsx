@@ -1,12 +1,14 @@
 
-import { Stack, Text } from "@mantine/core"
-import { useDisclosure } from "@mantine/hooks"
+import { Avatar, Stack, Text } from "@mantine/core"
 import { observer } from "mobx-react"
 import { useEffect } from "react"
 import type { IconType } from "react-icons"
 import { PiBookmarkSimpleFill, PiChatCenteredDotsFill, PiHeartFill, PiShareFatFill } from "react-icons/pi"
+import { useNavigate } from "react-router"
 import { useArticleStore } from "../../../entities/article/contexts/article.context"
 import { useAuthStore } from "../../../entities/user/contexts/auth.context"
+import { useUsersStore } from "../../../entities/user/contexts/users.context"
+import type { UserModel } from "../../../entities/user/models/user.model"
 import { formatNumber } from "../../../shared/lib/formatNumber"
 import ArticleCommentsDrawer from "../../ArticleComments/ui/ArticleCommentsDrawer"
 import { likeArticle } from "../api/likeArticle"
@@ -43,13 +45,37 @@ const ArticleActionButton: React.FC<{
 const ActionButtons: React.FC<{}> = observer(() => {
     const article = useArticleStore()
     const auth = useAuthStore()
+    const users = useUsersStore()
+    const navigate = useNavigate()
+    const [author, setAuthor] = useState<UserModel | null>(null)
     const [commentsOpened, { open: openComments, close: closeComments }] = useDisclosure(false);
 
     useEffect(() => {
         article.fetchMetrics().catch(() => {})
     }, [article])
 
+    useEffect(() => {
+        let cancelled = false
+        users.fetchById(article.authorId).then((user) => {
+            if (cancelled) return
+            setAuthor(user)
+        })
+
+        return () => {
+            cancelled = true
+        }
+    }, [article.authorId, users])
+
     return (<>
+        <Avatar
+            w={40}
+            h={40}
+            size={40}
+            src={author?.data.avatar || ""}
+            style={{ cursor: "pointer" }}
+            onClick={() => navigate(`/profile/${article.authorId}`)}
+        />
+
         <ArticleActionButton
             counter={article.metrics.likes}
             pressed={article.metrics.liked}

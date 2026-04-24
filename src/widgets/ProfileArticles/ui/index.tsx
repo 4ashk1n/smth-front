@@ -15,13 +15,29 @@ const ProfileArticles: React.FC<{ userId: string }> = ({ userId }) => {
     const navigate = useNavigate()
 
     useEffect(() => {
+        setOpenedTab("articles");
+        setArticles([]);
+    }, [userId]);
+
+    useEffect(() => {
         setIsLoading(true);
-        console.log(openedTab);
+        let cancelled = false;
+
         (async () => {
-            setArticles(await getArticlesByTab(userId, openedTab));
-            setIsLoading(false);
+            try {
+                const nextArticles = await getArticlesByTab(userId, openedTab);
+                if (cancelled) return;
+                setArticles(nextArticles);
+            } finally {
+                if (cancelled) return;
+                setIsLoading(false);
+            }
         })();
-    }, [openedTab])
+
+        return () => {
+            cancelled = true;
+        };
+    }, [openedTab, userId])
 
     const handleCardClick = (articleId: string) => navigate(`/article/${articleId}`)
 

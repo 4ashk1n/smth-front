@@ -1,13 +1,45 @@
 import { Group, Stack, Text, Title } from "@mantine/core"
-import type { ArticleMeta } from "@smth/shared"
+import type { ArticleMeta, ArticleMetricsResponse } from "@smth/shared"
+import { useEffect, useState } from "react"
 import { PiEye } from "react-icons/pi"
+import { apiRequest } from "../../../../shared/api"
 import { formatNumber } from "../../../../shared/lib/formatNumber"
 import { useCategoriesStore } from "../../../category/contexts/categories.context"
 import ArticleBackground from "../ArticleContent/ArticleBackground"
 
+const articleViewsCache = new Map<string, number>()
+
 const VerticalArticleCardOverlay: React.FC<{
     article: ArticleMeta
 }> = ({ article }) => {
+    const [views, setViews] = useState<number | null>(() => articleViewsCache.get(article.id) ?? null)
+
+    useEffect(() => {
+        if (article.status !== "published") return
+
+        const cachedViews = articleViewsCache.get(article.id)
+        if (cachedViews !== undefined) {
+            setViews(cachedViews)
+            return
+        }
+
+        let cancelled = false
+
+        apiRequest<ArticleMetricsResponse>(`/articles/${article.id}/metrics`, { credentials: "include" })
+            .then((response) => {
+                if (cancelled) return
+                articleViewsCache.set(article.id, response.data.views)
+                setViews(response.data.views)
+            })
+            .catch(() => {
+                if (cancelled) return
+                setViews(0)
+            })
+
+        return () => {
+            cancelled = true
+        }
+    }, [article.id, article.status])
 
     return (
         <Group
@@ -24,7 +56,7 @@ const VerticalArticleCardOverlay: React.FC<{
                     <>
                         <PiEye size={16} />
                         <Text c='white' lh={1} fz={12}>
-                            {formatNumber(999999)}
+                            {views === null ? "..." : formatNumber(views)}
                         </Text>
                     </>
                 
