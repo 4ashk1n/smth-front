@@ -11,6 +11,10 @@ const AuthWidget: React.FC<{}> = observer(() => {
         auth.startGoogleOAuth(window.location.pathname);
     };
 
+    const handleTikTokLogin = () => {
+        auth.startTikTokOAuth(window.location.pathname);
+    };
+
     return (
         <Stack w='100%' p={16} h='100%' align="center" justify="center">
             <Title order={1} c='white'>Вход</Title>
@@ -19,7 +23,7 @@ const AuthWidget: React.FC<{}> = observer(() => {
                     <FaGoogle size={20} />
                 </ActionIcon>
 
-                <ActionIcon size="xl" variant="white" radius={10} c='black' disabled opacity={.5}>
+                <ActionIcon size="xl" variant="white" radius={10} c='black' onClick={handleTikTokLogin}>
                     <FaTiktok size={20} />
                 </ActionIcon>
 

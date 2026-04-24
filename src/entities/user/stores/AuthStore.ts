@@ -12,12 +12,10 @@ type AuthSession = {
 const AUTH_STORAGE_KEY = "authSession";
 const DEFAULT_API_BASE_URL = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "";
 const DEFAULT_GOOGLE_AUTH_PATH = "/auth/google";
+const DEFAULT_TIKTOK_AUTH_PATH = "/auth/tiktok";
 const DEFAULT_ME_PATH = "/auth/me";
 const DEFAULT_REFRESH_PATH = "/auth/refresh";
-
-type MeResponse = {
-    user: User;
-};
+const DEFAULT_LOGOUT_PATH = "/auth/logout";
 
 export class AuthStore {
     user: User | null = null;
@@ -42,6 +40,10 @@ export class AuthStore {
 
     get googleAuthUrl(): string {
         return this.buildApiUrl(DEFAULT_GOOGLE_AUTH_PATH);
+    }
+
+    get tiktokAuthUrl(): string {
+        return this.buildApiUrl(DEFAULT_TIKTOK_AUTH_PATH);
     }
 
     setLoading(loading: boolean) {
@@ -86,6 +88,27 @@ export class AuthStore {
             authUrl.searchParams.set("returnTo", returnTo);
         }
         window.location.assign(authUrl.toString());
+    }
+
+    startTikTokOAuth(returnTo?: string) {
+        const authUrl = new URL(this.tiktokAuthUrl);
+        if (returnTo) {
+            authUrl.searchParams.set("returnTo", returnTo);
+        }
+        window.location.assign(authUrl.toString());
+    }
+
+    async logoutRequest() {
+        try {
+            await apiRequest(DEFAULT_LOGOUT_PATH, {
+                method: "POST",
+                credentials: "include",
+            });
+        } catch {
+            // Session cleanup on client should still happen even when request fails.
+        } finally {
+            this.logout();
+        }
     }
 
     async bootstrapAuth() {

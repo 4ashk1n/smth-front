@@ -1,8 +1,9 @@
-﻿import { Alert, Box, Group, Loader, Stack, Switch, Text, TextInput, Title } from "@mantine/core";
+import { Alert, Box, Button, Group, Loader, Stack, Switch, Text, TextInput, Title } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { observer } from "mobx-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { PiCameraDuotone, PiCheckCircleDuotone, PiWarningCircleDuotone } from "react-icons/pi";
+import { useNavigate } from "react-router";
 import { useAuthStore } from "../../entities/user/contexts/auth.context";
 import { useUsersStore } from "../../entities/user/contexts/users.context";
 import type { UserModel } from "../../entities/user/models/user.model";
@@ -78,6 +79,7 @@ const FIELDS: Array<keyof ProfileSettingsValues> = ["firstname", "lastname", "us
 const ProfileSettings: React.FC<ProfileSettingsProps> = observer(({ userId, onStateChange, onRegisterActions }) => {
     const auth = useAuthStore();
     const users = useUsersStore();
+    const navigate = useNavigate();
 
     const [user, setUser] = useState<UserModel | null>(null);
     const [loading, setLoading] = useState(true);
@@ -85,6 +87,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = observer(({ userId, onSt
     const [avatarUploading, setAvatarUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
     const [initialValues, setInitialValues] = useState<ProfileSettingsValues | null>(null);
     const [notificationSettings, setNotificationSettings] = useState<NotificationSettingsValues>(DEFAULT_NOTIFICATION_SETTINGS);
     const [initialNotificationSettings, setInitialNotificationSettings] = useState<NotificationSettingsValues>(DEFAULT_NOTIFICATION_SETTINGS);
@@ -222,7 +225,10 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = observer(({ userId, onSt
             form.setValues(nextValues);
             setInitialValues(nextValues);
             if (updatedUser.notificationSettings) {
-                const nextNotificationSettings = mapUserToNotificationSettings(updatedUser);
+                const nextNotificationSettings = mapUserToNotificationSettings({
+                    ...user.data,
+                    ...updatedUser,
+                });
                 setNotificationSettings(nextNotificationSettings);
                 setInitialNotificationSettings(nextNotificationSettings);
             } else if (notificationHasChanges) {
@@ -241,6 +247,13 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = observer(({ userId, onSt
         if (busy || !hasChanges) return;
         void handleSubmit(form.values);
     }, [busy, form.values, handleSubmit, hasChanges]);
+
+    const handleLogout = useCallback(async () => {
+        setIsLoggingOut(true);
+        await auth.logoutRequest();
+        setIsLoggingOut(false);
+        navigate("/auth");
+    }, [auth, navigate]);
 
     const handleAvatarLoad = useCallback(async (previewUrl: string, file: File) => {
         form.setFieldValue("avatar", previewUrl);
@@ -454,6 +467,18 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = observer(({ userId, onSt
                     }}
                 />
             </Stack>
+
+            <Button
+                color="red"
+                variant="filled"
+                radius="md"
+                disabled={busy || isLoggingOut}
+                loading={isLoggingOut}
+                onClick={handleLogout}
+                mt={8}
+            >
+                Выйти
+            </Button>
         </Stack>
     );
 });
