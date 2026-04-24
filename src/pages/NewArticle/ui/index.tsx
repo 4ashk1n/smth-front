@@ -17,11 +17,15 @@ const NewArticlePage = observer(() => {
   const [article, setArticle] = useState<ArticleModel | null>(null);
 
   useEffect(() => {
-    if (!auth.isAuthenticated) {
-      navigate("/profile");
+    if (auth.isBanned) {
+      navigate("/banned");
       return;
     }
-  }, [auth.isAuthenticated, navigate]);
+    if (!auth.isAuthenticated) {
+      navigate("/auth");
+      return;
+    }
+  }, [auth.isAuthenticated, auth.isBanned, navigate]);
 
   useEffect(() => {
     if (!id) return;

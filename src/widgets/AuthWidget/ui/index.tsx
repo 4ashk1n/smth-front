@@ -1,11 +1,20 @@
 import { ActionIcon, Group, Stack, Title } from "@mantine/core";
 import { observer } from "mobx-react";
+import { useEffect } from "react";
+import { useNavigate } from "react-router";
 import { FaGoogle, FaTiktok } from "react-icons/fa6";
 import { IoLogoVk } from "react-icons/io5";
 import { useAuthStore } from "../../../entities/user/contexts/auth.context";
 
 const AuthWidget: React.FC<{}> = observer(() => {
     const auth = useAuthStore();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (auth.isBanned) {
+            navigate("/banned", { replace: true });
+        }
+    }, [auth.isBanned, navigate]);
 
     const handleGoogleLogin = () => {
         auth.startGoogleOAuth(window.location.pathname);

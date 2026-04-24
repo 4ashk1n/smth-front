@@ -11,6 +11,7 @@ import FeedPage from '../pages/Feed/ui';
 import LandingPage from '../pages/Landing/ui';
 import NewArticlePage from '../pages/NewArticle/ui';
 import NotificationsPage from '../pages/Notifications/ui';
+import BannedPage from '../pages/Banned/ui';
 import ProfilePage from '../pages/Profile/ui';
 import ProfileSettingsPage from '../pages/Profile/ui/settings';
 import SearchPage from '../pages/Search/ui';
@@ -71,6 +72,7 @@ function App() {
 
                             <Route path={`/profile/:userId`} element={<ProfilePage />} />
                             <Route path={`/profile/:userId/settings`} element={<ProfileSettingsPage />} />
+                            <Route path={'/banned'} element={<BannedPage />} />
                             
                             <Route path={'/auth'} element={<Center w='100%' h='calc(100% - 80px)'><AuthWidget /></Center>} />
                             <Route path={'/search'} element={<SearchPage />} />

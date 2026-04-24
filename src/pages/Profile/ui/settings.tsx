@@ -2,11 +2,13 @@ import { Button, Group, ScrollArea, Stack, Title } from "@mantine/core";
 import { useState } from "react";
 import { PiArrowArcLeft, PiFloppyDiskDuotone } from "react-icons/pi";
 import { useNavigate, useParams } from "react-router";
+import { useAuthStore } from "../../../entities/user/contexts/auth.context";
 import ProfileSettings, { type ProfileSettingsActions, type ProfileSettingsState } from "../../../widgets/ProfileSettings";
 
 const ProfileSettingsPage = () => {
     const params = useParams();
     const navigate = useNavigate();
+    const auth = useAuthStore();
 
     const [sectionState, setSectionState] = useState<ProfileSettingsState>({
         isDirty: false,
@@ -16,6 +18,11 @@ const ProfileSettingsPage = () => {
 
     const [sectionActions, setSectionActions] = useState<ProfileSettingsActions | null>(null);
     const saveDisabled = !sectionState.isDirty || sectionState.isSaving || !sectionState.canSubmit;
+
+    if (auth.isBanned) {
+        navigate("/banned");
+        return null;
+    }
 
     return (
         <>

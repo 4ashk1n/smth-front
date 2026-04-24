@@ -23,6 +23,11 @@ export const WorkshopPage = () => {
         })();
     }, [])
 
+    if (auth.isBanned) {
+        navigate('/banned')
+        return null;
+    }
+
     if (!auth.user) {
         navigate('/auth')
         return null;
