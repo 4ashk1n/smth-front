@@ -40,7 +40,7 @@ const ProfilePage = observer(() => {
                 gap={16}
             >
                 <ProfileInfo user={user} />
-                <ProfileArticles userId={user.id} />
+                <ProfileArticles key={user.id} userId={user.id} />
             </Stack>
             <div style={{ height: 100 }} />
         </ScrollArea>

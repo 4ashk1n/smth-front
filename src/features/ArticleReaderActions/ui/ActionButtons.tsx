@@ -1,12 +1,14 @@
 
-import { Stack, Text } from "@mantine/core"
-import { useDisclosure } from "@mantine/hooks"
+import { Avatar, Stack, Text } from "@mantine/core"
 import { observer } from "mobx-react"
 import { useEffect, useState } from "react"
+import { useNavigate } from "react-router"
 import type { IconType } from "react-icons"
 import { PiBookmarkSimpleFill, PiChatCenteredDotsFill, PiHeartFill, PiShareFatFill } from "react-icons/pi"
 import { useArticleStore } from "../../../entities/article/contexts/article.context"
 import { useAuthStore } from "../../../entities/user/contexts/auth.context"
+import { useUsersStore } from "../../../entities/user/contexts/users.context"
+import type { UserModel } from "../../../entities/user/models/user.model"
 import { formatNumber } from "../../../shared/lib/formatNumber"
 import { likeArticle } from "../api/likeArticle"
 import { repostArticle } from "../api/repostArticle"
@@ -42,18 +44,38 @@ const ArticleActionButton: React.FC<{
 const ActionButtons: React.FC<{}> = observer(() => {
     const article = useArticleStore()
     const auth = useAuthStore()
-    const [opened, { toggle }] = useDisclosure();
-
-    const [loading, setLoading] = useState(false)
+    const users = useUsersStore()
+    const navigate = useNavigate()
+    const [author, setAuthor] = useState<UserModel | null>(null)
 
     useEffect(() => {
-        setLoading(true)
-        article.fetchMetrics().then(() => {
-            setLoading(false)
+        article.fetchMetrics().catch(() => {
+            // noop
         })
     }, [article])
 
+    useEffect(() => {
+        let cancelled = false
+        users.fetchById(article.authorId).then((user) => {
+            if (cancelled) return
+            setAuthor(user)
+        })
+
+        return () => {
+            cancelled = true
+        }
+    }, [article.authorId, users])
+
     return (<>
+        <Avatar
+            w={40}
+            h={40}
+            size={40}
+            src={author?.data.avatar || ""}
+            style={{ cursor: "pointer" }}
+            onClick={() => navigate(`/profile/${article.authorId}`)}
+        />
+
         <ArticleActionButton
             counter={article.metrics.likes}
             pressed={article.metrics.liked}
