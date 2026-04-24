@@ -10,6 +10,7 @@ import ArticlePage from '../pages/Article/ui';
 import FeedPage from '../pages/Feed/ui';
 import LandingPage from '../pages/Landing/ui';
 import NewArticlePage from '../pages/NewArticle/ui';
+import NotificationsPage from '../pages/Notifications/ui';
 import ProfilePage from '../pages/Profile/ui';
 import ProfileSettingsPage from '../pages/Profile/ui/settings';
 import SearchPage from '../pages/Search/ui';
@@ -66,6 +67,7 @@ function App() {
                             <Route path='/article/:id/edit' element={<NewArticlePage />} />
                             <Route path='/workshop' element={<WorkshopPage />} />
                             <Route path='/feed' element={<FeedPage />} />
+                            <Route path='/notifications' element={<NotificationsPage />} />
 
                             <Route path={`/profile/:userId`} element={<ProfilePage />} />
                             <Route path={`/profile/:userId/settings`} element={<ProfileSettingsPage />} />
