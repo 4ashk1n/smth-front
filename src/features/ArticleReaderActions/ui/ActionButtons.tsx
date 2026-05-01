@@ -4,7 +4,7 @@ import { useDisclosure } from "@mantine/hooks"
 import { observer } from "mobx-react"
 import { useEffect, useState } from "react"
 import type { IconType } from "react-icons"
-import { PiBookmarkSimpleFill, PiChatCenteredDotsFill, PiHeartFill, PiShareFatFill } from "react-icons/pi"
+import { PiChatCenteredDotsFill, PiHeartFill, PiShareFatFill } from "react-icons/pi"
 import { useNavigate } from "react-router"
 import { useArticleStore } from "../../../entities/article/contexts/article.context"
 import { useAuthStore } from "../../../entities/user/contexts/auth.context"
@@ -14,7 +14,6 @@ import { formatNumber } from "../../../shared/lib/formatNumber"
 import ArticleCommentsDrawer from "../../ArticleComments/ui/ArticleCommentsDrawer"
 import { likeArticle } from "../api/likeArticle"
 import { repostArticle } from "../api/repostArticle"
-import { saveArticle } from "../api/saveArticle"
 
 const ArticleActionButton: React.FC<{
     counter: number,
@@ -93,13 +92,13 @@ const ActionButtons: React.FC<{}> = observer(() => {
             onClick={openComments}
         />
 
-        <ArticleActionButton
+        {/* <ArticleActionButton
             counter={article.metrics.saves}
             pressedColor="yellow"
             pressed={article.metrics.saved}
             icon={PiBookmarkSimpleFill}
             onClick={() => saveArticle(article, auth.user?.id || "")}
-        />
+        /> */}
 
         <ArticleActionButton
             counter={article.metrics.reposts}

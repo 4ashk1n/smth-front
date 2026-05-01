@@ -1,7 +1,7 @@
 import { FloatingIndicator, Tabs } from "@mantine/core";
 import { observer } from "mobx-react";
 import React, { useEffect, useState } from "react";
-import { PiBooks, PiDownloadSimple, PiEyes, PiHeart, PiShareFat } from "react-icons/pi";
+import { PiBooks, PiEyes, PiHeart, PiShareFat } from "react-icons/pi";
 import { useAuthStore } from "../../../entities/user/contexts/auth.context";
 import type { ProfileTabs } from "../../../widgets/ProfileArticles/types/tabs.types";
 
@@ -9,7 +9,7 @@ const Icons: Record<ProfileTabs, React.ReactNode> = {
     articles: <PiBooks size={24} />,
     reviews: <PiEyes size={24} />,
     likes: <PiHeart size={24} />,
-    saved: <PiDownloadSimple size={24} />,
+    // saved: <PiDownloadSimple size={24} />,
     reposts: <PiShareFat size={24} />,
 }
 
