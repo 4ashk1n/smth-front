@@ -46,12 +46,16 @@ const NotificationsPage: React.FC = () => {
     };
 
     useEffect(() => {
+        if (auth.isBanned) {
+            navigate("/banned");
+            return;
+        }
         if (!auth.user) {
             navigate("/auth");
             return;
         }
         void loadPage(1, "replace");
-    }, [auth.user]);
+    }, [auth.isBanned, auth.user, navigate]);
 
     const handleOpen = async (notification: Notification) => {
         if (!notification.readAt) {

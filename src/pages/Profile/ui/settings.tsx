@@ -1,12 +1,14 @@
-﻿import { Button, Group, ScrollArea, Stack, Title } from "@mantine/core";
+import { Button, Group, ScrollArea, Stack, Title } from "@mantine/core";
 import { useState } from "react";
 import { PiArrowArcLeft, PiFloppyDiskDuotone } from "react-icons/pi";
 import { useNavigate, useParams } from "react-router";
+import { useAuthStore } from "../../../entities/user/contexts/auth.context";
 import ProfileSettings, { type ProfileSettingsActions, type ProfileSettingsState } from "../../../widgets/ProfileSettings";
 
 const ProfileSettingsPage = () => {
     const params = useParams();
     const navigate = useNavigate();
+    const auth = useAuthStore();
 
     const [sectionState, setSectionState] = useState<ProfileSettingsState>({
         isDirty: false,
@@ -15,8 +17,12 @@ const ProfileSettingsPage = () => {
     });
 
     const [sectionActions, setSectionActions] = useState<ProfileSettingsActions | null>(null);
-
     const saveDisabled = !sectionState.isDirty || sectionState.isSaving || !sectionState.canSubmit;
+
+    if (auth.isBanned) {
+        navigate("/banned");
+        return null;
+    }
 
     return (
         <>
@@ -72,7 +78,7 @@ const ProfileSettingsPage = () => {
                     <hr style={{ margin: "0 auto", opacity: 0.2, width: "100%", maxWidth: 760 }} />
 
                     <Stack gap={10} maw={760} w="100%" mx="auto">
-                        <Title order={3} fz={18} >
+                        <Title order={3} fz={18}>
                             Информация
                         </Title>
 

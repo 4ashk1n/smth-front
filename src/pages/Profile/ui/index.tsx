@@ -1,7 +1,7 @@
 import { ScrollArea, Stack } from "@mantine/core";
 import { observer } from "mobx-react";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { useAuthStore } from "../../../entities/user/contexts/auth.context";
 import { useUsersStore } from "../../../entities/user/contexts/users.context";
 import type { UserModel } from "../../../entities/user/models/user.model";
@@ -10,12 +10,17 @@ import ProfileInfo from "../../../widgets/ProfileInfo/ui";
 
 const ProfilePage = observer(() => {
     const auth = useAuthStore();
+    const navigate = useNavigate();
     const params = useParams()
     const [user, setUser] = useState<UserModel | null>(null)
     const [loading, setLoading] = useState(true)
     const users = useUsersStore()
 
     useEffect(() => {
+        if (auth.isBanned) {
+            navigate("/banned", { replace: true });
+            return;
+        }
         setLoading(true)
         if (params.userId) {
             users.fetchById(params.userId).then((user) => {
@@ -23,7 +28,7 @@ const ProfilePage = observer(() => {
                 setLoading(false)
             })
         }
-    }, [params.userId])
+    }, [auth.isBanned, navigate, params.userId, users])
 
     if (!user) {
         return null

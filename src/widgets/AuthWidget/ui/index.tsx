@@ -1,14 +1,27 @@
 import { ActionIcon, Group, Stack, Title } from "@mantine/core";
 import { observer } from "mobx-react";
+import { useEffect } from "react";
+import { useNavigate } from "react-router";
 import { FaGoogle, FaTiktok } from "react-icons/fa6";
 import { IoLogoVk } from "react-icons/io5";
 import { useAuthStore } from "../../../entities/user/contexts/auth.context";
 
 const AuthWidget: React.FC<{}> = observer(() => {
     const auth = useAuthStore();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (auth.isBanned) {
+            navigate("/banned", { replace: true });
+        }
+    }, [auth.isBanned, navigate]);
 
     const handleGoogleLogin = () => {
         auth.startGoogleOAuth(window.location.pathname);
+    };
+
+    const handleTikTokLogin = () => {
+        auth.startTikTokOAuth(window.location.pathname);
     };
 
     return (
@@ -19,7 +32,7 @@ const AuthWidget: React.FC<{}> = observer(() => {
                     <FaGoogle size={20} />
                 </ActionIcon>
 
-                <ActionIcon size="xl" variant="white" radius={10} c='black' disabled opacity={.5}>
+                <ActionIcon size="xl" variant="white" radius={10} c='black' onClick={handleTikTokLogin}>
                     <FaTiktok size={20} />
                 </ActionIcon>
 

@@ -7,22 +7,22 @@ type AuthSession = {
     user: User | null;
     accessToken: string | null;
     refreshToken: string | null;
+    banned: boolean;
 };
 
 const AUTH_STORAGE_KEY = "authSession";
 const DEFAULT_API_BASE_URL = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "";
 const DEFAULT_GOOGLE_AUTH_PATH = "/auth/google";
+const DEFAULT_TIKTOK_AUTH_PATH = "/auth/tiktok";
 const DEFAULT_ME_PATH = "/auth/me";
 const DEFAULT_REFRESH_PATH = "/auth/refresh";
-
-type MeResponse = {
-    user: User;
-};
+const DEFAULT_LOGOUT_PATH = "/auth/logout";
 
 export class AuthStore {
     user: User | null = null;
     accessToken: string | null = null;
     refreshToken: string | null = null;
+    banned: boolean = false;
 
     loading: boolean = false;
     error: string | null = null;
@@ -40,8 +40,16 @@ export class AuthStore {
         return this.user !== null || this.accessToken !== null;
     }
 
+    get isBanned(): boolean {
+        return this.banned;
+    }
+
     get googleAuthUrl(): string {
         return this.buildApiUrl(DEFAULT_GOOGLE_AUTH_PATH);
+    }
+
+    get tiktokAuthUrl(): string {
+        return this.buildApiUrl(DEFAULT_TIKTOK_AUTH_PATH);
     }
 
     setLoading(loading: boolean) {
@@ -54,6 +62,9 @@ export class AuthStore {
 
     setUser(user: User | null) {
         this.user = user;
+        if (user) {
+            this.banned = false;
+        }
         this.saveLocalSession();
     }
 
@@ -75,8 +86,18 @@ export class AuthStore {
         this.user = null;
         this.accessToken = null;
         this.refreshToken = null;
+        this.banned = false;
         this.error = null;
         window.localStorage.removeItem(AUTH_STORAGE_KEY);
+    }
+
+    markBanned() {
+        this.user = null;
+        this.accessToken = null;
+        this.refreshToken = null;
+        this.banned = true;
+        this.error = "Пользователь забанен";
+        this.saveLocalSession();
     }
 
     startGoogleOAuth(returnTo?: string) {
@@ -86,6 +107,27 @@ export class AuthStore {
             authUrl.searchParams.set("returnTo", returnTo);
         }
         window.location.assign(authUrl.toString());
+    }
+
+    startTikTokOAuth(returnTo?: string) {
+        const authUrl = new URL(this.tiktokAuthUrl);
+        if (returnTo) {
+            authUrl.searchParams.set("returnTo", returnTo);
+        }
+        window.location.assign(authUrl.toString());
+    }
+
+    async logoutRequest() {
+        try {
+            await apiRequest(DEFAULT_LOGOUT_PATH, {
+                method: "POST",
+                credentials: "include",
+            });
+        } catch {
+            // Session cleanup on client should still happen even when request fails.
+        } finally {
+            this.logout();
+        }
     }
 
     async bootstrapAuth() {
@@ -113,8 +155,13 @@ export class AuthStore {
             });
             const user = data.data;
             this.setUser(user);
+            this.banned = false;
             console.log(this.isAuthenticated ? "Authenticated" : "Not authenticated");
         } catch (error) {
+            const apiError = error as ApiError;
+            if (this.isBannedError(apiError)) {
+                this.markBanned();
+            }
             console.error("Failed to fetch user", error);
             this.setError(error instanceof Error ? error.message : "Failed to fetch user");
             throw error;
@@ -184,6 +231,7 @@ export class AuthStore {
             user: this.user,
             accessToken: this.accessToken,
             refreshToken: this.refreshToken,
+            banned: this.banned,
         };
     }
 
@@ -192,6 +240,7 @@ export class AuthStore {
             this.user = session.user;
             this.accessToken = session.accessToken;
             this.refreshToken = session.refreshToken;
+            this.banned = session.banned ?? false;
         });
     }
 
@@ -247,6 +296,11 @@ export class AuthStore {
                 throw error;
             }
 
+            if (this.isBannedError(apiError)) {
+                this.markBanned();
+                throw error;
+            }
+
             await this.refreshAccessToken();
 
             return apiRequest<T>(path, {
@@ -271,7 +325,11 @@ export class AuthStore {
             } catch (error) {
                 const apiError = error as ApiError;
                 if (apiError.status === 401) {
-                    this.logout();
+                    if (this.isBannedError(apiError)) {
+                        this.markBanned();
+                    } else {
+                        this.logout();
+                    }
                 }
                 throw error;
             } finally {
@@ -306,5 +364,21 @@ export class AuthStore {
 
     closeDrawer() {
         this.drawerOpened = false;
+    }
+
+    private isBannedError(error: ApiError): boolean {
+        const raw = error?.data as any;
+        if (!raw) return false;
+        if (typeof raw === "string") {
+            return raw.toLowerCase().includes("banned");
+        }
+        const message = raw.message;
+        if (typeof message === "string") {
+            return message.toLowerCase().includes("banned");
+        }
+        if (Array.isArray(message)) {
+            return message.some((m) => typeof m === "string" && m.toLowerCase().includes("banned"));
+        }
+        return false;
     }
 }
