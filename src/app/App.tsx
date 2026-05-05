@@ -2,16 +2,16 @@ import { Center, createTheme, MantineProvider } from '@mantine/core';
 import '@mantine/core/styles.css';
 import '@mantine/tiptap/styles.css';
 import "animate.css/animate.min.css";
-import { createContext, useEffect, useState } from 'react';
+import { createContext, useEffect } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router';
 import '../../node_modules/react-grid-layout/css/styles.css';
 import '../../node_modules/react-resizable/css/styles.css';
 import ArticlePage from '../pages/Article/ui';
+import BannedPage from '../pages/Banned/ui';
 import FeedPage from '../pages/Feed/ui';
 import LandingPage from '../pages/Landing/ui';
 import NewArticlePage from '../pages/NewArticle/ui';
 import NotificationsPage from '../pages/Notifications/ui';
-import BannedPage from '../pages/Banned/ui';
 import ProfilePage from '../pages/Profile/ui';
 import ProfileSettingsPage from '../pages/Profile/ui/settings';
 import SearchPage from '../pages/Search/ui';
@@ -30,7 +30,7 @@ export const ScrollPositionContext = createContext<{ x: number, y: number }>({ x
 
 
 function App() {
-    const [scrollPosition, onScrollPositionChange] = useState({ x: 0, y: 0 });
+    // const [scrollPosition, onScrollPositionChange] = useState({ x: 0, y: 0 });
     // const parallaxController = useParallaxController();
 
     useEffect(() => {

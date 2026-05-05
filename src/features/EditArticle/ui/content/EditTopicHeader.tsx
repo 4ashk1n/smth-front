@@ -5,9 +5,11 @@ import type { Topic } from "../../../../entities/article/types/content.types"
 
 const EditTopicHeader: React.FC<{ topic?: Topic }> = observer(({ topic }) => {
     const article = useArticleStore()
+    if (!article.content) return null
     const topicToRender = topic ?? article.content.currentTopic ?? article.content.topicsData[0]
 
     const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+        if (!article.content) return null
         article.content.editTopicTitle(topicToRender.id, event.target.value)
     }
 
@@ -19,7 +21,7 @@ const EditTopicHeader: React.FC<{ topic?: Topic }> = observer(({ topic }) => {
             // fw={700}
             lh={0.8}
             mt={10}
-            fw={900} 
+            fw={900}
             onChange={handleChange}
             defaultValue={topicToRender.title}
             style={{

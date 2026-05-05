@@ -5,7 +5,8 @@ import { motion } from "framer-motion";
 import { observer } from "mobx-react";
 import { type Layout } from "react-grid-layout";
 import { useArticleStore } from "../../entities/article/contexts/article.context";
-import type { Block, Icon, Image, Page, Paragraph } from "../../entities/article/types/content.types";
+import type { PageModel } from "../../entities/article/models/content.models";
+import type { Block, Icon, Image, Paragraph } from "../../entities/article/types/content.types";
 import ParagraphBlock from "../../entities/article/ui/ArticleContent/ParagraphBlock";
 import TopicHeader from "../../entities/article/ui/ArticleContent/TopicHeader";
 import IconBlockEdit from "../../features/EditArticle/ui/blocks/IconBlockEdit";
@@ -33,6 +34,7 @@ export const ArticleBlock = ({ block }: { block: Block }) => {
 
 const ArticleEditBlock = ({ block }: { block: Block }) => {
     const article = useArticleStore();
+    if (!article.content) return null
 
     return (
         <motion.div
@@ -73,8 +75,9 @@ const ArticleEditBlock = ({ block }: { block: Block }) => {
     );
 }
 
-const ArticleContent: React.FC<{ page?: Page }> = observer(({ page }) => {
+const ArticleContent: React.FC<{ page?: PageModel }> = observer(({ page }) => {
     const article = useArticleStore();
+    if (!article.content) return null
 
     const pageToRender = page ?? article.content.currentPage;
     if (!pageToRender) return null;
@@ -99,16 +102,21 @@ const ArticleContent: React.FC<{ page?: Page }> = observer(({ page }) => {
             containerPadding={{ lg: [0, 0], md: [0, 0], sm: [0, 0], xs: [0, 0] }}
             maxRows={8}
             margin={{ lg: [36, 18], md: [36, 18], sm: [16, 16], xs: [16, 16], xxs: [16, 16] }}
-            onLayoutChange={(currentLayout, _) => { article.content.changeLayout(currentLayout) }}
+            onLayoutChange={(currentLayout, _) => {
+                if (!article.content) return null; article.content.changeLayout(currentLayout)
+            }}
             resizeHandle={<ResizeHandle hidden={!article.editMode || !article.content.dragMode} />}
             autoSize={false}
             onDrag={(_, blockLayout, __, ___, event: MouseEvent) => {
+                if (!article.content) return null
                 article.content.setCurrentBlock(blockLayout.i);
                 article.content.setIsDragging(true);
                 article.content.setCurrentDragPos(event.clientX, event.clientY)
             }}
             useCSSTransforms={false}
-            onDragStop={() => { article.content.setIsDragging(false) }}
+            onDragStop={() => {
+                if (!article.content) return null; article.content.setIsDragging(false)
+            }}
 
         // resizeHandle={
         //     <div
@@ -150,7 +158,7 @@ const ArticleContent: React.FC<{ page?: Page }> = observer(({ page }) => {
                             minW: 1,
                             maxH: 7,
                             minH: 2,
-                            static: !article.content.dragMode
+                            static: !article.content?.dragMode
                         } as Layout}
                         style={{ height: 'fit-content' }}
 

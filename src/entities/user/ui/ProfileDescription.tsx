@@ -1,8 +1,7 @@
 import { Text } from "@mantine/core";
-import { useAuthStore } from "../contexts/auth.context";
 
 const ProfileDescription = () => {
-    const { user } = useAuthStore();
+    // const { user } = useAuthStore();
     return (
         <Text
             c='white'
@@ -13,7 +12,7 @@ const ProfileDescription = () => {
             fw={400}
             className="text-center"
         >
-            Молодой блогер николаич любит бананы, чемодан вокзал африка
+           
         </Text>
     )
 }

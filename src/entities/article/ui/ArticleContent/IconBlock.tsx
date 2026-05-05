@@ -1,13 +1,12 @@
+import { observer } from "mobx-react";
 import ReactIcon, { type IconName } from "../../../../shared/icon/ReactIcon";
 import { useArticleStore } from "../../contexts/article.context";
 import type { Icon } from "../../types/content.types";
 import Object3dBlock from "./Object3dBlock";
-import { observer } from "mobx-react";
 
 const IconBlock: React.FC<{ block: Icon }> = observer((props) => {
 
-    const { id, mainCategory } = useArticleStore()
-    console.log(mainCategory.colors.accentColor)
+    const { mainCategory } = useArticleStore()
     const gradientId = `accent-gradient-${mainCategory.id}`
 
 

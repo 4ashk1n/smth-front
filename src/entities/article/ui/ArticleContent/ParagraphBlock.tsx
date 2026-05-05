@@ -1,6 +1,5 @@
 import { Text } from "@mantine/core"
 import { observer } from "mobx-react"
-import { createReactEditorJS } from "react-editor-js"
 import { useIsMobileScreen } from "../../../../shared/lib/useIsMobile"
 import { useArticleStore } from "../../contexts/article.context"
 import type { Paragraph } from "../../types/content.types"
@@ -11,14 +10,14 @@ const ParagraphBlock: React.FC<{ block: Paragraph }> = observer((props) => {
     const { mainCategory } = useArticleStore()
     const isMobile = useIsMobileScreen()
 
-    const ReactEditorJS = createReactEditorJS()
-    const contentKey = (() => {
-        try {
-            return JSON.stringify(props.block.content ?? {})
-        } catch {
-            return String(props.block.content)
-        }
-    })()
+    // const ReactEditorJS = createReactEditorJS()
+    // const contentKey = (() => {
+    //     try {
+    //         return JSON.stringify(props.block.content ?? {})
+    //     } catch {
+    //         return String(props.block.content)
+    //     }
+    // })()
 
     const Paragraph2d = () => (<>
         {/* <ReactEditorJS
@@ -40,7 +39,7 @@ const ParagraphBlock: React.FC<{ block: Paragraph }> = observer((props) => {
                 textShadow: '0 4px 4px rgba(0, 0, 0, 0.25)' 
             }}
         >
-            {props.block.content.blocks.map((block: any) => block.data.text).join('\n')}
+            {(props.block.content as any).blocks.map((block: any) => block.data.text).join('\n')}
         </Text>
     </>)
 

@@ -8,143 +8,139 @@ import { dotVariants } from "../animations/dots"
 
 
 const FakeDot: React.FC<{}> = () => {
-  const article = useArticleStore()
+	const article = useArticleStore()
 
-  return (
-    <div className="flex items-center px-[4px] py-[12px] opacity-0">
-      <div
-        style={{
-          width: 8,
-          height: 8,
-          background: article.mainCategory.colors.lightColor,
-          borderRadius: '20px',
-        }}
-      />
-    </div>
-  )
+	return (
+		<div className="flex items-center px-[4px] py-[12px] opacity-0">
+			<div
+				style={{
+					width: 8,
+					height: 8,
+					background: article.mainCategory.colors.lightColor,
+					borderRadius: '20px',
+				}}
+			/>
+		</div>
+	)
 }
 
 const PageManager = observer(() => {
-  const article = useArticleStore()
-  const pages = article.content.pagesData
-  const currentPageId = article.content.currentPageId
+	const article = useArticleStore()
+	if (!article.content) return null
+	const pages = article.content.pagesData
+	const currentPageId = article.content.currentPageId
 
-  // Вместо зависимости от pages.size, используйте стабильный идентификатор
-  const pagesKey = `${article.content.pages.size}_${currentPageId}`
+	const pagesKey = `${article.content.pages.size}_${currentPageId}`
 
-  // Мемоизируем вычисления с ключом, который меняется только когда нужно
-  const { visiblePages, leftFakeDotsCount, rightFakeDotsCount } = useMemo(() => {
-    const currentPage = article.content.currentPage
-    const currentPageOrder = currentPage?.order ?? 0
+	const { visiblePages, leftFakeDotsCount, rightFakeDotsCount } = useMemo(() => {
+		if (!article.content) return { visiblePages: [], leftFakeDotsCount: 0, rightFakeDotsCount: 0 }
+		const currentPage = article.content.currentPage
+		const currentPageOrder = currentPage?.order ?? 0
 
-    // Всегда показываем 5 точек вокруг текущей
-    const start = Math.max(0, currentPageOrder - 2)
-    const end = Math.min(pages.length, currentPageOrder + 3)
-    const visiblePages = pages.slice(start, end)
+		const start = Math.max(0, currentPageOrder - 2)
+		const end = Math.min(pages.length, currentPageOrder + 3)
+		const visiblePages = pages.slice(start, end)
 
-    const leftFakeDotsCount = Math.max(0, 2 - currentPageOrder)
-    const rightFakeDotsCount = Math.max(0, 2 - (pages.length - 1 - currentPageOrder))
+		const leftFakeDotsCount = Math.max(0, 2 - currentPageOrder)
+		const rightFakeDotsCount = Math.max(0, 2 - (pages.length - 1 - currentPageOrder))
 
-    return { visiblePages, leftFakeDotsCount, rightFakeDotsCount }
-  }, [pagesKey]) // Зависим от стабильного ключа
+		return { visiblePages, leftFakeDotsCount, rightFakeDotsCount }
+	}, [pagesKey])
 
-  const currentPageOrder = article.content.currentPage?.order ?? 0
+	const currentPageOrder = article.content.currentPage?.order ?? 0
 
-  const [navigationDirection, setNavigationDirection] = useState(0)
-  const isInitialRender = useRef(true)
-  const prevOrderRef = useRef(currentPageOrder)
+	const [navigationDirection, setNavigationDirection] = useState(0)
+	const isInitialRender = useRef(true)
+	const prevOrderRef = useRef(currentPageOrder)
 
-  // вычисляем направление при ЛЮБОЙ смене страницы (и клик, и свайп)
-  useEffect(() => {
-    if (isInitialRender.current) {
-      isInitialRender.current = false
-      prevOrderRef.current = currentPageOrder
-      return
-    }
+	useEffect(() => {
+		if (isInitialRender.current) {
+			isInitialRender.current = false
+			prevOrderRef.current = currentPageOrder
+			return
+		}
 
-    const prev = prevOrderRef.current
-    const dir = currentPageOrder === prev ? 0 : currentPageOrder > prev ? 1 : -1
-    setNavigationDirection(dir)
-    prevOrderRef.current = currentPageOrder
+		const prev = prevOrderRef.current
+		const dir = currentPageOrder === prev ? 0 : currentPageOrder > prev ? 1 : -1
+		setNavigationDirection(dir)
+		prevOrderRef.current = currentPageOrder
 
-    const timer = setTimeout(() => {
-      setNavigationDirection(0)
-    }, 400)
+		const timer = setTimeout(() => {
+			setNavigationDirection(0)
+		}, 400)
 
-    return () => clearTimeout(timer)
-  }, [currentPageOrder])
+		return () => clearTimeout(timer)
+	}, [currentPageOrder])
 
 
-  const getAnimationProps = (page: Page) => {
-    const distance = Math.abs(page.order - currentPageOrder)
-    return {
-      distance,
-      direction: navigationDirection,
-      pageOrder: page.order,
-      currentPageOrder
-    }
-  }
+	const getAnimationProps = (page: Page) => {
+		const distance = Math.abs(page.order - currentPageOrder)
+		return {
+			distance,
+			direction: navigationDirection,
+			pageOrder: page.order,
+			currentPageOrder
+		}
+	}
 
-  const handlePageClick = (page: Page) => {
-    if (page.order === currentPageOrder) return
+	const handlePageClick = (page: Page) => {
+		if (page.order === currentPageOrder) return
+		if (!article.content) return null
 
-    // Синхронно устанавливаем направление
-    const direction = page.order > currentPageOrder ? 1 : -1
-    setNavigationDirection(direction)
+		const direction = page.order > currentPageOrder ? 1 : -1
+		setNavigationDirection(direction)
 
-    article.content.changePage(page.id)
-  }
+		article.content.changePage(page.id)
+	}
 
-  return (
-    <Group
-      wrap="nowrap"
-      gap={0}
-      opacity={+!article.content.dragMode}
-      className="transition-opacity transition-duration-300 ease-in-out"
-    >
-      {/* Фиктивные точки слева для выравнивания */}
-      {leftFakeDotsCount > 0 && Array.from({ length: leftFakeDotsCount }).map((_, i) => (
-        <FakeDot key={`left-fake-${i}`} />
-      ))}
+	return (
+		<Group
+			wrap="nowrap"
+			gap={0}
+			opacity={+!article.content.dragMode}
+			className="transition-opacity transition-duration-300 ease-in-out"
+		>
+			{leftFakeDotsCount > 0 && Array.from({ length: leftFakeDotsCount }).map((_, i) => (
+				<FakeDot key={`left-fake-${i}`} />
+			))}
 
-      <AnimatePresence mode="popLayout">
-        {visiblePages.map((page) => {
-          return (
-            <motion.div
-              key={`${page.id}-${page.order}`}
-              variants={dotVariants}
-              initial="enter"
-              animate="animate"
-              exit="exit"
-              custom={getAnimationProps(page)}
-              layout
-              transition={{
-                duration: 0.4,
-                ease: "easeInOut"
-              }}
-              className="hover:cursor-pointer hover:opacity-100! flex items-center px-[4px] py-[12px]"
-              onClick={() => handlePageClick(page)}
-            >
-              <div
-                style={{
-                  width: 8,
-                  height: 8,
-                  background: article.mainCategory.colors.lightColor,
-                  borderRadius: '20px',
-                  boxShadow: `0px 0px 5px 0px ${article.mainCategory.colors.darkColor}40`,
-                }}
-              />
-            </motion.div>
-          )
-        })}
-      </AnimatePresence>
+			<AnimatePresence mode="popLayout">
+				{visiblePages.map((page) => {
+					return (
+						<motion.div
+							key={`${page.id}-${page.order}`}
+							variants={dotVariants}
+							initial="enter"
+							animate="animate"
+							exit="exit"
+							custom={getAnimationProps(page)}
+							layout
+							transition={{
+								duration: 0.4,
+								ease: "easeInOut"
+							}}
+							className="hover:cursor-pointer hover:opacity-100! flex items-center px-[4px] py-[12px]"
+							onClick={() => handlePageClick(page)}
+						>
+							<div
+								style={{
+									width: 8,
+									height: 8,
+									background: article.mainCategory.colors.lightColor,
+									borderRadius: '20px',
+									boxShadow: `0px 0px 5px 0px ${article.mainCategory.colors.darkColor}40`,
+								}}
+							/>
+						</motion.div>
+					)
+				})}
+			</AnimatePresence>
 
-      {/* Фиктивные точки справа для выравнивания */}
-      {rightFakeDotsCount > 0 && Array.from({ length: rightFakeDotsCount }).map((_, i) => (
-        <FakeDot key={`right-fake-${i}`} />
-      ))}
-    </Group>
-  )
+			{rightFakeDotsCount > 0 && Array.from({ length: rightFakeDotsCount }).map((_, i) => (
+				<FakeDot key={`right-fake-${i}`} />
+			))}
+		</Group>
+	)
 })
 
 export default PageManager

@@ -12,7 +12,7 @@ const SendForReviewButton = () => {
     const article = useArticleStore();
     const auth = useAuthStore();
     const [isSaving, setIsSaving] = useState(false);
-    const [invalidFields, setInvalidFields] = useState<string[]>([]);
+    const [_invalidFields, setInvalidFields] = useState<string[]>([]);
 
     const [opened, { open, close }] = useDisclosure(false);
     const navigate = useNavigate()

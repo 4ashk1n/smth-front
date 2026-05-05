@@ -139,7 +139,6 @@ export class ArticleModel {
 
     fromJSON(article: any) {
         runInAction(() => {
-            console.log("Loading from JSON:", article);
             this.id = article.id ?? this.id;
             this.title = article.title ?? "";
             this.description = article.description ?? "";
@@ -297,14 +296,9 @@ export class ArticleModel {
 
 
     saveLocalDraft() {
-        console.log("Saving draft...");
         this.cleanupLegacyNewDraftKeys();
         const serialized = JSON.stringify(this.toJSON());
-        console.log("Before save:", window.localStorage.getItem(this.localDraftKey));
         window.localStorage.setItem(this.localDraftKey, serialized);
-        // Keep one legacy fallback key for older sessions.
-        window.localStorage.setItem("articleDraft", serialized);
-        console.log("After save:", window.localStorage.getItem(this.localDraftKey));
     }
 
     loadLocalDraft() {

@@ -6,48 +6,64 @@ export const ALL_CATEGORIES: Category[] = [
     name: "Физика",
     emoji: "⚛️",
     colors: { lightColor: "#CCE0FF", darkColor: "#003366", accentColor: "#0066FF" },
+    createdAt: new Date(),
+    updatedAt: new Date()
   },
   {
     id: "chemistry",
     name: "Химия",
     emoji: "🧪",
     colors: { lightColor: "#F2E5FF", darkColor: "#4A235A", accentColor: "#8E44AD" },
+    createdAt: new Date(),
+    updatedAt: new Date()
   },
   {
     id: "biology_ecology",
     name: "Биология",
     emoji: "🧬",
     colors: { lightColor: "#DFFFD6", darkColor: "#145A32", accentColor: "#44B244" },
+    createdAt: new Date(),
+    updatedAt: new Date()
   },
   {
     id: "astronomy_space",
     name: "Астрономия",
     emoji: "🌌",
     colors: { lightColor: "#E8DAF6", darkColor: "#2E0854", accentColor: "#9B59B6" },
+    createdAt: new Date(),
+    updatedAt: new Date()
   },
   {
     id: "mathematics",
     name: "Математика",
     emoji: "➗",
     colors: { lightColor: "#E0E7FF", darkColor: "#2C3E50", accentColor: "#4B0082" },
+    createdAt: new Date(),
+    updatedAt: new Date()
   },
   {
     id: "earth_sciences",
     name: "Науки о Земле",
     emoji: "🌍",
     colors: { lightColor: "#F2EBD3", darkColor: "#5D4037", accentColor: "#8E735B" },
+    createdAt: new Date(),
+    updatedAt: new Date()
   },
   {
     id: "medicine_health",
     name: "Медицина",
     emoji: "🩺",
     colors: { lightColor: "#FFDADA", darkColor: "#7B241C", accentColor: "#E74C3C" },
+    createdAt: new Date(),
+    updatedAt: new Date()
   },
   {
     id: "engineering_tech",
     name: "Технологии",
     emoji: "🛠️",
     colors: { lightColor: "#E5E8E8", darkColor: "#333333", accentColor: "#5D6D7E" },
+    createdAt: new Date(),
+    updatedAt: new Date()
   },
 
   {
@@ -55,30 +71,40 @@ export const ALL_CATEGORIES: Category[] = [
     name: "История",
     emoji: "🏺",
     colors: { lightColor: "#FDE8E8", darkColor: "#8B0000", accentColor: "#8B0000" },
+    createdAt: new Date(),
+    updatedAt: new Date()
   },
   {
     id: "social_studies_law",
     name: "Обществознание",
     emoji: "⚖️",
     colors: { lightColor: "#D6DBDF", darkColor: "#000000", accentColor: "#2C3E50" },
+    createdAt: new Date(),
+    updatedAt: new Date()
   },
   {
     id: "philology_languages",
     name: "Филология",
     emoji: "🗣️",
     colors: { lightColor: "#F3E5F5", darkColor: "#6C3483", accentColor: "#9966CC" },
+    createdAt: new Date(),
+    updatedAt: new Date()
   },
   {
     id: "psychology",
     name: "Психология",
     emoji: "🧠",
     colors: { lightColor: "#FFF3E0", darkColor: "#A0522D", accentColor: "#CBA135" },
+    createdAt: new Date(),
+    updatedAt: new Date()
   },
   {
     id: "philosophy_thinking",
     name: "Философия",
     emoji: "🤔",
     colors: { lightColor: "#EBDEF0", darkColor: "#5B2C6F", accentColor: "#6C3483" },
+    createdAt: new Date(),
+    updatedAt: new Date()
   },
 
   {
@@ -86,30 +112,40 @@ export const ALL_CATEGORIES: Category[] = [
     name: "Литература",
     emoji: "📚",
     colors: { lightColor: "#F9EBEA", darkColor: "#7B241C", accentColor: "#B03A2E" },
+    createdAt: new Date(),
+    updatedAt: new Date()
   },
   {
     id: "cinema_theatre",
     name: "Кино и театр",
     emoji: "🎭",
     colors: { lightColor: "#FFF2DC", darkColor: "#B9770E", accentColor: "#FFA500" },
+    createdAt: new Date(),
+    updatedAt: new Date()
   },
   {
     id: "art_design",
     name: "Искусство",
     emoji: "🎨",
     colors: { lightColor: "#FFE4F2", darkColor: "#C71585", accentColor: "#FF00CC" },
+    createdAt: new Date(),
+    updatedAt: new Date()
   },
   {
     id: "music_sound",
     name: "Музыка",
     emoji: "🎵",
     colors: { lightColor: "#EEDDF7", darkColor: "#C71585", accentColor: "#800080" },
+    createdAt: new Date(),
+    updatedAt: new Date()
   },
   {
     id: "photo_media_art",
     name: "Медиаискусство",
     emoji: "📷",
     colors: { lightColor: "#EAF2F8", darkColor: "#2C3E50", accentColor: "#333333" },
+    createdAt: new Date(),
+    updatedAt: new Date()
   },
 
   {
@@ -117,30 +153,40 @@ export const ALL_CATEGORIES: Category[] = [
     name: "Студенческая жизнь",
     emoji: "🎓",
     colors: { lightColor: "#F2FFD5", darkColor: "#154360", accentColor: "#2980B9" },
+    createdAt: new Date(),
+    updatedAt: new Date()
   },
   {
     id: "extracurricular",
     name: "Внеучебка",
     emoji: "🏃‍♂️",
     colors: { lightColor: "#FAFCD5", darkColor: "#3D3D00", accentColor: "#BFD200" },
+    createdAt: new Date(),
+    updatedAt: new Date()
   },
   {
     id: "projects_competitions",
     name: "Проекты и конкурсы",
     emoji: "🏆",
     colors: { lightColor: "#FFF5E1", darkColor: "#A0522D", accentColor: "#DAA520" },
+    createdAt: new Date(),
+    updatedAt: new Date()
   },
   {
     id: "career_guidance",
     name: "Карьера",
     emoji: "🧭",
     colors: { lightColor: "#F8F9F9", darkColor: "#2E4053", accentColor: "#7F8C8D" },
+    createdAt: new Date(),
+    updatedAt: new Date()
   },
   {
     id: "volunteering_internships",
     name: "Стажировки",
     emoji: "🤝",
     colors: { lightColor: "#D4EFDF", darkColor: "#117864", accentColor: "#117864" },
+    createdAt: new Date(),
+    updatedAt: new Date()
   },
 
   {
@@ -148,24 +194,32 @@ export const ALL_CATEGORIES: Category[] = [
     name: "AI",
     emoji: "🤖",
     colors: { lightColor: "#D6FFF7", darkColor: "#006666", accentColor: "#00C7B7" },
+    createdAt: new Date(),
+    updatedAt: new Date()
   },
   {
     id: "cybersecurity",
     name: "Кибербезопасность",
     emoji: "🛡️",
     colors: { lightColor: "#FADBD8", darkColor: "#922B21", accentColor: "#C0392B" },
+    createdAt: new Date(),
+    updatedAt: new Date()
   },
   {
     id: "games",
     name: "Игры",
     emoji: "🎮",
     colors: { lightColor: "#E8FFD9", darkColor: "#145A32", accentColor: "#00FF66" },
+    createdAt: new Date(),
+    updatedAt: new Date()
   },
   {
     id: "future_tech",
     name: "Технологии будущего",
     emoji: "🚀",
     colors: { lightColor: "#F5F5F5", darkColor: "#000000", accentColor: "#4B0082" },
+    createdAt: new Date(),
+    updatedAt: new Date()
   },
 
   {
@@ -173,18 +227,24 @@ export const ALL_CATEGORIES: Category[] = [
     name: "Интервью",
     emoji: "🎤",
     colors: { lightColor: "#E0F7F4", darkColor: "#00796B", accentColor: "#00B5AD" },
+    createdAt: new Date(),
+    updatedAt: new Date()
   },
   {
     id: "reportage",
     name: "Репортажи",
     emoji: "📰",
     colors: { lightColor: "#F3E5AB", darkColor: "#5D4037", accentColor: "#5D4037" },
+    createdAt: new Date(),
+    updatedAt: new Date()
   },
   {
     id: "alumni_stories",
     name: "Выпускники",
     emoji: "🎒",
     colors: { lightColor: "#ECF0F1", darkColor: "#2C3E50", accentColor: "#34495E" },
+    createdAt: new Date(),
+    updatedAt: new Date()
   },
 ]
 

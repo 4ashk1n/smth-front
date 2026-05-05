@@ -1,9 +1,8 @@
-import React, { Suspense, lazy, useEffect, useMemo, type ComponentType } from 'react';
+import React, { Suspense, lazy, useMemo, type ComponentType } from 'react';
 import type { IconBaseProps } from 'react-icons';
 
 
 
-// Маппинг библиотек иконок
 export const iconComponents: { [key: string]: () => Promise<any> } = {
   Ai: () => import('react-icons/ai'),
   Bs: () => import('react-icons/bs'),
@@ -35,7 +34,6 @@ export const iconComponents: { [key: string]: () => Promise<any> } = {
   Cg: () => import('react-icons/cg'),
 };
 
-// Тип для имен иконок (можно расширить по необходимости)
 export type IconName =
   | `Ai${string}`
   | `Bs${string}`
@@ -73,7 +71,6 @@ interface ReactIconProps extends IconBaseProps {
 }
 
 
-// Компонент для отображения ошибок
 const ErrorFallback: React.FC<{ iconName: string }> = ({ iconName }) => (
   <div style={{
     display: 'inline-flex',
@@ -100,7 +97,7 @@ const ReactIcon: React.FC<ReactIconProps> = ({
 
   useMemo(() => {
     const libraryPrefix = name.substring(0, 2) as keyof typeof iconComponents;
-    // console.log(name.substring(0, 2), libraryPrefix)
+
     const importFunction = iconComponents[libraryPrefix];
 
     if (!importFunction) {
@@ -125,11 +122,6 @@ const ReactIcon: React.FC<ReactIconProps> = ({
       console.warn(`Ошибка загрузки иконки "${name}":`, error);
     }
   }, [name]);
-
-  useEffect(() => {
-      // console.log(LazyIconComponent)
-  }, [LazyIconComponent])
-
 
   return (
     <Suspense fallback={loadingFallback}>

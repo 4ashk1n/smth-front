@@ -303,7 +303,6 @@ export class ContentStore {
     }
 
     setDragMode(dragMode: boolean) {
-        console.log(dragMode, "DRAG")
         if (!this.editMode) {
             this.dragMode = false;
             return
@@ -362,21 +361,17 @@ export class ContentStore {
 
     addEmptyPage(): PageModel | null {
         if (!this.editMode) return null
-        // TODO: Выбор топика (старый или новый)
         const newPageId = uuidv4()
         let prevTopic = this.getPageByOrder(this.pagesData.length - 1)?.topicId
-        console.log(prevTopic)
         if (!prevTopic || prevTopic === ContentStore.COVER_ID || prevTopic === '') {
             const newTopic = this.addNewTopic()
             if (!newTopic) return null
             prevTopic = newTopic.id
-            console.log(prevTopic)
         }
         const maxOrder = this.pagesData.reduce((max, page) => Math.max(max, page.order), 0)
         const newPage = new PageModel({ id: newPageId, topicId: prevTopic, order: maxOrder + 1 }, [])
         this.pages.set(newPageId, newPage)
         this.topics.get(prevTopic)?.pages.push(newPage)
-        console.log('ADD EMPTY PAGE', newPage, 'TO', prevTopic)
 
         return newPage
     }
@@ -495,11 +490,9 @@ export class ContentStore {
 
     changeLayout(layout: Layout[]) {
         if (!this.currentPage || !this.editMode) return
-        console.log(layout)
 
         this.currentPage.blocks.forEach((b) => {
             const blockLayout = layout.find(l => l.i === b.layout.i)
-            console.log(b.layout, blockLayout)
             if (!blockLayout) return
             this.editBlock({ ...b as ParagraphModel | ImageModel | IconModel, layout: blockLayout })
         })

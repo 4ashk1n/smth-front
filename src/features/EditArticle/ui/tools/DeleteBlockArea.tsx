@@ -7,14 +7,16 @@ const DeleteBlockArea: React.FC<{}> = observer(() => {
     const article = useArticleStore()
     const ref = useRef<HTMLDivElement>(null)
     const [active, setActive] = useState(false)
+    if (!article.content) return null
 
     useEffect(() => {
         if (!ref.current) return
+        if (!article.content) return
         if (!article.content.dragMode) return
         const pos = ref.current.getBoundingClientRect()
 
         setActive(!(
-            article.content.currentDragPos.x < pos.x || 
+            article.content.currentDragPos.x < pos.x ||
             article.content.currentDragPos.y < pos.y ||
             article.content.currentDragPos.x > pos.x + pos.width ||
             article.content.currentDragPos.y > pos.y + pos.height
@@ -22,6 +24,7 @@ const DeleteBlockArea: React.FC<{}> = observer(() => {
     }, [article.content.currentDragPos.x, article.content.currentDragPos.y, article.content.dragMode])
 
     useEffect(() => {
+        if (!article.content) return 
         if (!article.content.isDragging && active) {
             article.content.deleteBlock(article.content.currentBlockId)
             setActive(false)

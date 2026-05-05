@@ -1,9 +1,8 @@
 import { Stack, type FlexProps } from "@mantine/core";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import HighlitedBlock from "../../../../shared/ui/blocks/HighlitedBlock";
 
 import { observer } from "mobx-react";
-import { useDeviceType } from "../../../../shared/lib/useDeviceType";
 import type { CategoryColors } from "../../../category/types/category.types";
 import { useArticleStore } from "../../contexts/article.context";
 import type { Object3d } from "../../types/content.types";
@@ -16,15 +15,11 @@ type Object3dBlockProps = FlexProps & Object3d & CategoryColors & {
 const Object3dBlock: React.FC<Object3dBlockProps> = observer((props) => {
     const [tiltAngleX, setTiltAngleX] = useState(props.rotateX)
     const [tiltAngleY, setTiltAngleY] = useState(props.rotateY)
-    const [parallaxDepth, setParallaxDepth] = useState(props.translateZ)
-    const deviceType = useDeviceType();
+    const [_parallaxDepth, setParallaxDepth] = useState(props.translateZ)
 
     const article = useArticleStore()
-    const parallaxId = useMemo(() => 'parallax-' + article.id + '-' + Math.floor(Math.random() * 100000000), [article.id])
-
 
     useEffect(() => {
-        console.log('useEf')
         setTiltAngleX(props.rotateX)
         setTiltAngleY(props.rotateY)
         setParallaxDepth(props.translateZ)

@@ -13,7 +13,7 @@ const ProfilePage = observer(() => {
     const navigate = useNavigate();
     const params = useParams()
     const [user, setUser] = useState<UserModel | null>(null)
-    const [loading, setLoading] = useState(true)
+    const [_loading, setLoading] = useState(true)
     const users = useUsersStore()
 
     useEffect(() => {

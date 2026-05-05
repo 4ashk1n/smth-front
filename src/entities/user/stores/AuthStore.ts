@@ -101,7 +101,6 @@ export class AuthStore {
     }
 
     startGoogleOAuth(returnTo?: string) {
-        console.log(this.googleAuthUrl)
         const authUrl = new URL(this.googleAuthUrl);
         if (returnTo) {
             authUrl.searchParams.set("returnTo", returnTo);
@@ -156,7 +155,6 @@ export class AuthStore {
             const user = data.data;
             this.setUser(user);
             this.banned = false;
-            console.log(this.isAuthenticated ? "Authenticated" : "Not authenticated");
         } catch (error) {
             const apiError = error as ApiError;
             if (this.isBannedError(apiError)) {
@@ -291,7 +289,6 @@ export class AuthStore {
             }));
         } catch (error) {
             const apiError = error as ApiError;
-            console.log(apiError.status)
             if (apiError.status !== 401) {
                 throw error;
             }
@@ -311,7 +308,6 @@ export class AuthStore {
     }
 
     private async refreshAccessToken(): Promise<void> {
-        console.log("Refreshing access token");
         if (this.refreshRequest) {
             return this.refreshRequest;
         }

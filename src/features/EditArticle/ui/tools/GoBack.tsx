@@ -1,14 +1,12 @@
 import { Button, Modal, Stack } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import { PiArrowArcLeft } from "react-icons/pi"
-import { useNavigate } from "react-router"
 import { useArticleStore } from "../../../../entities/article/contexts/article.context"
 import DeleteDraftButton from "./DeleteDraftButton"
 import SaveDraftButton from "./SaveDraftButton"
 
 
 export const GoBackModal = () => {
-    const navigate = useNavigate()
     const article = useArticleStore()
     const [opened, { open, close }] = useDisclosure(false);
 

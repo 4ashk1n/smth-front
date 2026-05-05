@@ -1,8 +1,8 @@
 
 import type { API, BlockMutationEvent } from "@editorjs/editorjs";
+import ReactEditorJS from "@react-editor-js/client";
 import { observer } from "mobx-react";
 import { useEffect, useMemo } from "react";
-import { createReactEditorJS } from 'react-editor-js';
 import { useArticleStore } from "../../../../entities/article/contexts/article.context";
 import type { Paragraph } from "../../../../entities/article/types/content.types";
 import { EDITOR_JS_TOOLS } from "../../../../shared/config/editorjs.config";
@@ -12,7 +12,6 @@ const ParagraphBlockEdit: React.FC<{
     block: Paragraph
 }> = observer((props) => {
     const article = useArticleStore()
-    const ReactEditorJS = createReactEditorJS()
 
     const holderId = `${props.block.id}-editorjs`;
     const blockSuggestions = useMemo(
@@ -64,11 +63,11 @@ const ParagraphBlockEdit: React.FC<{
         }
     }
 
-    const handleChange = (api: API, event: BlockMutationEvent | BlockMutationEvent[]) => {
-        // console.log(api.blocks.)
+    const handleChange = (api: API, _event: BlockMutationEvent | BlockMutationEvent[]) => {
         checkOverflow()
         api.saver.save().then((outputData) => {
-            article.content.editBlock({ ...props.block, content: outputData })
+            if (!article.content) return null
+            article.content.editBlock({ ...props.block, content: outputData } as any);
         }).catch((error) => {
             console.log('Saving failed: ', error)
         });
@@ -85,7 +84,7 @@ const ParagraphBlockEdit: React.FC<{
             tools={EDITOR_JS_TOOLS}
             onChange={handleChange}
             onReady={checkOverflow}
-            defaultValue={props.block.content}
+            defaultValue={props.block.content as any}
         >
             <div style={{ position: "relative", width: "100%", height: "100%" }}>
                 <div

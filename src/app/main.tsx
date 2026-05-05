@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from 'react'
+import { createContext, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import CategoriesProvider from '../entities/category/contexts/categories.context.tsx'
 import AuthProvider from '../entities/user/contexts/auth.context.tsx'
@@ -13,12 +13,9 @@ export const GlobalContext = createContext<{
 })
 
 const AppContainer = () => {
-  const [scrollContainer, setScrollContainer] = useState<HTMLDivElement | undefined>(undefined)
-  useEffect(() => {
-    console.log(scrollContainer)
-  }, [scrollContainer])
+  const [_, setScrollContainer] = useState<HTMLDivElement | undefined>(undefined)
+
   return (
-    // <ParallaxProvider scrollAxis='horizontal'>
     <GlobalContext.Provider value={{ setScrollContainer }}>
       <CategoriesProvider>
         <UsersProvider>
@@ -28,7 +25,6 @@ const AppContainer = () => {
         </UsersProvider>
       </CategoriesProvider>
     </GlobalContext.Provider>
-    // </ParallaxProvider>
   )
 }
 
@@ -38,5 +34,3 @@ createRoot(document.getElementById('root')!).render(
   // </StrictMode>,
 )
 
-
-// test 3

@@ -59,7 +59,6 @@ const ProfileMetrics: React.FC<{
     }, [user])
 
     useEffect(() => {
-        console.log(user.metrics)
         setMetrics(user.metrics)
     }, [user.metrics.articles, user.metrics.followers, user.metrics.following])
 

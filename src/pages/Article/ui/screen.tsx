@@ -5,7 +5,6 @@ import ArticleBackground from "../../../entities/article/ui/ArticleContent/Artic
 import ArticleHeader from "../../../entities/article/ui/ArticleHeader"
 import PageSwipeContainer from "../../../features/ArticleNavigation/ui/PageSwipeContainer"
 import SlidingArticleContent from "../../../features/ArticleNavigation/ui/SlidingArticleContent"
-import TopicsList from "../../../features/ArticleNavigation/ui/TopicManager"
 import { useIsMobileScreen } from "../../../shared/lib/useIsMobile"
 import ResponsiveGridLayout from "../../../shared/ui/grids/ResponsiveGridLayout"
 import ArticleContent from "../../../widgets/ArticleContent"
@@ -15,8 +14,6 @@ const ArticleScreen = observer(() => {
 
     const article = useArticleStore()
     const isMobile = useIsMobileScreen()
-
-    console.log(article.content)
 
     return (<>
     
@@ -70,7 +67,7 @@ const ArticleScreen = observer(() => {
                         </div>
 
                         <div key="topics-list" data-grid={{ x: 4, y: 0, w: 1, h: 1, static: true }}>
-                            <TopicsList />
+                            {/* <TopicsList /> */}
                         </div>
                     </ResponsiveGridLayout>
                 </div>

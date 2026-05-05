@@ -5,7 +5,7 @@ import { PiBooks, PiEyes, PiHeart, PiShareFat } from "react-icons/pi";
 import { useAuthStore } from "../../../entities/user/contexts/auth.context";
 import type { ProfileTabs } from "../../../widgets/ProfileArticles/types/tabs.types";
 
-const Icons: Record<ProfileTabs, React.ReactNode> = {
+const Icons: Record<Exclude<ProfileTabs, 'saved'>, React.ReactNode> = {
     articles: <PiBooks size={24} />,
     reviews: <PiEyes size={24} />,
     likes: <PiHeart size={24} />,
@@ -37,7 +37,6 @@ const ProfileArticleTabs: React.FC<{
             <Tabs.List px={16} grow w='100%' ref={setRootRef} pos={'relative'}>
                 {
                     Object.keys(Icons).map((tab) => {
-                        console.log(auth)
                         if (!auth.user || !auth.isAuthenticated || auth.user.id !== userId) {
                             if (tab === 'reviews' || tab === 'likes' || tab === 'saved') {
                                 return null
@@ -60,7 +59,7 @@ const ProfileArticleTabs: React.FC<{
                                 }
                             }}
                         >
-                            {Icons[tab as ProfileTabs]}
+                            {Icons[tab as Exclude<ProfileTabs, 'saved'>]}
                         </Tabs.Tab>
                     )})
                 }

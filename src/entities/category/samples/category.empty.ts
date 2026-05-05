@@ -8,5 +8,7 @@ export const EMPTY_CATEGORY: Category = {
         accentColor: '#888888',
         darkColor: '#000000',
         lightColor: '#bbbbbb'
-    }
+    },
+    createdAt: new Date(),
+    updatedAt: new Date()
 }

@@ -20,3 +20,4 @@ export type Paragraph = SHARED_Paragraph;
 export type Image = SHARED_Image;
 export type Icon = SHARED_Icon;
 export type BlockUnion = Paragraph | Image | Icon;
+export type BlockLayout = SHARED_Block['layout'];

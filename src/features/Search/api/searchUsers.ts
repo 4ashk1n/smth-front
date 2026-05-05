@@ -1,4 +1,4 @@
-import { type SearchUsersResponse, type UserMeta } from "@smth/shared";
+import { type SearchUsersResponse } from "@smth/shared";
 import { apiRequest } from "../../../shared/api";
 
 export type SearchUsersPage = SearchUsersResponse["data"];

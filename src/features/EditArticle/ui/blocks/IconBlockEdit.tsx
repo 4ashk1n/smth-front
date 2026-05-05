@@ -23,7 +23,8 @@ const IconBlockEdit: React.FC<{
 
   const saveChanges = () => {
     if (props.block.name === block.name) return;
-    article.content.editBlock(block);
+    if (!article.content) return null
+    article.content.editBlock(block as any);
   };
 
   useEffect(() => {
@@ -31,6 +32,7 @@ const IconBlockEdit: React.FC<{
   }, [block.name]);
 
   useEffect(() => {
+    if (!article.content) return 
     if (opened && article.content.dragMode) article.content.setDragMode(false);
   }, [opened, article.content]);
 
@@ -46,7 +48,7 @@ const IconBlockEdit: React.FC<{
             borderRadius: "10px",
           }}
           onClick={() => {
-            if (!article.content.dragMode) open();
+            if (!article.content?.dragMode) open();
           }}
         >
           <svg width="1px" height="1px" style={{ visibility: "hidden" }}>

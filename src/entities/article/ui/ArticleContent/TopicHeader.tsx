@@ -7,6 +7,9 @@ const TopicHeader: React.FC<{
     topic?: Topic
 }> = observer(({topic}) => {
     const article = useArticleStore()
+    if (!article.content) {
+        return null;
+    }
     const topicToRender = topic ?? article.content.currentTopic ?? article.content.topicsData[0]
     return (
         // <Object3dBlock

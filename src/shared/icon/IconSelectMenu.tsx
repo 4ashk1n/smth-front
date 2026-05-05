@@ -15,7 +15,6 @@ import {
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import type { IconType } from "react-icons";
 import { FiFilter, FiSearch } from "react-icons/fi";
-import { ImHome } from "react-icons/im";
 import { iconComponents } from "./ReactIcon";
 
 // --- настройки ---
@@ -24,6 +23,10 @@ const LOAD_MORE_THRESHOLD_PX = 240;
 const FILTER_MENU_MAX_H = 260;
 
 type IconModule = Record<string, IconType>;
+
+const PlaceholderIcon: IconType = ({ size = 20, color = "white" }) => (
+  <span style={{ fontSize: size, color, lineHeight: 1 }}>◻</span>
+);
 
 const IconSelectMenuItem: React.FC<{
   name: string;
@@ -305,7 +308,7 @@ const IconSelectMenu: React.FC<
                   .map((_, idx) => (
                     <Grid.Col key={`sk-${idx}`} span={6}>
                       <Skeleton visible h="100%" w="100%" radius={10} opacity={0.2}>
-                        <IconSelectMenuItem icon={ImHome} name="loading" onClick={() => {}} />
+                            <IconSelectMenuItem icon={PlaceholderIcon} name="loading" onClick={() => {}} />
                       </Skeleton>
                     </Grid.Col>
                   ))}
@@ -331,7 +334,7 @@ const IconSelectMenu: React.FC<
                       .map((_, idx) => (
                         <Grid.Col key={`more-${idx}`} span={6}>
                           <Skeleton visible h="100%" w="100%" radius={10} opacity={0.12}>
-                            <IconSelectMenuItem icon={ImHome} name="..." onClick={() => {}} />
+                            <IconSelectMenuItem icon={PlaceholderIcon} name="..." onClick={() => {}} />
                           </Skeleton>
                         </Grid.Col>
                       ))}
@@ -356,61 +359,33 @@ const IconSelectMenu: React.FC<
 
 export default IconSelectMenu;
 
-import { AiOutlineHome } from "react-icons/ai";
-import { BiHome } from "react-icons/bi";
-import { BsHouse } from "react-icons/bs";
-import { CgHome } from "react-icons/cg";
-import { CiHome } from "react-icons/ci";
-import { DiTerminal } from "react-icons/di";
-import { FaHouse } from "react-icons/fa6";
-import { FcHome } from "react-icons/fc";
-import { FiHome } from "react-icons/fi";
-import { GiHouse } from "react-icons/gi";
-import { GoHome } from "react-icons/go";
-import { GrHome } from "react-icons/gr";
-import { HiHome } from "react-icons/hi2";
-import { IoHome } from "react-icons/io5";
-import { LiaHomeSolid } from "react-icons/lia";
-import { LuHouse } from "react-icons/lu";
-import { MdHome } from "react-icons/md";
-import { PiHouse } from "react-icons/pi";
-import { RiHome2Line } from "react-icons/ri";
-import { RxHome } from "react-icons/rx";
-import { SiTelegram } from "react-icons/si";
-import { SlHome } from "react-icons/sl";
-import { TbHome } from "react-icons/tb";
-import { TfiHome } from "react-icons/tfi";
-import { TiHome } from "react-icons/ti";
-import { VscHome } from "react-icons/vsc";
-import { WiDayRainMix } from "react-icons/wi";
-
 const libs: { [key: string]: { name: string; icon: IconType } } = {
-  Ai: { name: "Ant Design", icon: AiOutlineHome },
-  Bs: { name: "Bootstrap", icon: BsHouse },
-  Bi: { name: "BoxIcons", icon: BiHome },
-  Ci: { name: "Circum", icon: CiHome },
-  Di: { name: "Devicons", icon: DiTerminal },
-  Fi: { name: "Feather", icon: FiHome },
-  Fc: { name: "Flat Color", icon: FcHome },
-  Fa: { name: "Font Awesome 6", icon: FaHouse },
-  Gi: { name: "Game Icons", icon: GiHouse },
-  Go: { name: "GitHub Octicons", icon: GoHome },
-  Gr: { name: "Grommet", icon: GrHome },
-  Hi: { name: "Heroicons 2", icon: HiHome },
-  Im: { name: "IcoMoon", icon: ImHome },
-  Lia: { name: "Line Awesome", icon: LiaHomeSolid },
-  Io: { name: "Ionicons 5", icon: IoHome },
-  Lu: { name: "Lucide", icon: LuHouse },
-  Md: { name: "Material Design", icon: MdHome },
-  Pi: { name: "Phosphor", icon: PiHouse },
-  Rx: { name: "Radix", icon: RxHome },
-  Ri: { name: "Remix", icon: RiHome2Line },
-  Si: { name: "Simple", icon: SiTelegram },
-  Sl: { name: "Simple Line", icon: SlHome },
-  Tb: { name: "Tabler", icon: TbHome },
-  Tfi: { name: "Themify", icon: TfiHome },
-  Ti: { name: "Typicons", icon: TiHome },
-  Vsc: { name: "VS Code", icon: VscHome },
-  Wi: { name: "Weather", icon: WiDayRainMix },
-  Cg: { name: "css.gg", icon: CgHome },
+  Ai: { name: "Ant Design", icon: PlaceholderIcon },
+  Bs: { name: "Bootstrap", icon: PlaceholderIcon },
+  Bi: { name: "BoxIcons", icon: PlaceholderIcon },
+  Ci: { name: "Circum", icon: PlaceholderIcon },
+  Di: { name: "Devicons", icon: PlaceholderIcon },
+  Fi: { name: "Feather", icon: PlaceholderIcon },
+  Fc: { name: "Flat Color", icon: PlaceholderIcon },
+  Fa: { name: "Font Awesome 6", icon: PlaceholderIcon },
+  Gi: { name: "Game Icons", icon: PlaceholderIcon },
+  Go: { name: "GitHub Octicons", icon: PlaceholderIcon },
+  Gr: { name: "Grommet", icon: PlaceholderIcon },
+  Hi: { name: "Heroicons 2", icon: PlaceholderIcon },
+  Im: { name: "IcoMoon", icon: PlaceholderIcon },
+  Lia: { name: "Line Awesome", icon: PlaceholderIcon },
+  Io: { name: "Ionicons 5", icon: PlaceholderIcon },
+  Lu: { name: "Lucide", icon: PlaceholderIcon },
+  Md: { name: "Material Design", icon: PlaceholderIcon },
+  Pi: { name: "Phosphor", icon: PlaceholderIcon },
+  Rx: { name: "Radix", icon: PlaceholderIcon },
+  Ri: { name: "Remix", icon: PlaceholderIcon },
+  Si: { name: "Simple", icon: PlaceholderIcon },
+  Sl: { name: "Simple Line", icon: PlaceholderIcon },
+  Tb: { name: "Tabler", icon: PlaceholderIcon },
+  Tfi: { name: "Themify", icon: PlaceholderIcon },
+  Ti: { name: "Typicons", icon: PlaceholderIcon },
+  Vsc: { name: "VS Code", icon: PlaceholderIcon },
+  Wi: { name: "Weather", icon: PlaceholderIcon },
+  Cg: { name: "css.gg", icon: PlaceholderIcon },
 };
