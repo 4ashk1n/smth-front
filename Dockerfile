@@ -2,12 +2,15 @@
 
 WORKDIR /app
 
-COPY smth-front/package*.json ./smth-front/
 COPY smth-shared ./smth-shared
+WORKDIR /app/smth-shared
+RUN npm ci --ignore-scripts
+RUN npm run build
 
+WORKDIR /app
+COPY smth-front/package*.json ./smth-front/
 WORKDIR /app/smth-front
 RUN npm ci
-
 COPY smth-front ./
 
 ARG VITE_API_BASE_URL=http://localhost:3000/api
