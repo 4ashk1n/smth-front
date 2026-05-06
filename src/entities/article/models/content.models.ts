@@ -1,14 +1,18 @@
+import { makeAutoObservable } from "mobx";
 import type { Layout } from "react-grid-layout";
-import type { BlockBase, Icon, Image, Object3d, Page, Paragraph, Topic } from "../types/content.types";
+import type { Block as BlockBase, Icon, Image, Object3d, Page, Paragraph, Topic } from "../types/content.types";
 
 abstract class BlockBaseModel {
     id: string = '';
+    pageId: string = '';
     type: string = '';
     layout: Layout;
-    object3d?: Object3d;
+    object3d: Object3d | null = null;
+    
 
     constructor(block: BlockBase) {
         this.id = block.id;
+        this.pageId = block.pageId;
         this.type = block.type;
         this.layout = block.layout;
         this.object3d = block.object3d;
@@ -17,6 +21,7 @@ abstract class BlockBaseModel {
     static get empty(): BlockBaseModel {
         return {
             id: '',
+            pageId: '',
             type: '',
             layout: {
                 x: 0,
@@ -25,18 +30,20 @@ abstract class BlockBaseModel {
                 h: 1,
                 i: ''
             },
-            object3d: undefined
+            object3d: null
         }
     }
 }
 
 export class ParagraphModel extends BlockBaseModel {
     type: 'paragraph' = 'paragraph';
-    content: string = '';
+    content: {
+        blocks: any[];
+    };
 
     constructor(paragraph: Paragraph) {
         super(paragraph);
-        this.content = paragraph.content;
+        this.content = JSON.parse(paragraph.content);
     }
 
     static get empty(): Paragraph {
@@ -69,9 +76,9 @@ export class IconModel extends BlockBaseModel {
 export class ImageModel extends BlockBaseModel {
     type: 'image' = 'image';
     url: string = '';
-    source?: string;
-    sourceUrl?: string;
-    label?: string;
+    source: string | null = null;
+    sourceUrl: string | null = null;
+    label: string | null = null;
 
     constructor(image: Image) {
         super(image);
@@ -95,46 +102,41 @@ export class ImageModel extends BlockBaseModel {
 
 export class PageModel {
     id: string = '';
-    blocks: BlockBaseModel[] = [];
     topicId: string = '';
     order: number = 0;
+    blocks: BlockBaseModel[] = [];
 
-    constructor(page: Page) {
+    constructor(page: Page, blocks: BlockBaseModel[]) {
         this.id = page.id;
-        this.blocks = page.blocks.map(b => {
-            switch (b.type) {
-                case 'paragraph':
-                    return new ParagraphModel(b);
-                case 'icon':
-                    return new IconModel(b);
-                case 'image':
-                    return new ImageModel(b);
-            }
-        });
         this.topicId = page.topicId;
         this.order = page.order;
+        this.blocks = blocks.filter(b => b.pageId === page.id);
+        makeAutoObservable(this, {}, { autoBind: true });
     }
 
-    static get empty(): Page {
+    static get empty(): PageModel {
         return {
             id: '',
-            blocks: [],
             topicId: '',
             order: 0,
+            blocks: []
         }
     }
 }
 
 export class TopicModel {
     id: string = '';
-    pages: PageModel[] = [];
     order: number = 0;
     title: string = '';
+    articleId: string = '';
+    pages: PageModel[] = [];
 
-    constructor(topic: Topic) {
+    constructor(topic: Topic, pages: PageModel[]) {
         this.id = topic.id;
-        this.pages = topic.pages.map(p => new PageModel(p));
         this.order = topic.order;
         this.title = topic.title;
+        this.articleId = topic.articleId;
+        this.pages = pages.filter(p => p.topicId === topic.id);
+        makeAutoObservable(this, {}, { autoBind: true });
     }
 }

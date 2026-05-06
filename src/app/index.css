@@ -62,10 +62,19 @@
   letter-spacing: 0.01em;
 }
 
-/* .react-resizable-handle{
+.react-resizable-handle::after{
   z-index: 9999;
-  background-color: red;
-  border-radius: 10px 0 0 0;
+  border-color: red!important;
+  width: 10px!important;
+  height: 10px!important;
+  border-radius: 0 0 5px 0;
+  right: -5px!important;
+  bottom: -5px!important;
+
+}
+/* 
+.react-resizable-handle::after {
+  visibility: hidden!importa;
 } */
 
 body {

@@ -1,17 +1,31 @@
 import { Text } from "@mantine/core"
-import Markdown from "react-markdown"
+import { observer } from "mobx-react"
+import { useIsMobileScreen } from "../../../../shared/lib/useIsMobile"
 import { useArticleStore } from "../../contexts/article.context"
 import type { Paragraph } from "../../types/content.types"
-import HighlitedBlock from "../../../../shared/ui/blocks/HighlitedBlock"
 import Object3dBlock from "./Object3dBlock"
-import { useIsMobileScreen } from "../../../../shared/lib/useIsMobile"
 
 
-const ParagraphBlock: React.FC<{ block: Paragraph }> = (props) => {
+const ParagraphBlock: React.FC<{ block: Paragraph }> = observer((props) => {
     const { mainCategory } = useArticleStore()
     const isMobile = useIsMobileScreen()
 
+    // const ReactEditorJS = createReactEditorJS()
+    // const contentKey = (() => {
+    //     try {
+    //         return JSON.stringify(props.block.content ?? {})
+    //     } catch {
+    //         return String(props.block.content)
+    //     }
+    // })()
+
     const Paragraph2d = () => (<>
+        {/* <ReactEditorJS
+            key={contentKey}
+            holder={`${props.block.id}-editorjs`}
+            readOnly={true}
+            defaultValue={props.block.content}
+        /> */}
         <Text
             fz={isMobile ? 14 : 16}
             lh={isMobile ? '16px' : '18px'}
@@ -25,7 +39,7 @@ const ParagraphBlock: React.FC<{ block: Paragraph }> = (props) => {
                 textShadow: '0 4px 4px rgba(0, 0, 0, 0.25)' 
             }}
         >
-            <Markdown remarkRehypeOptions={{}}>{props.block.content}</Markdown>
+            {(props.block.content as any).blocks.map((block: any) => block.data.text).join('\n')}
         </Text>
     </>)
 
@@ -38,6 +52,6 @@ const ParagraphBlock: React.FC<{ block: Paragraph }> = (props) => {
                 : <Paragraph2d />
         }
     </>)
-}
+})
 
 export default ParagraphBlock

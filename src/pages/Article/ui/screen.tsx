@@ -1,16 +1,14 @@
 import { Stack } from "@mantine/core"
+import { observer } from "mobx-react"
+import { useArticleStore } from "../../../entities/article/contexts/article.context"
 import ArticleBackground from "../../../entities/article/ui/ArticleContent/ArticleBackground"
 import ArticleHeader from "../../../entities/article/ui/ArticleHeader"
 import PageSwipeContainer from "../../../features/ArticleNavigation/ui/PageSwipeContainer"
 import SlidingArticleContent from "../../../features/ArticleNavigation/ui/SlidingArticleContent"
-import TopicsList from "../../../features/ArticleNavigation/ui/TopicManager"
+import { useIsMobileScreen } from "../../../shared/lib/useIsMobile"
 import ResponsiveGridLayout from "../../../shared/ui/grids/ResponsiveGridLayout"
 import ArticleContent from "../../../widgets/ArticleContent"
 import ArticleOverlay from "../../../widgets/ArticleOverlay/ui"
-import { useIsMobileScreen } from "../../../shared/lib/useIsMobile"
-import { observer } from "mobx-react-lite"
-import { useArticleStore } from "../../../entities/article/contexts/article.context"
-import { ParallaxProvider } from "react-scroll-parallax"
 
 const ArticleScreen = observer(() => {
 
@@ -69,7 +67,7 @@ const ArticleScreen = observer(() => {
                         </div>
 
                         <div key="topics-list" data-grid={{ x: 4, y: 0, w: 1, h: 1, static: true }}>
-                            <TopicsList />
+                            {/* <TopicsList /> */}
                         </div>
                     </ResponsiveGridLayout>
                 </div>

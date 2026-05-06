@@ -1,17 +1,21 @@
-import ImageBlock from "../../entities/article/ui/ArticleContent/ImageBlock";
 import IconBlock from "../../entities/article/ui/ArticleContent/IconBlock";
+import ImageBlock from "../../entities/article/ui/ArticleContent/ImageBlock";
 
-import { useArticleStore } from "../../entities/article/contexts/article.context";
-import type { Block, Icon, Image, Page, Paragraph } from "../../entities/article/types/content.types";
-import { useIsMobileScreen } from "../../shared/lib/useIsMobile";
-import ParagraphBlock from "../../entities/article/ui/ArticleContent/ParagraphBlock";
-import { observer } from "mobx-react-lite";
-import { useEffect } from "react";
+import { motion } from "framer-motion";
+import { observer } from "mobx-react";
 import { type Layout } from "react-grid-layout";
-import ResponsiveGridLayout from "../../shared/ui/grids/ResponsiveGridLayout";
+import { useArticleStore } from "../../entities/article/contexts/article.context";
+import type { PageModel } from "../../entities/article/models/content.models";
+import type { Block, Icon, Image, Paragraph } from "../../entities/article/types/content.types";
+import ParagraphBlock from "../../entities/article/ui/ArticleContent/ParagraphBlock";
 import TopicHeader from "../../entities/article/ui/ArticleContent/TopicHeader";
-import PageManager from "../../features/ArticleNavigation/ui/PageManager";
-import ArticleCover from "../../entities/article/ui/ArticleContent/ArticleCover";
+import IconBlockEdit from "../../features/EditArticle/ui/blocks/IconBlockEdit";
+import ImageBlockEdit from "../../features/EditArticle/ui/blocks/ImageBlockEdit";
+import ParagraphBlockEdit from "../../features/EditArticle/ui/blocks/ParagraphBlockEdit";
+import EditTopicHeader from "../../features/EditArticle/ui/content/EditTopicHeader";
+import ResizeHandle from "../../features/EditArticle/ui/tools/ResizeHandle";
+import ResponsiveGridLayout from "../../shared/ui/grids/ResponsiveGridLayout";
+import ArticleCover from "./ArticleCover";
 
 
 export const ArticleBlock = ({ block }: { block: Block }) => {
@@ -28,9 +32,52 @@ export const ArticleBlock = ({ block }: { block: Block }) => {
     </>)
 }
 
-const ArticleContent: React.FC<{ page?: Page }> = observer(({ page }) => {
+const ArticleEditBlock = ({ block }: { block: Block }) => {
     const article = useArticleStore();
-    const isMobile = useIsMobileScreen();
+    if (!article.content) return null
+
+    return (
+        <motion.div
+            animate={article.content.dragMode ? {
+                x: [0, -1, 1, -1, 1, -1, 1, -1, 0].map(a => a * .5),
+                rotate: [0, -1, 1, -1, 1, -1, 1, -1, 0].map(a => a * .5),
+                transition: {
+                    duration: 0.5,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                }
+            } : {
+                x: 0,
+                rotate: 0
+            }}
+            style={{
+                height: '100%',
+                width: '100%',
+                pointerEvents: 'auto', // Важно для работы drag&drop
+                // position: 'relative'
+            }}
+        >
+            {
+                block.type === 'paragraph' ?
+                    <ParagraphBlockEdit block={block as Paragraph} /> :
+                    block.type === 'image' ?
+                        <ImageBlockEdit block={block as Image} /> :
+                        block.type === 'icon' ?
+                            <IconBlockEdit block={block as Icon} /> :
+                            <></>
+            }
+
+            {/* {
+                article.content.dragMode ? 
+                    <ResizeHandle /> : <></>
+            } */}
+        </motion.div>
+    );
+}
+
+const ArticleContent: React.FC<{ page?: PageModel }> = observer(({ page }) => {
+    const article = useArticleStore();
+    if (!article.content) return null
 
     const pageToRender = page ?? article.content.currentPage;
     if (!pageToRender) return null;
@@ -40,7 +87,9 @@ const ArticleContent: React.FC<{ page?: Page }> = observer(({ page }) => {
         article.content.topics.get(pageToRender.topicId) ??
         article.content.currentTopic;
 
-    if (topic?.id === 'cover') return <ArticleCover />
+
+
+    if (page?.id === 'cover') return <ArticleCover />
 
 
     return (<>
@@ -48,32 +97,79 @@ const ArticleContent: React.FC<{ page?: Page }> = observer(({ page }) => {
             className="layout"
             key={'RGL-' + article.id}
             cols={{ lg: 2, md: 2, sm: 2, xs: 2, xxs: 2 }}
-            rowHeight={isMobile ? 80 : 180}
-            compactType={null}
+            rowHeight={80}
+            compactType={'vertical'}
             containerPadding={{ lg: [0, 0], md: [0, 0], sm: [0, 0], xs: [0, 0] }}
-            maxRows={4}
+            maxRows={8}
             margin={{ lg: [36, 18], md: [36, 18], sm: [16, 16], xs: [16, 16], xxs: [16, 16] }}
+            onLayoutChange={(currentLayout, _) => {
+                if (!article.content) return null; article.content.changeLayout(currentLayout)
+            }}
+            resizeHandle={<ResizeHandle hidden={!article.editMode || !article.content.dragMode} />}
+            autoSize={false}
+            onDrag={(_, blockLayout, __, ___, event: MouseEvent) => {
+                if (!article.content) return null
+                article.content.setCurrentBlock(blockLayout.i);
+                article.content.setIsDragging(true);
+                article.content.setCurrentDragPos(event.clientX, event.clientY)
+            }}
+            useCSSTransforms={false}
+            onDragStop={() => {
+                if (!article.content) return null; article.content.setIsDragging(false)
+            }}
+
+        // resizeHandle={
+        //     <div
+        //         style={{
+        //             // position: 'absolute',
+        //             // bottom: 0,
+        //             // right: 0,
+        //             width: 16,
+        //             height: 16,
+        //             background: 'black',
+        //             zIndex: 99999
+        //         }}
+
+        //         // ref={ref}
+        //         // className={`resizeHandle handle-${handleAxis}`}
+        //         // {...restProps}
+        //     >
+        //         {/* <PiArrowsOutSimple style={{
+        //         rotate: '90deg',
+        //     }} /> */}
+        //     </div>
+        // }
         >
-            <div key='topic-header' data-grid={{ x: 0, y: 0, w: 2, h: 1, static: true }}>
-                <TopicHeader topic={topic} />
+            <div key='topic-header' data-grid={{ x: 0, y: 0, w: 2, h: 1, static: true, resizeHandles: [] }}>
+                {
+                    article.editMode ? <EditTopicHeader topic={topic} /> : <TopicHeader topic={topic} />
+                }
             </div>
 
             {
-                blocks.map((block, i) =>
-                    <div key={`${i}`}
+                blocks.map((block) =>
+                    <div key={`${block.layout.i}`}
                         data-grid={{
                             x: block.layout.x,
-                            y: block.layout.y + block.layout.y * (isMobile ? 1 : 0) - 1 * (isMobile ? 1 : 0),
+                            y: block.layout.y,
                             w: block.layout.w,
-                            h: block.layout.h + block.layout.h * (isMobile ? 1 : 0),
+                            h: block.layout.h,
                             maxW: 2,
                             minW: 1,
-                            maxH: 4,
-                            minH: 1,
-                            static: true
+                            maxH: 7,
+                            minH: 2,
+                            static: !article.content?.dragMode
                         } as Layout}
-                        style={{ height: 'fit-content' }}>
-                        <ArticleBlock block={block} />
+                        style={{ height: 'fit-content' }}
+
+                    >
+
+                        {
+                            article.editMode ?
+                                <ArticleEditBlock block={block} /> :
+                                <ArticleBlock block={block} />
+                        }
+
                     </div>
                 )
             }

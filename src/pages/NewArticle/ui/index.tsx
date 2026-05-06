@@ -1,31 +1,74 @@
-// import { Stack } from "@mantine/core"
-// import ArticleHeader from "../../../widgets/ArticleHeader/ui"
-// import { useEffect } from "react"
-// import { ArticleFullEmpty } from "../../../entities/article/types/ArticleFullEmpty"
-// import EditArticleContent from "../../../features/EditArticle/ui/EditArticleContent"
-// import { ArticleContext, articleStore } from "../../../features/stores/ArticleStore"
-// import EditArticleHeader from "../../../features/EditArticle/ui/header/EditArticleHeader"
-// import ArticleBackground from "../../../widgets/ArticleContent/ui/ArticleBackground"
+﻿import { observer } from "mobx-react";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router";
+import ArticleStoreProvider from "../../../entities/article/contexts/article.context";
+import { ArticleModel } from "../../../entities/article/models/article.model";
+import { useCategoriesStore } from "../../../entities/category/contexts/categories.context";
+import { useAuthStore } from "../../../entities/user/contexts/auth.context";
+import { getArticleById } from "../../../features/EditArticle/api/getArticleById";
+import { getReviewRemarksSuggestions } from "../../../features/EditArticle/api/getReviewRemarksSuggestions";
+import ArticleScreen from "../../Article/ui/screen";
 
-const NewArticlePage = () => {
-    // useEffect(() => {
-    //     articleStore.setArticle(ArticleFullEmpty)
-    // }, [])
+const NewArticlePage = observer(() => {
+  const auth = useAuthStore();
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const categories = useCategoriesStore();
+  const [article, setArticle] = useState<ArticleModel | null>(null);
 
-    // return (<>
-    //     <ArticleContext.Provider value={articleStore} >
-    //         <Stack align="center" w='100%' mih='100vh'>
-    //             <ArticleBackground />
-    //             <Stack maw={'1280px'} w='90%'>
-    //                 <EditArticleHeader />
-    //                 {/* <ArticleContent editMode article={draft as ArticleFull} /> */}
-    //                 <EditArticleContent />
-    //             </Stack>
-    //         </Stack>
-    //     </ArticleContext.Provider>
-    // </>)
+  useEffect(() => {
+    if (auth.isBanned) {
+      navigate("/banned");
+      return;
+    }
+    if (!auth.isAuthenticated) {
+      navigate("/auth");
+      return;
+    }
+  }, [auth.isAuthenticated, auth.isBanned, navigate]);
 
-    return <></>
-}
+  useEffect(() => {
+    if (!id) return;
 
-export default NewArticlePage
+    let cancelled = false;
+    const articleModel = new ArticleModel(categories);
+
+    getArticleById(id)
+      .then(async (articleDTO) => {
+        if (cancelled) return;
+        articleModel.fromDTO(articleDTO);
+
+        if (!cancelled) {
+          setArticle(articleModel);
+        }
+
+        try {
+          const remarks = await getReviewRemarksSuggestions(articleDTO.id);
+          if (!cancelled) {
+            articleModel.setAISuggestions(remarks.suggestions);
+          }
+        } catch (error) {
+          console.error("Failed to load moderation remarks", error);
+        }
+      })
+      .catch((error) => {
+        console.error("Failed to load article", error);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id, categories]);
+
+  if (!article) return null;
+
+  return (
+    <>
+      <ArticleStoreProvider article={article} editMode>
+        <ArticleScreen />
+      </ArticleStoreProvider>
+    </>
+  );
+});
+
+export default NewArticlePage;

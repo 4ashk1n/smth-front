@@ -2,14 +2,20 @@ import { Stack, Text, Title } from "@mantine/core";
 import type { CategoryColors } from "../../../category/types/category.types";
 import { useArticleStore } from "../../contexts/article.context";
 import UserPill from "../../../user/ui/UserPill";
-import { observer } from "mobx-react-lite";
+import { observer } from "mobx-react";
 import HighlitedBlock from "../../../../shared/ui/blocks/HighlitedBlock";
 import { useIsMobileScreen } from "../../../../shared/lib/useIsMobile";
+import { useUsersStore } from "../../../user/contexts/users.context";
+import { useAuthStore } from "../../../user/contexts/auth.context";
 
 
 const ArticleHeader: React.FC<{}> = observer(() => {
     const article = useArticleStore()
+    const users = useUsersStore()
+    const auth = useAuthStore()
     const isMobile = useIsMobileScreen()
+    const author = users.getById(article.authorId)?.toJSON()
+        ?? (auth.user?.id === article.authorId ? auth.user : null)
 
     return (<>
         {
@@ -101,7 +107,7 @@ const ArticleHeader: React.FC<{}> = observer(() => {
                         </Stack>
 
                     </Stack>
-                    <UserPill size="md" user={article.author} />
+                    <UserPill size="md" user={author} />
                 </HighlitedBlock>
         }
     </>)

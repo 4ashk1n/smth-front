@@ -1,5 +1,5 @@
 import { motion, useTransform, type MotionValue } from "framer-motion"
-import { observer } from "mobx-react-lite"
+import { observer } from "mobx-react"
 
 interface SlidingFeedContentProps {
     swipeY: MotionValue<number>

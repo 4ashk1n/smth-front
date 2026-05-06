@@ -1,29 +1,46 @@
-import { Stack, Grid } from "@mantine/core"
+import { useEffect, useState } from "react"
+import { useParams } from "react-router"
 import ArticleStoreProvider from "../../../entities/article/contexts/article.context"
-import { ARTICLE_DTO_SAMPLE } from "../../../entities/article/samples/article.sample"
-import ArticleContent from "../../../widgets/ArticleContent"
-import ArticleBackground from "../../../entities/article/ui/ArticleContent/ArticleBackground"
-import ArticleHeader from "../../../entities/article/ui/ArticleHeader"
-import ReactGridLayout from "react-grid-layout"
-import ResponsiveGridLayout from "../../../shared/ui/grids/ResponsiveGridLayout"
-import TopicsList from "../../../features/ArticleNavigation/ui/TopicManager"
-import { useIsMobileScreen } from "../../../shared/lib/useIsMobile"
-import ArticleOverlay from "../../../widgets/ArticleOverlay/ui"
-import PageSwipeContainer from "../../../features/ArticleNavigation/ui/PageSwipeContainer"
-import SlidingArticleContent from "../../../features/ArticleNavigation/ui/SlidingArticleContent"
-import ArticleContentWithPreload from "../../../features/ArticleNavigation/ui/ArticleContentWithPreload"
+import { ArticleModel } from "../../../entities/article/models/article.model"
+import { useCategoriesStore } from "../../../entities/category/contexts/categories.context"
+import { getArticleById } from "../../../features/EditArticle/api/getArticleById"
 import ArticleScreen from "./screen"
 
 const ArticlePage = () => {
-    const isMobile = useIsMobileScreen()
+    const { id } = useParams()
+    const categories = useCategoriesStore()
+    const [article, setArticle] = useState<ArticleModel | null>(null)
+
+    useEffect(() => {
+        if (!id) return
+
+        let cancelled = false
+        const articleModel = new ArticleModel(categories)
+
+        getArticleById(id)
+            .then((articleDTO) => {
+                if (cancelled) return
+                articleModel.fromDTO(articleDTO)
+                setArticle(articleModel)
+            })
+            .catch((error) => {
+                console.error("Failed to load article", error)
+                if (cancelled) return
+                setArticle(null)
+            })
+
+        return () => {
+            cancelled = true
+        }
+    }, [id, categories])
+
+    if (!article) return null
 
     return (
-        <>
-            <ArticleStoreProvider article={ARTICLE_DTO_SAMPLE}>
-                <ArticleScreen />
-            </ArticleStoreProvider>
-
-        </>)
+        <ArticleStoreProvider article={article}>
+            <ArticleScreen />
+        </ArticleStoreProvider>
+    )
 }
 
 export default ArticlePage

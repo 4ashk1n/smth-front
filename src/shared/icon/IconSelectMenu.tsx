@@ -1,299 +1,391 @@
-import { lazy, useEffect, useRef, useState, type ComponentType } from "react"
-import { Alert, Grid, ScrollArea, Skeleton, Stack, Text, TextInput, type StackProps } from "@mantine/core"
-import { FiHome, FiSearch } from "react-icons/fi"
-import type { IconType } from "react-icons"
-import { AiOutlineHome } from "react-icons/ai"
-import { BsHouse } from "react-icons/bs"
-import { BiHome } from "react-icons/bi"
-import { CiHome } from "react-icons/ci"
-import { DiTerminal } from "react-icons/di"
-import { FcHome } from "react-icons/fc"
-import { FaHouse } from "react-icons/fa6"
-import { GiHouse } from "react-icons/gi"
-import { GoHome } from "react-icons/go"
-import { GrHome } from "react-icons/gr"
-import { HiHome } from "react-icons/hi2"
-import { ImHome } from "react-icons/im"
-import { LiaHomeSolid } from "react-icons/lia"
-import { IoAlertSharp, IoHome } from "react-icons/io5"
-import { LuHouse } from "react-icons/lu"
-import { MdHome } from "react-icons/md"
-import { PiHouse } from "react-icons/pi"
-import { RxHome } from "react-icons/rx"
-import { RiHome2Line } from "react-icons/ri"
-import { SiTelegram } from "react-icons/si"
-import { SlHome } from "react-icons/sl"
-import { TbHome } from "react-icons/tb"
-import { TfiHome } from "react-icons/tfi"
-import { TiHome } from "react-icons/ti"
-import { VscHome } from "react-icons/vsc"
-import { WiDayRainMix } from "react-icons/wi"
-import { CgHome } from "react-icons/cg"
-import { iconComponents } from "./ReactIcon"
+import {
+    ActionIcon,
+    Alert,
+    Checkbox,
+    Grid,
+    Group,
+    Popover,
+    ScrollArea,
+    Skeleton,
+    Stack,
+    Text,
+    TextInput,
+    type StackProps,
+} from "@mantine/core";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import type { IconType } from "react-icons";
+import { FiFilter, FiSearch } from "react-icons/fi";
+import { iconComponents } from "./ReactIcon";
 
+// --- настройки ---
+const LIMIT = 60;
+const LOAD_MORE_THRESHOLD_PX = 240;
+const FILTER_MENU_MAX_H = 260;
+
+type IconModule = Record<string, IconType>;
+
+const PlaceholderIcon: IconType = ({ size = 20, color = "white" }) => (
+  <span style={{ fontSize: size, color, lineHeight: 1 }}>◻</span>
+);
 
 const IconSelectMenuItem: React.FC<{
-    name: string,
-    icon: IconType,
-    onClick: () => void,
-    isLib?: boolean
-}> = (props) => {
-    return (
-        <Stack
-            gap={5}
-            p={10}
-            style={{ borderRadius: '10px', cursor: 'pointer' }}
-            bg={'#00000080'}
-            align="center"
-            justify="center"
-            h={'100%'}
-            onClick={() => props.onClick()}
-        >
-            <props.icon color="white" size={20} />
-            <Text style={{ textAlign: 'center' }} lh={1} c='#ffffff80' size="sm">{props.name}</Text>
-        </Stack>
-    )
-}
+  name: string;
+  icon: IconType;
+  onClick: () => void;
+}> = ({ name, icon: Icon, onClick }) => {
+  return (
+    <Stack
+      gap={5}
+      p={10}
+      style={{ borderRadius: "10px", cursor: "pointer" }}
+      bg={"#00000080"}
+      align="center"
+      justify="center"
+      h={"100%"}
+      onClick={onClick}
+    >
+      <Icon color="white" size={20} />
+      <Text style={{ textAlign: "center" }} lh={1} c="#ffffff80" size="12px">
+        {name}
+      </Text>
+    </Stack>
+  );
+};
 
-const LIMIT = 50
+function useDebouncedValue<T>(value: T, delay = 250) {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const t = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(t);
+  }, [value, delay]);
+  return debounced;
+}
 
 const IconSelectMenu: React.FC<
-    StackProps & {
-        setIcon: (icon: string) => void
-    }
+  StackProps & {
+    setIcon: (icon: string) => void;
+    color?: string;
+  }
 > = (props) => {
-    const [icon, setIcon] = useState('')
-    const [currentLibName, setCurrentLibName] = useState('')
-    const [currentLib, setCurrentLib] = useState<any>({})
-    const [offset, setOffset] = useState(0)
-    const [keys, setKeys] = useState<string[]>([])
-    const [items, setItems] = useState<{ name: string, icon: IconType }[]>([])
-    const search = useRef<HTMLInputElement>(null)
-    const [query, setQuery] = useState('')
-    // const [scrollPosition, onScrollPositionChange] = useState({ x: 0, y: 0 });
-    const ref = useRef<HTMLDivElement>(null)
-    const [loading, setLoading] = useState(false)
+  const [query, setQuery] = useState("");
+  const debouncedQuery = useDebouncedValue(query, 250);
 
-    const [loadedContent, setLoadedContent] = useState<any>(null)
+  const [filtersOpened, setFiltersOpened] = useState(false);
+  const [selectedLibs, setSelectedLibs] = useState<string[]>([]);
 
-    useEffect(() => {
-        if (currentLibName) {
-            setLoading(true)
-            const items = lazy(async () => {
-                const module = await iconComponents[currentLibName]();
-                return { default: <>{Object.keys(module).map(k => <Grid.Col span={6}><IconSelectMenuItem onClick={() => setIcon(k)} name={k} icon={module[k]} /></Grid.Col>)}</> } as any;
-            })
-            setLoadedContent(items)
-        }
-    }, [currentLibName])
+  const [modules, setModules] = useState<Record<string, IconModule | null>>({});
+  const [loadingLibs, setLoadingLibs] = useState<Record<string, boolean>>({});
 
-    useEffect(() => {
-        setLoading(false)
-    }, [loadedContent])
+  const [visibleCount, setVisibleCount] = useState(LIMIT);
+  const viewportRef = useRef<HTMLDivElement | null>(null);
 
-    useEffect(() => {
-        // console.log(loading)
-    }, [loading])
+  const shouldShowResults = debouncedQuery.trim().length > 0 || selectedLibs.length > 0;
 
-    useEffect(() => {
-        if (icon) {
-            props.setIcon(icon)
-        }
-    }, [icon])
+  const effectiveLibs = useMemo(() => {
+    if (!shouldShowResults) return [];
+    return selectedLibs.length > 0 ? selectedLibs : Object.keys(libs);
+  }, [selectedLibs, shouldShowResults]);
 
-    // useEffect(() => {
-    //     if (keys.length > 0 && currentLib) {
-    //         // console.log(offset)
-    //         setItems([...items, ...keys.slice(offset, offset + LIMIT).map(k => ({ name: k, icon: currentLib[k] }))])
-    //     }
-    // }, [keys, currentLib, offset])
+  useEffect(() => {
+    setVisibleCount(LIMIT);
+    const el = viewportRef.current;
+    if (el) el.scrollTop = 0;
+  }, [debouncedQuery, selectedLibs.join("|")]);
 
-    // useEffect(() => {
-    //     // console.log(ref.current?.clientHeight, scrollPosition.y)
-    //     if ( ref.current?.clientHeight && ref.current.clientHeight - scrollPosition.y < 250 ) {
-    //         setOffset(offset + LIMIT)
-    //     }
-    // }, [scrollPosition])
+  useEffect(() => {
+    let cancelled = false;
 
-    return (
-        <Stack p={20} gap={10} align="center" bg='#00000080' style={{ borderRadius: '10px', ...props.style }} {...props}>
-            <Text fz={24} fw={700} c='#ffffff80'>Иконки {currentLibName && libs[currentLibName].name}</Text>
-            <Alert mih={'fit-content'} variant="light" title={'Поиск на английском'} color='#ffffff' w='100%' p={10} style={{ borderRadius: '10px' }} icon={<IoAlertSharp size={20} />}>
-                <Text c='#ffffff80'>
-                    В данный момент поиск работает только на английском языке. Например: "home", "telegram", "cat"
+    async function loadLib(libKey: string) {
+      if (modules[libKey] !== undefined) return; 
+      setModules((p) => ({ ...p, [libKey]: null }));
+      setLoadingLibs((p) => ({ ...p, [libKey]: true }));
+
+      try {
+        const loader = iconComponents[libKey];
+        const mod = loader ? ((await loader()) as IconModule) : ({} as IconModule);
+
+        if (cancelled) return;
+        setModules((p) => ({ ...p, [libKey]: mod }));
+      } finally {
+        if (cancelled) return;
+        setLoadingLibs((p) => ({ ...p, [libKey]: false }));
+      }
+    }
+
+    if (!shouldShowResults) return;
+
+    effectiveLibs.forEach((k) => void loadLib(k));
+
+    return () => {
+      cancelled = true;
+    };
+  }, [effectiveLibs.join("|"), shouldShowResults]);
+
+  const allFilteredItems = useMemo(() => {
+    if (!shouldShowResults) return [];
+
+    const q = debouncedQuery.trim().toLowerCase();
+
+    const out: { name: string; icon: IconType }[] = [];
+
+    for (const libKey of effectiveLibs) {
+      const mod = modules[libKey];
+      if (!mod) continue; // ещё не загрузилось
+
+      for (const iconName of Object.keys(mod)) {
+        if (q && !iconName.toLowerCase().includes(q)) continue;
+        const Icon = mod[iconName];
+        if (!Icon) continue;
+        out.push({ name: iconName, icon: Icon });
+      }
+    }
+
+    return out;
+  }, [debouncedQuery, effectiveLibs, modules, shouldShowResults]);
+
+  const visibleItems = useMemo(() => {
+    return allFilteredItems.slice(0, visibleCount);
+  }, [allFilteredItems, visibleCount]);
+
+  const canLoadMore = visibleCount < allFilteredItems.length;
+
+  const onScrollPositionChange = () => {
+    const el = viewportRef.current;
+    if (!el) return;
+    if (!shouldShowResults) return;
+    if (!canLoadMore) return;
+
+    const distanceToBottom = el.scrollHeight - (el.scrollTop + el.clientHeight);
+    if (distanceToBottom < LOAD_MORE_THRESHOLD_PX) {
+      setVisibleCount((c) => Math.min(c + LIMIT, allFilteredItems.length));
+    }
+  };
+
+  const anyLibLoading = useMemo(() => {
+    return effectiveLibs.some((k) => loadingLibs[k]);
+  }, [effectiveLibs, loadingLibs]);
+
+  const toggleLib = (libKey: string) => {
+    setSelectedLibs((prev) =>
+      prev.includes(libKey) ? prev.filter((x) => x !== libKey) : [...prev, libKey]
+    );
+  };
+
+  return (
+    <Stack gap={10} align="center" style={{ height: "100%", ...props.style }} {...props}>
+      <Alert
+        mih={"fit-content"}
+        fz={16}
+        variant="light"
+        // title={"Поиск на английском"}
+        color="#ffffff"
+        w="100%"
+        p={10}
+        style={{ borderRadius: "10px" }}
+        // icon={<IoAlertSharp size={20} />}
+      >
+        <Text fz={12} lh={1.2} c="#ffffff80">
+          Поиск работает по названиям иконок. Примеры: "house", "telegram", "cat"
+        </Text>
+      </Alert>
+
+      <Group w="100%" gap={8} align="center" wrap="nowrap">
+        <TextInput
+          size="sm"
+          w="100%"
+          value={query}
+          onChange={(e) => setQuery(e.currentTarget.value)}
+          leftSection={<FiSearch />}
+          placeholder="Поиск иконок (англ)"
+          radius={"10"}
+          styles={{
+            input: {
+              backgroundColor: "#00000080",
+              color: "white",
+              border: "none",
+            },
+          }}
+        />
+
+        <Popover opened={filtersOpened} onChange={setFiltersOpened} position="top-end" withArrow zIndex={2000}>
+          <Popover.Target>
+            <ActionIcon
+              size="36"
+              radius={10}
+              variant="subtle"
+              onClick={() => setFiltersOpened((v) => !v)}
+              style={{ background: "#00000080" }}
+              aria-label="Фильтры библиотек"
+            >
+              <FiFilter color="white" />
+            </ActionIcon>
+          </Popover.Target>
+
+          <Popover.Dropdown
+            style={{
+              background: "#0b0b0bcc",
+              border: "1px solid #ffffff14",
+              borderRadius: 12,
+              width: 260,
+              backdropFilter: "blur(10px)",
+            }}
+          >
+            <Stack gap={10}>
+              <Group justify="space-between" align="center">
+                <Text c="white" fw={600} fz={14}>
+                  Библиотеки
                 </Text>
-            </Alert>
-            <TextInput size='md'
-                w='100%'
-                ref={search}
-                leftSection={<FiSearch />}
-                placeholder="Поиск (англ)"
-                radius={'5'}
-                styles={{
-                    input: {
-                        backgroundColor: '#00000080',
-                        color: 'white',
-                        border: 'none'
-                    }
-                }}
-            />
 
-            <ScrollArea scrollbars={loading ? false : 'y'} h={'100%'} w={'100%'}>
-                
-                <Grid gutter={10}>
-                    {loading &&
-                        (Array(6).fill(0)).map(() =>
-                            <Grid.Col span={6}>
-                                <Skeleton visible={true} h='100%' w='100%' radius={10} opacity={0.2}>
-                                    <IconSelectMenuItem icon={ImHome} name='loading' onClick={() => { }} />
-                                </Skeleton>
-                            </Grid.Col>
-                        )
-                    }
-                    { 
-                        loadedContent
-                    }
-                    {
-                        !search.current?.value && !currentLibName ?
-                            Object.keys(libs).map((lib) => {
-                                return (
-                                    <Grid.Col key={lib} span={6}>
-                                        <IconSelectMenuItem isLib onClick={() => {setLoading(true); setCurrentLibName(lib)}} name={libs[lib].name} icon={libs[lib].icon} />
-                                    </Grid.Col>
-                                )
-                            })
-                            :
-                            currentLibName && items.length > 0 ?
+                {/* <ActionIcon
+                  variant="subtle"
+                  onClick={clearFilters}
+                  disabled={selectedLibs.length === 0}
+                  style={{ borderRadius: 10 }}
+                  aria-label="Сбросить фильтры"
+                >
+                  <FiX color={selectedLibs.length ? "white" : "#ffffff55"} />
+                </ActionIcon> */}
+              </Group>
 
-                                items.map((item) => {
-                                    return (
-                                        <Grid.Col key={item.name} span={6}>
-                                            <IconSelectMenuItem name={item.name} icon={item.icon} onClick={() => { setIcon(item.name) }} />
-                                        </Grid.Col>
-                                    )
-                                })
-                                : null
-                    }
-                </Grid>
-            </ScrollArea>
+              <ScrollArea h={FILTER_MENU_MAX_H} scrollbars="y">
+                <Stack gap={8}>
+                  {Object.keys(libs).map((libKey) => {
+                    const lib = libs[libKey];
+                    const checked = selectedLibs.includes(libKey);
+                    const DemoIcon = lib.icon;
 
-        </Stack>
-    )
-}
+                    return (
+                      <Checkbox
+                        key={libKey}
+                        checked={checked}
+                        color={props.color || "black"}
+                        onChange={() => toggleLib(libKey)}
+                        label={
+                          <Group gap={8} wrap="nowrap">
+                            <DemoIcon size={16} color="white" />
+                            <Text c="white" fz={13}>
+                              {lib.name}
+                            </Text>
+                          </Group>
+                        }
+                        styles={{
+                          input: { cursor: "pointer" },
+                          label: { cursor: "pointer" },
+                        }}
+                      />
+                    );
+                  })}
+                </Stack>
+              </ScrollArea>
+
+              <Text c="#ffffff80" fz={12} lh={1.2}>
+                Если фильтры не выбраны, поиск идёт по всем библиотекам.
+              </Text>
+            </Stack>
+          </Popover.Dropdown>
+        </Popover>
+      </Group>
+
+      <ScrollArea
+        h="100%"
+        w="100%"
+        viewportRef={viewportRef}
+        onScrollPositionChange={onScrollPositionChange}
+        scrollbars="y"
+      >
+        {!shouldShowResults ? (
+          <Stack align="center" justify="center" mih={220} gap={8}>
+            <Text c="#ffffff80" fz={14} ta="center">
+              Выберите библиотеки в фильтрах или начните вводить поиск
+            </Text>
+          </Stack>
+        ) : (
+          <>
+            {anyLibLoading && visibleItems.length === 0 && (
+              <Grid gutter={10}>
+                {Array(10)
+                  .fill(0)
+                  .map((_, idx) => (
+                    <Grid.Col key={`sk-${idx}`} span={6}>
+                      <Skeleton visible h="100%" w="100%" radius={10} opacity={0.2}>
+                            <IconSelectMenuItem icon={PlaceholderIcon} name="loading" onClick={() => {}} />
+                      </Skeleton>
+                    </Grid.Col>
+                  ))}
+              </Grid>
+            )}
+
+            {visibleItems.length > 0 ? (
+              <Grid gutter={10}>
+                {visibleItems.map((item) => (
+                  <Grid.Col key={item.name} span={6}>
+                    <IconSelectMenuItem
+                      name={item.name}
+                      icon={item.icon}
+                      onClick={() => props.setIcon(item.name)}
+                    />
+                  </Grid.Col>
+                ))}
+
+                {canLoadMore && (
+                  <>
+                    {Array(6)
+                      .fill(0)
+                      .map((_, idx) => (
+                        <Grid.Col key={`more-${idx}`} span={6}>
+                          <Skeleton visible h="100%" w="100%" radius={10} opacity={0.12}>
+                            <IconSelectMenuItem icon={PlaceholderIcon} name="..." onClick={() => {}} />
+                          </Skeleton>
+                        </Grid.Col>
+                      ))}
+                  </>
+                )}
+              </Grid>
+            ) : (
+              !anyLibLoading && (
+                <Stack align="center" justify="center" mih={220} gap={8}>
+                  <Text c="#ffffff80" fz={14} ta="center">
+                    Ничего не найдено
+                  </Text>
+                </Stack>
+              )
+            )}
+          </>
+        )}
+      </ScrollArea>
+    </Stack>
+  );
+};
 
 export default IconSelectMenu;
 
-const libs: { [key: string]: { name: string, icon: IconType } } = {
-    Ai: {
-        name: 'Ant Design',
-        icon: AiOutlineHome
-    },
-    Bs: {
-        name: 'Bootstrap',
-        icon: BsHouse
-    },
-    Bi: {
-        name: 'BoxIcons',
-        icon: BiHome
-    },
-    Ci: {
-        name: 'Circum',
-        icon: CiHome
-    },
-    Di: {
-        name: 'Devicons',
-        icon: DiTerminal
-    },
-    Fi: {
-        name: 'Feather',
-        icon: FiHome
-    },
-    Fc: {
-        name: 'Flat Color',
-        icon: FcHome
-    },
-    Fa: {
-        name: 'Font Awesome 6',
-        icon: FaHouse
-    },
-    Gi: {
-        name: 'Game Icons',
-        icon: GiHouse
-    },
-    Go: {
-        name: 'GitHub Octicons',
-        icon: GoHome
-    },
-    Gr: {
-        name: 'Grommet',
-        icon: GrHome
-    },
-    Hi: {
-        name: 'Heroicons 2',
-        icon: HiHome
-    },
-    Im: {
-        name: 'IcoMoon',
-        icon: ImHome
-    },
-    Lia: {
-        name: 'Line Awesome',
-        icon: LiaHomeSolid
-    },
-    Io: {
-        name: 'Ionicons 5',
-        icon: IoHome
-    },
-    Lu: {
-        name: 'Lucide',
-        icon: LuHouse
-    },
-    Md: {
-        name: 'Material Design',
-        icon: MdHome
-    },
-    Pi: {
-        name: 'Phosphor',
-        icon: PiHouse
-    },
-    Rx: {
-        name: 'Radix',
-        icon: RxHome
-    },
-    Ri: {
-        name: 'Remix',
-        icon: RiHome2Line
-    },
-    Si: {
-        name: 'Simple',
-        icon: SiTelegram
-    },
-    Sl: {
-        name: 'Simple Line',
-        icon: SlHome
-    },
-    Tb: {
-        name: 'Tabler',
-        icon: TbHome
-    },
-    Tfi: {
-        name: 'Themify',
-        icon: TfiHome
-    },
-    Ti: {
-        name: 'Typicons',
-        icon: TiHome
-    },
-    Vsc: {
-        name: 'VS Code',
-        icon: VscHome
-    },
-    Wi: {
-        name: 'Weather',
-        icon: WiDayRainMix
-    },
-    Cg: {
-        name: 'css.gg',
-        icon: CgHome
-    },
+const libs: { [key: string]: { name: string; icon: IconType } } = {
+  Ai: { name: "Ant Design", icon: PlaceholderIcon },
+  Bs: { name: "Bootstrap", icon: PlaceholderIcon },
+  Bi: { name: "BoxIcons", icon: PlaceholderIcon },
+  Ci: { name: "Circum", icon: PlaceholderIcon },
+  Di: { name: "Devicons", icon: PlaceholderIcon },
+  Fi: { name: "Feather", icon: PlaceholderIcon },
+  Fc: { name: "Flat Color", icon: PlaceholderIcon },
+  Fa: { name: "Font Awesome 6", icon: PlaceholderIcon },
+  Gi: { name: "Game Icons", icon: PlaceholderIcon },
+  Go: { name: "GitHub Octicons", icon: PlaceholderIcon },
+  Gr: { name: "Grommet", icon: PlaceholderIcon },
+  Hi: { name: "Heroicons 2", icon: PlaceholderIcon },
+  Im: { name: "IcoMoon", icon: PlaceholderIcon },
+  Lia: { name: "Line Awesome", icon: PlaceholderIcon },
+  Io: { name: "Ionicons 5", icon: PlaceholderIcon },
+  Lu: { name: "Lucide", icon: PlaceholderIcon },
+  Md: { name: "Material Design", icon: PlaceholderIcon },
+  Pi: { name: "Phosphor", icon: PlaceholderIcon },
+  Rx: { name: "Radix", icon: PlaceholderIcon },
+  Ri: { name: "Remix", icon: PlaceholderIcon },
+  Si: { name: "Simple", icon: PlaceholderIcon },
+  Sl: { name: "Simple Line", icon: PlaceholderIcon },
+  Tb: { name: "Tabler", icon: PlaceholderIcon },
+  Tfi: { name: "Themify", icon: PlaceholderIcon },
+  Ti: { name: "Typicons", icon: PlaceholderIcon },
+  Vsc: { name: "VS Code", icon: PlaceholderIcon },
+  Wi: { name: "Weather", icon: PlaceholderIcon },
+  Cg: { name: "css.gg", icon: PlaceholderIcon },
 };

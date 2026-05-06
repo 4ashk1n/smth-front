@@ -1,7 +1,7 @@
 import { useGesture } from "@use-gesture/react"
-import { motion, useMotionValue, animate, MotionValue } from "framer-motion"
+import { animate, motion, MotionValue, useMotionValue } from "framer-motion"
+import { observer } from "mobx-react"
 import { useRef } from "react"
-import { observer } from "mobx-react-lite"
 
 interface Props {
     index: number
@@ -24,8 +24,6 @@ const VerticalArticleSwipeContainer = observer(({
         {
             
             onDrag: ({ movement: [mx, my], last, cancel }) => {
-                console.log(2)
-                // если пользователь повёл больше по X — не трогаем вертикаль
                 if (Math.abs(mx) > Math.abs(my)) {
                     cancel?.()
                     return
@@ -40,7 +38,6 @@ const VerticalArticleSwipeContainer = observer(({
                     return
                 }
 
-                // вверх => next
                 if (my < 0 && index < maxIndex) {
                     animate(y, -height).then(() => {
                         onChange(index + 1)
@@ -49,7 +46,6 @@ const VerticalArticleSwipeContainer = observer(({
                     return
                 }
 
-                // вниз => prev
                 if (my > 0 && index > 0) {
                     animate(y, height).then(() => {
                         onChange(index - 1)

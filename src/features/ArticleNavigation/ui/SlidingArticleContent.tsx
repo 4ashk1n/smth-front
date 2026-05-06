@@ -1,58 +1,69 @@
-// features/ArticleNavigation/ui/SlidingArticleContent.tsx
-import { observer } from "mobx-react-lite"
+import { useLongPress } from "@mantine/hooks"
+import { motion, type MotionValue, useTransform } from "framer-motion"
+import { observer } from "mobx-react"
 import { useArticleStore } from "../../../entities/article/contexts/article.context"
 import ArticleContent from "../../../widgets/ArticleContent"
-import { type MotionValue, useTransform, motion } from "framer-motion"
 
 interface SlidingArticleContentProps {
-  swipeX: MotionValue<number>
+	swipeX: MotionValue<number>
 }
 
 const SlidingArticleContent: React.FC<SlidingArticleContentProps> = observer(
-  ({ swipeX }) => {
-    const article = useArticleStore()
-    const pages = article.content.pagesData
-    const current = article.content.currentPage
+	({ swipeX }) => {
+		const article = useArticleStore()
+		if (!article.content) return null
+		const pages = article.content.pagesData
+		let current = article.content.currentPage
 
-    if (!current) return null
+		if (!current) {
+			current = article.content.getPageByOrder(pages.length - 1)
+		}
 
-    const currentOrder = current.order
-    const width = typeof window !== "undefined" ? window.innerWidth : 375
+		const width = typeof window !== "undefined" ? window.innerWidth : 375
 
-    // базовый сдвиг, чтобы current всегда был по центру при swipeX = 0
-    const baseOffset = -currentOrder * width
+		const currentOrder = current?.order ?? 0
 
-    const translateX = useTransform(swipeX, (dx) => baseOffset + dx)
+		const baseOffset = -currentOrder * width
 
-    return (
-      <div
-        style={{
-          width: "100%",
-          height: "100%",
-          overflow: "hidden",
-        }}
-      >
-        <motion.div
-          style={{
-            display: "flex",
-            width: pages.length * width,
-            height: "100%",
-            x: translateX,
-            willChange: "transform",
-          }}
-        >
-          {pages.map((page) => (
-            <div
-              key={page.id}                         // 👈 стабильный key по id
-              style={{ width, height: "100%", flexShrink: 0 }}
-            >
-              <ArticleContent page={page} />        {/* страница никогда не размонтируется */}
-            </div>
-          ))}
-        </motion.div>
-      </div>
-    )
-  }
+		const translateX = useTransform(swipeX, (dx) => baseOffset + dx)
+
+		const activateDragMode = useLongPress(() => {
+			if (!article.content) return null
+			if (!article.content.editMode || article.swiping) return
+			article.content.setDragMode(true)
+		})
+
+
+		return (
+			<div
+				style={{
+					width: "100%",
+					height: "100%",
+					overflow: "hidden",
+				}}
+				{...activateDragMode}
+			>
+				<motion.div
+					style={{
+						display: "flex",
+						width: pages.length * width,
+						height: "100%",
+						x: translateX,
+						willChange: "transform",
+					}}
+				>
+					{pages.map((page) => (
+						<div
+							key={page.id}
+							style={{ width, height: "100%", flexShrink: 0 }}
+						>
+							<ArticleContent page={page} />
+						</div>
+					))}
+				</motion.div>
+			</div>
+		)
+	}
 )
 
 export default SlidingArticleContent

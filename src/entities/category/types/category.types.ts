@@ -1,12 +1,7 @@
-export type CategoryColors = {
-    lightColor: string
-    darkColor: string
-    accentColor: string
-}
+import type {
+    Category as SHARED_Category,
+    CategoryColors as SHARED_CategoryColors
+} from "@smth/shared";
 
-export interface Category {
-    id: string
-    name: string
-    emoji: string
-    colors: CategoryColors
-}
+export type CategoryColors = SHARED_CategoryColors;
+export type Category = SHARED_Category;

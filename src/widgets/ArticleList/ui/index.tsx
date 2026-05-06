@@ -1,9 +1,9 @@
-import { GetArticleCardDTO } from "smth-shared/src/dto/article.dto";
-import { useEffect, useState } from "react";
-import { getArticles } from "../api/getArticles";
-import Grid_4s1b1c from "./grids/4s1b1c";
-import { BackgroundImage, Stack } from "@mantine/core";
-import type { Category } from "../../../entities/category/types/category.types";
+// import { GetArticleCardDTO } from "smth-shared/src/dto/article.dto";
+// import { useEffect, useState } from "react";
+// import { getArticles } from "../api/getArticles";
+// import Grid_4s1b1c from "./grids/4s1b1c";
+// import { BackgroundImage, Stack } from "@mantine/core";
+// import type { Category } from "../../../entities/category/types/category.types";
 
 const ArticleList = () => {
     // const [articles, setArticles] = useState<ArticleD[]>([])

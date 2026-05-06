@@ -1,0 +1,1 @@
+export type ProfileTabs = 'likes' | 'reposts' | 'articles' | 'reviews' | 'saved'

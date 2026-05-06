@@ -1,4 +1,4 @@
-import { Divider, Group, Image, Text } from "@mantine/core";
+import { Divider, Group, Image } from "@mantine/core";
 import NavBarButton from "./NavBarButton";
 
 

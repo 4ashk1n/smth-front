@@ -1,14 +1,24 @@
 
-import { ActionIcon, Burger, NumberFormatter, Stack, Text, Transition } from "@mantine/core"
+import { Avatar, Stack, Text } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
-import { observer } from "mobx-react-lite"
-import { PiBookmarkSimpleFill, PiChatCenteredDotsFill, PiHeartFill, PiShareFatFill } from "react-icons/pi"
-import { useArticleStore } from "../../../entities/article/contexts/article.context"
+import { observer } from "mobx-react"
+import { useEffect, useState } from "react"
 import type { IconType } from "react-icons"
+import { PiChatCenteredDotsFill, PiHeartFill, PiShareFatFill } from "react-icons/pi"
+import { useNavigate } from "react-router"
+import { useArticleStore } from "../../../entities/article/contexts/article.context"
+import { useAuthStore } from "../../../entities/user/contexts/auth.context"
+import { useUsersStore } from "../../../entities/user/contexts/users.context"
+import type { UserModel } from "../../../entities/user/models/user.model"
+import { formatNumber } from "../../../shared/lib/formatNumber"
+import ArticleCommentsDrawer from "../../ArticleComments/ui/ArticleCommentsDrawer"
+import { likeArticle } from "../api/likeArticle"
+import { repostArticle } from "../api/repostArticle"
 
 const ArticleActionButton: React.FC<{
     counter: number,
     pressed: boolean,
+    pressedColor: string,
     icon: IconType,
     onClick: () => void
 }> = observer((props) => {
@@ -18,16 +28,15 @@ const ArticleActionButton: React.FC<{
             w='fit-content'
             justify="center"
             gap={2}
+            onClick={props.onClick}
         >
-                <props.icon size={30} color="white" />
+            <props.icon size={30} color={props.pressed ? props.pressedColor : 'white'} />
             <Text
                 size="12px"
                 c='white'
                 style={{ textAlign: 'center' }}
             >
-                {/* <NumberFormatter> */}
-                {props.counter}
-                {/* </NumberFormatter> */}
+                {formatNumber(props.counter)}
             </Text>
         </Stack>
     )
@@ -35,68 +44,80 @@ const ArticleActionButton: React.FC<{
 
 const ActionButtons: React.FC<{}> = observer(() => {
     const article = useArticleStore()
-    const [opened, { toggle }] = useDisclosure();
+    const auth = useAuthStore()
+    const users = useUsersStore()
+    const navigate = useNavigate()
+    const [author, setAuthor] = useState<UserModel | null>(null)
+    const [commentsOpened, { open: openComments, close: closeComments }] = useDisclosure(false);
+
+    useEffect(() => {
+        article.fetchMetrics().catch(() => {})
+    }, [article])
+
+    useEffect(() => {
+        let cancelled = false
+        users.fetchById(article.authorId).then((user) => {
+            if (cancelled) return
+            setAuthor(user)
+        })
+
+        return () => {
+            cancelled = true
+        }
+    }, [article.authorId, users])
+
     return (<>
-        <Stack
-            w='fit-content'
-            h='fit-content'
-            pos={'absolute'}
-            justify="center"
-            right={8}
-            bottom={8}
-            gap={24}
-        >
+        <Avatar
+            w={40}
+            h={40}
+            size={40}
+            src={author?.data.avatar || ""}
+            style={{ cursor: "pointer" }}
+            onClick={() => navigate(`/profile/${article.authorId}`)}
+        />
 
-            <Transition
-                mounted={opened}
-                duration={200}
-                transition={'slide-up'}
-            >
-                {
-                    (styles) =>
-                        <Stack
-                            gap={24}
-                            justify="center"
-                            align="center"
-                            style={styles}
-                        >
-                            <ArticleActionButton
-                                counter={0}
-                                pressed={false}
-                                icon={PiHeartFill}
-                                onClick={() => { }}
-                            />
+        <ArticleActionButton
+            counter={article.metrics.likes}
+            pressed={article.metrics.liked}
+            pressedColor="red"
+            icon={PiHeartFill}
+            onClick={() => likeArticle(article, auth.user?.id || '') }
+        />
 
+        <ArticleActionButton
+            counter={article.metrics.comments}
+            pressedColor="white"
+            pressed={commentsOpened}
+            icon={PiChatCenteredDotsFill}
+            onClick={openComments}
+        />
 
-                            <ArticleActionButton
-                                counter={0}
-                                pressed={false}
-                                icon={PiChatCenteredDotsFill}
-                                onClick={() => { }}
-                            />
+        {/* <ArticleActionButton
+            counter={article.metrics.saves}
+            pressedColor="yellow"
+            pressed={article.metrics.saved}
+            icon={PiBookmarkSimpleFill}
+            onClick={() => saveArticle(article, auth.user?.id || "")}
+        /> */}
 
-                            <ArticleActionButton
-                                counter={0}
-                                pressed={false}
-                                icon={PiBookmarkSimpleFill}
-                                onClick={() => { }}
-                            />
+        <ArticleActionButton
+            counter={article.metrics.reposts}
+            pressed={article.metrics.reposted}
+            pressedColor="blue"
+            icon={PiShareFatFill}
+            onClick={() => repostArticle(article, auth.user?.id || "")}
+        />
 
-                            <ArticleActionButton
-                                counter={0}
-                                pressed={false}
-                                icon={PiShareFatFill}
-                                onClick={() => { }}
-                            />
-                        </Stack>
-                }
-
-            </Transition>
-            {/* <ActionIcon size='40px' radius={'10px'} onClick={toggle} color={article.mainCategory.colors.accentColor}> */}
-                <Burger size={'sm'} opened={opened}/>
-            {/* </ActionIcon> */}
-            
-        </Stack>
+        <ArticleCommentsDrawer
+            opened={commentsOpened}
+            articleId={article.id}
+            commentsCount={article.metrics.comments}
+            currentUserId={auth.user?.id}
+            onClose={closeComments}
+            onCommentsCountChange={(count) => {
+                article.updateMetrics({ comments: count })
+            }}
+        />
     </>)
 })
 

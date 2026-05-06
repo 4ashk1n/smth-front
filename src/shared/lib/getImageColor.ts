@@ -1,7 +1,7 @@
 export function getImageColor(url: string, opacity: number = 1): Promise<string> {
   return new Promise((resolve, reject) => {
     const img = new Image();
-    img.crossOrigin = "anonymous"; // просим браузер не таинтить canvas
+    img.crossOrigin = "anonymous"; 
     img.src = url;
 
     img.onload = () => {

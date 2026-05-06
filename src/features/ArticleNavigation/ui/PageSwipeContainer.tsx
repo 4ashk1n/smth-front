@@ -1,89 +1,99 @@
-import { useRef } from "react"
 import { useGesture } from "@use-gesture/react"
-import { motion, useMotionValue, animate, MotionValue } from "framer-motion"
+import { animate, motion, MotionValue, useMotionValue } from "framer-motion"
+import { observer } from "mobx-react"
+import { useRef } from "react"
 import { useArticleStore } from "../../../entities/article/contexts/article.context"
-import { observer } from "mobx-react-lite"
 
 interface Props {
-  overlay: React.ReactNode
-  children: (swipeX: MotionValue<number>) => React.ReactNode
-  lockAxis?: (axis: "x" | "y") => void // пригодится для пункта 3
+	overlay: React.ReactNode
+	children: (swipeX: MotionValue<number>) => React.ReactNode
+	lockAxis?: (axis: "x" | "y") => void
 }
 
 const PageSwipeContainer = observer(({ children, overlay, lockAxis }: Props) => {
-  const ref = useRef<HTMLDivElement>(null)
-  const article = useArticleStore()
-  const pages = article.content.pagesData
-  const order = article.content.currentPage?.order ?? 0
+	const ref = useRef<HTMLDivElement>(null)
+	const article = useArticleStore()
+	if (!article.content) return null
+	const pages = article.content.pagesData
+	const currentPageId = article.content.currentPage?.id
+	const pageIndex = Math.max(0, pages.findIndex((page) => page.id === currentPageId))
 
-  const x = useMotionValue(0)
-  const width = typeof window !== "undefined" ? window.innerWidth : 375
+	const x = useMotionValue(0)
+	const width = typeof window !== "undefined" ? window.innerWidth : 375
 
-  useGesture(
-    {
-      onDrag: ({ movement: [mx, my], last, cancel }) => {
-        // axis lock: если пользователь повёл больше по Y — не крадём вертикаль
-        if (Math.abs(my) > Math.abs(mx)) {
-          cancel?.()
-          return
-        }
-        lockAxis?.("x")
+	useGesture(
+		{
+			onDrag: ({ movement: [mx, my], last, cancel }) => {
+				if (!article.content) return null
+				if (article.content.dragMode) {
+					return
+				};
 
-        x.set(mx)
 
-        if (!last) return
+				if (Math.abs(my) > Math.abs(mx)) {
+					cancel?.()
+					return
+				}
+				lockAxis?.("x")
 
-        const passed = Math.abs(mx) > width * 0.15
-        if (!passed) {
-          animate(x, 0)
-          return
-        }
+				article.setSwiping(true)
 
-        console.log(order)
-        // mx < 0 => влево => next
-        if (mx < 0 && order < pages.length - 1) {
-          animate(x, -width).then(() => {
-            article.content.changePage(article.content.getPageByOrder(order + 1)?.id ?? "")
-            x.set(0)
-          })
-          return
-        }
+				x.set(mx)
 
-        // mx > 0 => вправо => prev
-        if (mx > 0 && order > 0) {
-          animate(x, width).then(() => {
-            article.content.changePage(article.content.getPageByOrder(order - 1)?.id ?? "")
-            x.set(0)
-          })
-          return
-        }
+				if (!last) return
 
-        animate(x, 0)
-      },
-    },
-    {
-      target: ref,
-      drag: { axis: "x", threshold: 10, filterTaps: true },
-    }
-  )
+				const passed = Math.abs(mx) > width * 0.15
+				if (!passed) {
+					animate(x, 0)
+					return
+				}
 
-  return (
-    <motion.div
-      ref={ref}
-      style={{
-        position: "absolute",
-        inset: 0,
-        touchAction: "none",
-      }}
-    >
-      {children(x)}
+				if (mx < 0 && pageIndex < pages.length - 1) {
+					animate(x, -width).then(() => {
+						if (!article.content) return null
+						article.content.changePage(pages[pageIndex + 1]?.id ?? "")
+						x.set(0)
+					})
+					return
+				}
 
-      {/* overlay НЕ должен быть авто-кликабельным на весь экран */}
-      <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
-        {overlay}
-      </div>
-    </motion.div>
-  )
+				if (mx > 0 && pageIndex > 0) {
+					animate(x, width).then(() => {
+						if (!article.content) return null
+						article.content.changePage(pages[pageIndex - 1]?.id ?? "")
+						x.set(0)
+					})
+					return
+				}
+
+				animate(x, 0)
+			},
+			onDragEnd: () => {
+				article.setSwiping(false)
+			}
+		},
+		{
+			target: ref,
+			drag: { axis: "x", threshold: 10, filterTaps: true },
+		}
+	)
+
+	return (
+		<motion.div
+			ref={ref}
+			style={{
+				position: "absolute",
+				inset: 0,
+				touchAction: "none",
+			}}
+		>
+			{children(x)}
+
+			<div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
+				{overlay}
+			</div>
+		</motion.div>
+	)
 })
 
 export default PageSwipeContainer

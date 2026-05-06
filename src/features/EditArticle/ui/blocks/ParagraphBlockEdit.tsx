@@ -1,102 +1,116 @@
-import { Textarea } from "@mantine/core"
-import type { Paragraph } from "../../../../entities/article/types/blocks/Paragraph"
-import HighlitedBlock from "../../../../shared/blocks/HighlitedBlock"
-import { useContext, useEffect, useState } from "react"
-import { useEditor } from '@tiptap/react';
-import { BubbleMenu } from '@tiptap/react/menus'
-import StarterKit from '@tiptap/starter-kit';
-import { RichTextEditor } from '@mantine/tiptap';
-import Placeholder from '@tiptap/extension-placeholder';
-import { Markdown } from 'tiptap-markdown-3';
-import { ArticleContext } from "../../../stores/ArticleStore"
-import { observer } from "mobx-react-lite"
 
-const ParagraphBlockEdit: React.FC<{ 
+import type { API, BlockMutationEvent } from "@editorjs/editorjs";
+import ReactEditorJS from "@react-editor-js/client";
+import { observer } from "mobx-react";
+import { useEffect, useMemo } from "react";
+import { useArticleStore } from "../../../../entities/article/contexts/article.context";
+import type { Paragraph } from "../../../../entities/article/types/content.types";
+import { EDITOR_JS_TOOLS } from "../../../../shared/config/editorjs.config";
+import MultiPopoverWithDrawer from "../../../../shared/ui/popover/MultiPopoverWithDrawer";
+
+const ParagraphBlockEdit: React.FC<{
     block: Paragraph
 }> = observer((props) => {
-    const [block, setBlock] = useState(props.block)
-    const { editBlock, categoryColors } = useContext(ArticleContext)
+    const article = useArticleStore()
 
-    const editor = useEditor({
-        extensions: [
-            StarterKit,
-            Markdown,
-            Placeholder.configure({ placeholder: 'Текст' }),
-        ],
-        content: block.content,
-        onUpdate: ({ editor }) => {
-            // setContent(editor.storage.markdown.getMarkdown())
-            setBlock({ ...block, content: editor.storage.markdown.getMarkdown() })
-        },
-    })
+    const holderId = `${props.block.id}-editorjs`;
+    const blockSuggestions = useMemo(
+        () => article.aiSuggestions.filter((suggestion) => suggestion.blockId === props.block.id),
+        [article.aiSuggestions, props.block.id],
+    );
 
-    const saveChanges = () => {
-        if (props.block.content === block.content && props.block.title === block.title) return
-        editBlock(block)
+    useEffect(() => {
+        const portalRoot =
+            document.querySelector('[data-mantine-shared-portal-node="true"]') ??
+            document.body;
+
+        const movePopover = () => {
+            const popover = document.querySelector('.ce-popover.ce-popover--opened');
+            if (!popover) return;
+
+            if (popover.parentElement === portalRoot) return;
+
+            portalRoot.appendChild(popover);
+            popover.classList.add('ej-bottom-sheet');
+        };
+
+        const obs = new MutationObserver(movePopover);
+        obs.observe(document.body, {
+            subtree: true,
+            childList: true,
+            attributes: true,
+            attributeFilter: ['class'],
+        });
+
+        movePopover();
+        return () => obs.disconnect();
+    }, []);
+
+    const checkOverflow = () => {
+        const blocks = document.getElementsByClassName('ce-block');
+        for (let i = 0; i < blocks.length; i++) {
+            const block = blocks[i] as HTMLElement;
+            const parent = block.parentElement?.parentElement?.parentElement;
+            if (!parent) continue
+            const parentHeight = parent?.offsetHeight;
+            const blockEndPosition = block.offsetTop + block.offsetHeight;
+            if (blockEndPosition > parentHeight) {
+                block.style.color = 'red'
+            }
+            else {
+                block.style.color = '#eaeaea'
+            }
+        }
     }
-    
-    // useEffect(() => {
-    //     if (props.block.content === block.content && props.block.title === block.title) return
-    //     editBlock(block)
-    // }, [block.content, block.title])
+
+    const handleChange = (api: API, _event: BlockMutationEvent | BlockMutationEvent[]) => {
+        checkOverflow()
+        api.saver.save().then((outputData) => {
+            if (!article.content) return null
+            article.content.editBlock({ ...props.block, content: outputData } as any);
+        }).catch((error) => {
+            console.log('Saving failed: ', error)
+        });
+    };
+
+    useEffect(() => {
+        checkOverflow()
+    }, [props.block.layout.h, props.block.layout.w, props.block.layout.x, props.block.layout.y])
 
     return (<>
-        <HighlitedBlock onBlur={saveChanges} style={{ zIndex: 10 }} p={40} w='100%' h={'100%'} direction={'column'} gap={10} {...categoryColors}>
-            <Textarea
-                autosize
-                fw={600}
-                placeholder="Заголовок"
-                defaultValue={block.title}
-                onMouseDown={(e) => { e.stopPropagation(); e.preventDefault }}
-                onChange={(e) => setBlock({ ...block, title: e.currentTarget.value })}
-                variant="unstyled"
-                h={'fit-content'}
-                styles={{
-                    input: {
-                        fontSize: '24px',
-                        color: 'white',
-                        borderRadius: '10px'
-                    }
-                }} />
+        <ReactEditorJS
+            holder={holderId}
+            placeholder={'Aaa'}
+            tools={EDITOR_JS_TOOLS}
+            onChange={handleChange}
+            onReady={checkOverflow}
+            defaultValue={props.block.content as any}
+        >
+            <div style={{ position: "relative", width: "100%", height: "100%" }}>
+                <div
+                    id={holderId}
+                    style={{
+                        width: '100%',
+                        height: '100%',
+                        border: '2px dashed ' + article.mainCategory.colors.accentColor + '80',
+                        borderRadius: '10px',
+                    }}
+                >
 
-            <RichTextEditor
-                fz={18}
-                variant="subtle"
-                editor={editor}
-                onMouseDown={(e) => { e.stopPropagation(); e.preventDefault }}
-                styles={{
-                    root: {
-                        border: 'none',
-                        padding: '0px'
-                    },
-                    content: {
-                        backgroundColor: 'transparent',
-                        color: 'white',
-                        padding: '0px'
-                    },
-                }}
-            >
-
-                {
-                    editor &&
-                    <BubbleMenu editor={editor} >
-                        <RichTextEditor.ControlsGroup>
-                            <RichTextEditor.Bold />
-                            <RichTextEditor.Italic />
-                            <RichTextEditor.Underline />
-                        </RichTextEditor.ControlsGroup>
-                    </BubbleMenu>
-                }
-
-                <RichTextEditor.Content
-                
-                    className="[&>*>.ProseMirror]:p-0!"
-                    style={{ cursor: 'text' }}
-                />
-
-            </RichTextEditor>
-
-        </HighlitedBlock>
+                </div>
+                <div
+                    style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 10,
+                        transform: "translateY(-100%)",
+                        zIndex: 30,
+                    }}
+                >
+                    <MultiPopoverWithDrawer suggestions={blockSuggestions} hidden={article.swiping} />
+                </div>
+            </div>
+        </ReactEditorJS >
     </>)
 })
 

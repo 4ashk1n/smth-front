@@ -1,4 +1,4 @@
-import { Group, Image as MantineImage, Text, type PillProps } from "@mantine/core";
+import { Group, Image as MantineImage, Text } from "@mantine/core";
 import { useEffect, useRef, useState } from "react";
 import { getImageColor } from "../../lib/getImageColor";
 
@@ -20,7 +20,6 @@ const ColoredPill: React.FC<ColoredPillProps> = (props) => {
             if (!props.image) return;
             const color = await getImageColor(props.image, .5);
             setColor(color);
-            // console.log(color)
         })()
     }, [])
 

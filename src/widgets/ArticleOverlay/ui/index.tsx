@@ -1,14 +1,16 @@
 import { Stack } from "@mantine/core"
-import PageManager from "../../../features/ArticleNavigation/ui/PageManager"
-import ArticleHeader from "../../../entities/article/ui/ArticleHeader"
-import ActionButtons from "../../../features/ArticleReaderActions/ui/ActionButtons"
-import { useArticleStore } from "../../../entities/article/contexts/article.context"
-import { observer } from "mobx-react-lite"
 import { motion } from "framer-motion"
+import { observer } from "mobx-react"
+import { useArticleStore } from "../../../entities/article/contexts/article.context"
+import ArticleHeader from "../../../entities/article/ui/ArticleHeader"
+import PageManager from "../../../features/ArticleNavigation/ui/PageManager"
+import DeleteBlockArea from "../../../features/EditArticle/ui/tools/DeleteBlockArea"
+import ActionsMenu from "./ActionsMenu"
 
 const ArticleOverlay = observer(() => {
   const article = useArticleStore()
-  const visible = article.content.currentPageId !== "cover"
+  const visible = article.content ? article.content.currentPageId !== "cover" : false
+
 
   return (
     <motion.div
@@ -27,7 +29,8 @@ const ArticleOverlay = observer(() => {
     >
       <Stack
         gap={12}
-        py={12}
+        pt={12}
+        pb={92}
         align="center"
         style={{
           position: "absolute",
@@ -40,8 +43,11 @@ const ArticleOverlay = observer(() => {
         }}
       >
         <PageManager />
+        {
+          article.content && article.content.editMode && <DeleteBlockArea />
+        }
         <ArticleHeader />
-        <ActionButtons />
+        <ActionsMenu />
       </Stack>
     </motion.div>
   )
