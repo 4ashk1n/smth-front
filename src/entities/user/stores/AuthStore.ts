@@ -14,6 +14,7 @@ const AUTH_STORAGE_KEY = "authSession";
 const DEFAULT_API_BASE_URL = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "";
 const DEFAULT_GOOGLE_AUTH_PATH = "/auth/google";
 const DEFAULT_TIKTOK_AUTH_PATH = "/auth/tiktok";
+const DEFAULT_YANDEX_AUTH_PATH = "/auth/yandex";
 const DEFAULT_ME_PATH = "/auth/me";
 const DEFAULT_REFRESH_PATH = "/auth/refresh";
 const DEFAULT_LOGOUT_PATH = "/auth/logout";
@@ -36,7 +37,6 @@ export class AuthStore {
     }
 
     get isAuthenticated(): boolean {
-        // For OAuth session-cookie flow, user presence is enough.
         return this.user !== null || this.accessToken !== null;
     }
 
@@ -50,6 +50,10 @@ export class AuthStore {
 
     get tiktokAuthUrl(): string {
         return this.buildApiUrl(DEFAULT_TIKTOK_AUTH_PATH);
+    }
+
+    get yandexAuthUrl(): string {
+        return this.buildApiUrl(DEFAULT_YANDEX_AUTH_PATH);
     }
 
     setLoading(loading: boolean) {
@@ -116,14 +120,20 @@ export class AuthStore {
         window.location.assign(authUrl.toString());
     }
 
+    startYandexOAuth(returnTo?: string) {
+        const authUrl = new URL(this.yandexAuthUrl);
+        if (returnTo) {
+            authUrl.searchParams.set("returnTo", returnTo);
+        }
+        window.location.assign(authUrl.toString());
+    }
+
     async logoutRequest() {
         try {
             await apiRequest(DEFAULT_LOGOUT_PATH, {
                 method: "POST",
                 credentials: "include",
             });
-        } catch {
-            // Session cleanup on client should still happen even when request fails.
         } finally {
             this.logout();
         }
@@ -140,7 +150,6 @@ export class AuthStore {
             if (status === 401 || status === 403) {
                 this.setError(null);
             }
-            // No active session is a valid state.
         }
     }
 
