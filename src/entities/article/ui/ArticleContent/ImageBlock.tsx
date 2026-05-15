@@ -5,7 +5,21 @@ import { useArticleStore } from "../../contexts/article.context";
 import type { Image } from "../../types/content.types";
 import Object3dBlock from "./Object3dBlock";
 
+function isValidHttpUrl(string: string) {
+    // source: https://stackoverflow.com/a/43467144
+  let url;
+  
+  try {
+    url = new URL(string);
+  } catch (_) {
+    return false;  
+  }
+
+  return url.protocol === "http:" || url.protocol === "https:";
+}
+
 function resolveImageSrc(block: Image): string {
+    if (isValidHttpUrl(block.url ?? "")) return block.url;
     return buildPublicS3Url(block.url ?? "") ?? "";
 }
 

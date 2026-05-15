@@ -103,7 +103,7 @@ const ActionButtons: React.FC<{}> = observer(() => {
         <ArticleActionButton
             counter={article.metrics.reposts}
             pressed={article.metrics.reposted}
-            pressedColor="blue"
+            pressedColor="yellow"
             icon={PiShareFatFill}
             onClick={() => repostArticle(article, auth.user?.id || "")}
         />
